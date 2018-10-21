@@ -6,13 +6,12 @@
  
 	Fall 2018 - COMS W4156 Advance Software Engineering - Prof. Gail Kaiser
 				
-
+___
 ## Abstract
 
 In this project, we plan to implement a Gomoku game software, which has two modes: game between two people and rivalry between Human and Artifactual Intelligence. The client and user interface will be implemented using Python and the server side will be implemented using Java. To develop further, some reinforcement learning algorithms will be applied in the application to enhance the wisdom of AI chess player. 
+___	
 
-___
-					
 ## 1. Background
  
 In the March of 2016, AlphaGo beat Lee Sedol in a five-game Go match, which was first time a computer Go program defeated a 9-dan professional player without handicap. Science magazine chose this even as one of the greatest breakthroughs of year 2016. And it also changed people’s perception toward AI from distrust to respect. 
@@ -20,7 +19,6 @@ In the March of 2016, AlphaGo beat Lee Sedol in a five-game Go match, which was 
 Inspired by AlphaGo, we decide to develop an Alpha Gomoku program which tries its best to beat human by cutting-edge AI technologies. In addition to man-machine mode, user can choose traditional mode to play with another person. 
 
 Making our game more attractive, different user interface designs and background music can provide users with pleasure to have their individual settings. 
- 
 
 ## 2. Proposal
  
