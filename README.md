@@ -1,13 +1,11 @@
 # Gomoku-Desktop
-Project Proposal
 
-Alpha Gomoku
+# Alpha Gomoku Project Proposal
  
-Chengqi Dai (cd3046), Yiqian Wang (yw3225), Wenbo Song (ws2505), Zhongkai Sun (zs2341)
+	Chengqi Dai (cd3046), Yiqian Wang (yw3225), Wenbo Song (ws2505), Zhongkai Sun (zs2341)
  
-Fall 2018 - COMS W4156 Advance Software Engineering - Prof. Gail Kaiser
+	Fall 2018 - COMS W4156 Advance Software Engineering - Prof. Gail Kaiser
 				
-		 	 	 		
 
 ## Abstract
 
