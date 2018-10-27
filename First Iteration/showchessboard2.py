@@ -84,7 +84,10 @@ class Gomoku(QWidget):
     def mouseReleaseEvent(self, event):   
         self.piece.pos = event.pos()
         if self.piece.pos:
-            print('step: %d, 坐标: ( , x: %d ,y: %d )' % (self.step, self.piece.pos.x(), self.piece.pos.y()))
+            self.i = round((self.piece.pos.x() - margin) / grid_w)
+            self.j = round((self.piece.pos.y() - margin) / grid_h)
+            #print('step: %d, 坐标: ( x: %d ,y: %d )' % (self.step, self.piece.pos.x(), self.piece.pos.y()))
+            print('step: %d, 网格坐标: ( x: %d ,y: %d )' % (self.step, self.i, self.j))
         # next step
         self.step += 1
         # change color
