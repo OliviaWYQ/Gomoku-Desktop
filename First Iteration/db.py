@@ -2,6 +2,7 @@ import pymongo
 import time
 
 class MongoClient:
+    
     # to connect mongodb
     uri = None;
     client = None
@@ -70,3 +71,29 @@ class MongoClient:
         })
         self.win_rate = (self.win_matches + 0.0) / self.total_matches
         return self.win_rate
+
+
+# How to use
+if __name__ == '__main__':
+
+    client = MongoClient()
+
+    # insert a match
+    # the first player wins
+    moves = [(1,2), (3,5), (7,9)]
+    user1win = True
+    user1_id = "testuser1"
+    client.insert_one_history(moves, user1win, user1_id)
+    # the second player wins
+    moves = [(3,2), (3,5), (7,9)]
+    user2win = False
+    user2_id = "testuser2"
+    client.insert_one_history(moves, user2win, user2_id)
+
+    # get all matches by user id
+    cursor = client.get_matches("testuser1")
+    # display the matches
+    for c in cursor:
+        print(c)
+
+    client.shut_down()
