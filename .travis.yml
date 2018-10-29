@@ -8,4 +8,4 @@ install:
   - pip install -r requirements.txt
 
 script: 
-  - pytest /First\ Iteration/test.py
+  - pytest /client/test.py
