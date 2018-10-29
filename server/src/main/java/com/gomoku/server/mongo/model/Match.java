@@ -15,7 +15,7 @@ public class Match {
     private String user2Id;
     private List<List<Integer>> moves;
     private List<Integer> encodedMoves;
-    private boolean user1win;
+    private int user1win;
 
     public void setId(){
         this.matchId = user1Id + '@' + user2Id + '@' + System.currentTimeMillis();
@@ -77,11 +77,11 @@ public class Match {
         this.user2Id = user2Id;
     }
 
-    public boolean isUser1win() {
+    public int isUser1win() {
         return user1win;
     }
 
-    public void setUser1win(boolean user1win) {
+    public void setUser1win(int user1win) {
         this.user1win = user1win;
     }
 
