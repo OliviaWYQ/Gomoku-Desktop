@@ -1,46 +1,36 @@
 #! /usr/bin/python
 import sys
 
-
-
-
 class chessboard(object):
-  
-        size = 9 #  size of chessboard
-    
-    
+
         #initialize
-        def __init__ (self) :
-                #build a size * size chessboard
-                self.board = [ [ 0 for i in range(size)] for j in range(size)]
+        def __init__ (self,size_num) :
+                self.size = size_num
+                self.board = [ [ 0 for i in range(self.size)] for j in range(self.size)] #build a size * size chessboard
+                self.steplist = [];
         #reset
         def reset (self):
                 #reset value for each point = 0; empty: 0; black: 1; white: 2;
-                for i in range(size):
-                        for j in range(size):
+                self.steplist[:] = []
+                for i in range(self.size):
+                        for j in range(self.size):
                                 self.board[i][j] = 0
                 return 0
-
-
-        #get the value of point if we have row and col
+        #get the value (empty: 0; black: 1; white: 2;invalid:-1)
         def getvalue(self,row,col):
-                #check if row and col are out of range
-                if (row < 0) or (row >= size) or (col < 0)or(col >= size):
+                if (row < 0) or (row >= self.size) or (col < 0)or(col >= self.size):#invalid position
                         return -1
                 else:
                         return self.board[row][col]
-
-        #put the value of point after each round
+        #put the value of point after each round (fail:0;success:1)
         def changevalue(self,row,col,val):
-                if (row < 0)or(row >= size)or(col < 0)or(col >= size):
-                        return
+                if (self.getvalue[row][col] == 0): #position emoty
+                        self.steplist.append((row,col))
+                        self.board[row][col] = val
+                        return 1
                 else:
-                        self.board[i][j] = val
-                        return
-
-
-
-
+                        return 0
+        #check five continuous piece
         def five_in_line(self,val,row,col,n_dir):
                 x = row
                 y = col
@@ -51,7 +41,6 @@ class chessboard(object):
                         if self.getvalue(x,y) != val:
                                 return False
                 return True
-
         #check if there is a winner (0:unfinished; 1:black win; 2:white win; 3:draw)
         def checkwinner(self):
                 t_board = self.board
@@ -59,8 +48,8 @@ class chessboard(object):
                 dir = ((0,1),(1,-1),(1,0),(1,1))
                 Full = True
                 #check each point
-                for i in range(size):
-                        for j in range(size):
+                for i in range(self.size):
+                        for j in range(self.size):
                                 #if the point is empty
                                 if (self.getvalue(i,j) == 0):
                                         Full = False
@@ -71,11 +60,14 @@ class chessboard(object):
                                         for d in dir:
                                                 if (self.five_in_line(p_value,i,j,d)):
                                                         return p_value
-
-
                 #no one wins
                 if (Full == True):
                         return 3
                 else:
                         return 0
-                return 0
+        #return each step in a list
+        def sendsteps(self):
+            return self.steplist
+        #return size
+        def getsize(self):
+            return self.size
