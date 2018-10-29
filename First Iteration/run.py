@@ -7,8 +7,13 @@ Created on Mon Oct 29 13:45:19 2018
 
 Main function
 """
+from PyQt5.QtWidgets import QWidget, QApplication, QLabel, QVBoxLayout, QMessageBox
+from showchessboard3 import *
+import sys
+from PyQt5.QtGui import QPixmap, QIcon, QFont
+from PyQt5.QtCore import Qt
+from boardwin import chessboard as CB
 
-import showchessboard3
 
 def main():
     app = QApplication(sys.argv)
