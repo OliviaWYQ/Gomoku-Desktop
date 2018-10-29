@@ -3,8 +3,8 @@ import os
 import random
 import chessboard # imports chessboard.py
 
-def test_obj():
-        obj = obj()
+def test_chessboard():
+        obj = chessboard()
         obj.reset()
         #position out of range check
         t1 = obj.changevalue(-1,-1,1)
