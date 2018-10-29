@@ -9,12 +9,23 @@ Main function
 """
 
 from showchessboard3 import *
+from login import *
+import sys
+from PyQt5.QtWidgets import QWidget, QApplication, QLabel, QVBoxLayout, QMessageBox
+from PyQt5.QtGui import QPixmap, QIcon, QFont
+from PyQt5.QtCore import Qt
+from chessboard import chessboard as CB
 
 def main():
     app = QApplication(sys.argv)
-    game = Gomoku()
-    game.show()
-    sys.exit(app.exec_())
+
+    root = Tk()
+    lf = LoginFrame(root)
+    root.mainloop()
+
+    # game = Gomoku()
+    # game.show()
+    # sys.exit(app.exec_())
     
 if __name__ == '__main__':
     main()

@@ -3,7 +3,7 @@ import json
 import os
 from tkinter import *
 import tkinter.messagebox as tm
-
+from showchessboard3 import *
 
 class LoginFrame(Frame):
     def __init__(self, master):
@@ -40,14 +40,20 @@ class LoginFrame(Frame):
         payload["pass"] = password
         #payload = {'user':'user', 'pass':'123456'}
         r = requests.post('http://localhost:8080/auth/login', json=payload)
+
         print(r.text)
-        
+        print(payload)
         print(payload["userName"])
 
         if r.text == "Success":
             tm.showinfo("Login info", "Welcome: " + username)
             #os.system('python3 showchessboard2.py')
-            sys.exit()
+            #self.quit()
+            game = Gomoku()
+            game.show()
+            sys.exit(app.exec_())
+            #sys.exit()
+
         else:
             tm.showerror("Login error", "Incorrect username")
 
@@ -73,7 +79,8 @@ class LoginFrame(Frame):
         else:
             tm.showerror("Signup error", "Try Again")
 
-root = Tk()
-lf = LoginFrame(root)
-root.mainloop()
+
+# root = Tk()
+# lf = LoginFrame(root)
+# root.mainloop()
 

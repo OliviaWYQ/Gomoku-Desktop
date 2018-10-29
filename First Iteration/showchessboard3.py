@@ -109,6 +109,7 @@ class Gomoku(QWidget):
                 self.i = None
                 self.j = None
                 print("Out of Range!")
+                return
             else:
                 print('step: %d, 网格坐标: ( x: %d ,y: %d )' % (self.step, self.i, self.j))
         # next step
