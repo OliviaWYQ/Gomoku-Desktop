@@ -1,7 +1,7 @@
 import io
 import os
 import random
-import chessboard # imports chessboard.py
+from chessboard import *# imports chessboard.py
 
 def test_chessboard():
         obj = chessboard()
