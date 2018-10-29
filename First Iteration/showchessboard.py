@@ -15,10 +15,8 @@ from PyQt5.QtWidgets import QWidget, QApplication, QLabel, QVBoxLayout, QMessage
 from PyQt5.QtGui import QPixmap, QIcon, QFont
 from PyQt5.QtCore import Qt
 from chessboard import chessboard as CB
+import requests
 #from login import *
-
-username_b = "Playername"
-username_w = "Guest"
 
 D_piece = 36
 R_piece = D_piece / 2
@@ -30,8 +28,12 @@ grid_h = (height_chessboard - (margin* 2)) / 14
 
 
 class Gomoku(QWidget):
-    def __init__(self):
+    def __init__(self, userName, serverIp):
         super().__init__()
+        #username_b = userName
+        self.serverIp = serverIp
+        self.username_b = userName
+        self.username_w = "Guest"
         self.restart()
         
     def restart(self):    
@@ -74,12 +76,12 @@ class Gomoku(QWidget):
         user_white.move(720, height_chessboard - 195)
         # show playername in black
         Player_b = QLabel(self)
-        Player_b.setText("Black:    " + username_b)
+        Player_b.setText("Black:    " + self.username_b)
         Player_b.move(750, 220)
         Player_b.setFont(QFont("Roman times", 16, QFont.Bold))
         # show playername in white
         Player_w = QLabel(self)
-        Player_w.setText("White:    " + username_w)
+        Player_w.setText("White:    " + self.username_w)
         Player_w.move(750, height_chessboard - 230)
         Player_w.setFont(QFont("Roman times", 16, QFont.Bold))
         
@@ -149,11 +151,12 @@ class Gomoku(QWidget):
             self.color = self.black
             self.colornum = 1
                 
-    def showGameEnd(self, winner):  
+    def showGameEnd(self, winner, ):
+        self.sendMatch(winner, self.obj.sendsteps())
         if winner == 1:
-            winnername = username_b
+            winnername = self.username_b
         elif winner == 2:
-            winnername = username_w
+            winnername = self.username_w
         else:
             winnername = "TIE GAME! None of You"
         self.label = QLabel("About Qt MessageBox")  
@@ -162,8 +165,8 @@ class Gomoku(QWidget):
                                       QMessageBox.Retry|QMessageBox.Close,  
                                       QMessageBox.Retry)  
         if button == QMessageBox.Retry:  
-            self.label.setText("Question button/Retry")  
-            self.cam = Gomoku()
+            self.label.setText("Question button/Retry")
+            self.cam = Gomoku(self.username_b, self.serverIp)
             self.cam.show()
             self.close()
             
@@ -171,7 +174,28 @@ class Gomoku(QWidget):
             self.label.setText("Question button/Close")  
             raise SystemExit(0)
         else:  
-            return  
+            return
+
+
+    def sendMatch(self, winFlag, moves):
+        
+        payload = {}
+        payload["user1id"] = self.username_b
+        payload["user2id"] = self.username_w
+        payload["user1win"] = winFlag
+        payload["moves"] = moves
+        #payload = {'user':'user', 'pass':'123456'}
+        r = requests.post('http://' + self.serverIp + ':8080/match', json=payload)
+        
+        # print(payload)
+
+        # if (r.text == "Success"):
+        #     QMessageBox.warning(self, 'Success', 'Success')
+        #     self.game = Gomoku(self.userName.text())
+        #     self.game.show()
+        #     self.close()
+        # else:
+        #     QMessageBox.warning(self, 'Error', 'Bad user or password')
 
 '''    
 def main():
