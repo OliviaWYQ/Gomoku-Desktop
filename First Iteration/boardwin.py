@@ -4,8 +4,8 @@ import sys
 class chessboard(object):
 
         #initialize
-        def __init__ (self,size_num) :
-                self.size = size_num
+        def __init__ (self) :
+                self.size = 15
                 self.board = [ [ 0 for i in range(self.size)] for j in range(self.size)] #build a size * size chessboard
                 self.steplist = [];
         #reset
