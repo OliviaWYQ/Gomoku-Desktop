@@ -14,7 +14,7 @@ import sys
 from PyQt5.QtWidgets import QWidget, QApplication, QLabel, QVBoxLayout, QMessageBox
 from PyQt5.QtGui import QPixmap, QIcon, QFont
 from PyQt5.QtCore import Qt
-from boardwin2 import chessboard as CB
+from boardwin import chessboard as CB
 
 username_b = "Playername"
 username_w = "Guest"

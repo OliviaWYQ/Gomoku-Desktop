@@ -37,7 +37,7 @@ class chessboard(object):
                 #if next four pieces can be in a line
                 for n in range(4):
                         x = x + n_dir[0]
-                        y = y + n_dir[0]
+                        y = y + n_dir[1]
                         if self.getvalue(x,y) != val:
                                 return False
                 return True
