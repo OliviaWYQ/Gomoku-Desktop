@@ -146,17 +146,22 @@ class Gomoku(QWidget):
             winnername = username_w
         else:
             winnername = "TIE GAME! None of You"
-        self.label = QLabel("About Qt MessageBox")  
-        button = QMessageBox.question(self,"Gomoku Game Information",  
-                                      self.tr("Game End\n%s Win!\nStart A New Game?" % winnername),  
-                                      QMessageBox.Ok|QMessageBox.Cancel,  
-                                      QMessageBox.Ok)  
-        if button == QMessageBox.Ok:  
-            self.label.setText("Question button/Ok")  
-        elif button == QMessageBox.Cancel:  
-            self.label.setText("Question button/Cancel")  
-        else:  
-            return  
+        self.label = QLabel("About Qt MessageBox")
+        button = QMessageBox.question(self,"Gomoku Game Information",
+                                      self.tr("Game End\n%s Win!\nStart A New Game?" % winnername),
+                                      QMessageBox.Ok|QMessageBox.Cancel,
+                                      QMessageBox.Ok)
+        if button == QMessageBox.Ok:
+            self.label.setText("Question button/Ok")
+
+            self.cam = Gomoku()
+            self.cam.show()
+            self.close()
+
+        elif button == QMessageBox.Cancel:
+            self.label.setText("Question button/Cancel")
+        else:
+            return
 
 
 '''    
