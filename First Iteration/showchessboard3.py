@@ -14,7 +14,8 @@ import sys
 from PyQt5.QtWidgets import QWidget, QApplication, QLabel, QVBoxLayout, QMessageBox
 from PyQt5.QtGui import QPixmap, QIcon, QFont
 from PyQt5.QtCore import Qt
-from boardwin import chessboard as CB
+from chessboard import chessboard as CB
+#from login import *
 
 username_b = "Playername"
 username_w = "Guest"
@@ -37,7 +38,11 @@ class Gomoku(QWidget):
         self.winnervalue = 0
         self.showchessboard()
         #login
-        
+        '''
+        root = Tk()
+        lf = LoginFrame(root)
+        root.mainloop()
+        '''
         self.gamestart()
         self.setMouseTracking(True)
     
@@ -120,7 +125,7 @@ class Gomoku(QWidget):
         self.obj.changevalue(self.i, self.j, self.colornum)
         #CB check value
         self.winnervalue = self.obj.checkwinner()
-        print('winner:', self.winnervalue)
+        #print('winner:', self.winnervalue)
         if self.winnervalue != 0:
             self.showGameEnd(self.winnervalue)
     
