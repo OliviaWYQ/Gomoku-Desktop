@@ -105,12 +105,6 @@ class Gomoku(QWidget):
         if self.piece.pos:
             self.i = round((self.piece.pos.x() - margin) / grid_w)
             self.j = round((self.piece.pos.y() - margin) / grid_h)
-            if self.i < 0 or self.i > 14 or self.j < 0 or self.j > 14:
-                self.i = None
-                self.j = None
-                print("Out of Range!")
-            else:
-                print('step: %d, 网格坐标: ( x: %d ,y: %d )' % (self.step, self.i, self.j))
         # next step
         self.step += 1
         # change color
@@ -121,13 +115,17 @@ class Gomoku(QWidget):
             self.color = self.black
             self.colornum = 1
         self.update()
+        
         #CB input value
-        self.obj.changevalue(self.i, self.j, self.colornum)
-        #CB check value
-        self.winnervalue = self.obj.checkwinner()
-        #print('winner:', self.winnervalue)
-        if self.winnervalue != 0:
-            self.showGameEnd(self.winnervalue)
+        if (self.obj.changevalue(self.i, self.j, self.colornum) == 0):
+            print("Out of Range!")
+        else:
+            print('step: %d, 网格坐标: ( x: %d ,y: %d )' % (self.step, self.i, self.j))
+            #CB check value
+            self.winnervalue = self.obj.checkwinner()
+            #print('winner:', self.winnervalue)
+            if self.winnervalue != 0:
+                self.showGameEnd(self.winnervalue)
     
     def paintEvent(self, event):
         if self.piece.pos:
@@ -137,7 +135,6 @@ class Gomoku(QWidget):
                 y = margin + self.j * grid_h - R_piece
                 self.put[self.step].setGeometry(x, y, D_piece, D_piece) # draw piece to grid
                 
-        
     def showGameEnd(self, winner):  
         if winner == 1:
             winnername = username_b

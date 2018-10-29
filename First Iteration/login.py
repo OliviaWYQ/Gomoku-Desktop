@@ -24,7 +24,9 @@ class LoginFrame(Frame):
         self.checkbox.grid(columnspan=2)
 
         self.logbtn = Button(self, text="Login", command=self._login_btn_clicked)
+        self.signupbtn = Button(self, text="Sign Up", command=self._sign_up_btn_clicked)
         self.logbtn.grid(columnspan=2)
+        self.signupbtn.grid(columnspan=2)
 
         self.pack()
 
@@ -34,21 +36,42 @@ class LoginFrame(Frame):
         password = self.entry_password.get()
         #authenticate from server side
         payload = {}
-        payload["user"] = username
+        payload["userName"] = username
         payload["pass"] = password
         #payload = {'user':'user', 'pass':'123456'}
         r = requests.post('http://localhost:8080/auth/login', json=payload)
         print(r.text)
         
-        print(payload["user"])
+        print(payload["userName"])
 
         if r.text == "Success":
             tm.showinfo("Login info", "Welcome: " + username)
-            os.system('python3 showchessboard2.py')
+            #os.system('python3 showchessboard2.py')
             sys.exit()
         else:
             tm.showerror("Login error", "Incorrect username")
 
+    def _sign_up_btn_clicked(self):
+        # print("Clicked")
+        username = self.entry_username.get()
+        password = self.entry_password.get()
+        #authenticate from server side
+        payload = {}
+        payload["userName"] = username
+        payload["pass"] = password
+        #payload = {'user':'user', 'pass':'123456'}
+        r = requests.post('http://localhost:8080/auth/signup', json=payload)
+        print(r.text)
+        
+        print(payload["userName"])
+
+        if r.text == "Success":
+            #tm.showinfo("Login info", "Welcome: " + username)
+            #os.system('python3 showchessboard2.py')
+            #sys.exit()
+            tm.showerror("Sign up info", "Sign Up Success")
+        else:
+            tm.showerror("Signup error", "Try Again")
 
 root = Tk()
 lf = LoginFrame(root)
