@@ -32,6 +32,9 @@ grid_h = (height_chessboard - (margin* 2)) / 14
 class Gomoku(QWidget):
     def __init__(self):
         super().__init__()
+        self.restart()
+        
+    def restart(self):    
         #CB init
         self.obj = CB()
         self.obj.reset()
@@ -90,8 +93,9 @@ class Gomoku(QWidget):
         self.piece.pos = None
         # draw a piece, total 15 *15
         self.put = [QLabel(self) for i in range(15 * 15)]
-        self.step = 0
-        self.color = self.white # change to black first
+        self.step = 1
+        self.color = self.black # change to black first
+        self.colornum = 1
         
     '''
     def mousePressEvent(self, event):
@@ -105,6 +109,36 @@ class Gomoku(QWidget):
         if self.piece.pos:
             self.i = round((self.piece.pos.x() - margin) / grid_w)
             self.j = round((self.piece.pos.y() - margin) / grid_h)
+        #print('test: step: %d, 网格坐标: ( x: %d ,y: %d, color: %d )' % (self.step, self.i, self.j, self.colornum))
+        
+        #CB input value
+        if (self.obj.changevalue(self.i, self.j, self.colornum) == 0):
+            print("Invalid! (step: %d, x: %d ,y: %d, color: %d)"  % (self.step, self.i, self.j, self.colornum))
+            self.i = None
+            self.j = None
+            
+        else:
+            print('step: %d, 网格坐标: ( x: %d ,y: %d, color: %d )' % (self.step, self.i, self.j, self.colornum))
+            #CB check value
+            self.winnervalue = self.obj.checkwinner()
+            print('winner:', self.winnervalue)
+            if self.winnervalue != 0:
+                self.paint(event)
+                self.showGameEnd(self.winnervalue)
+            else:
+                self.paint(event)
+                self.nextstep()
+        self.update()
+        
+    def paint(self, event):
+        if self.piece.pos:
+            self.put[self.step].setPixmap(self.color)
+            if self.i != None and self.j != None:
+                x = margin + self.i * grid_w - R_piece
+                y = margin + self.j * grid_h - R_piece
+                self.put[self.step].setGeometry(x, y, D_piece, D_piece) # draw piece to grid
+                
+    def nextstep(self):
         # next step
         self.step += 1
         # change color
@@ -114,28 +148,6 @@ class Gomoku(QWidget):
         else:
             self.color = self.black
             self.colornum = 1
-        self.update()
-        
-        #CB input value
-        if (self.obj.changevalue(self.i, self.j, self.colornum) == 0):
-            print("Out of Range! (step: %d, x: %d ,y: %d )"  % (self.step, self.i, self.j))
-            self.i = None
-            self.j = None
-        else:
-            print('step: %d, 网格坐标: ( x: %d ,y: %d )' % (self.step, self.i, self.j))
-            #CB check value
-            self.winnervalue = self.obj.checkwinner()
-            #print('winner:', self.winnervalue)
-            if self.winnervalue != 0:
-                self.showGameEnd(self.winnervalue)
-    
-    def paintEvent(self, event):
-        if self.piece.pos:
-            self.put[self.step].setPixmap(self.color)
-            if self.i != None and self.j != None:
-                x = margin + self.i * grid_w - R_piece
-                y = margin + self.j * grid_h - R_piece
-                self.put[self.step].setGeometry(x, y, D_piece, D_piece) # draw piece to grid
                 
     def showGameEnd(self, winner):  
         if winner == 1:
@@ -146,16 +158,20 @@ class Gomoku(QWidget):
             winnername = "TIE GAME! None of You"
         self.label = QLabel("About Qt MessageBox")  
         button = QMessageBox.question(self,"Gomoku Game Information",  
-                                      self.tr("Game End\n%s Win!\nStart A New Game?" % winnername),  
-                                      QMessageBox.Ok|QMessageBox.Cancel,  
-                                      QMessageBox.Ok)  
-        if button == QMessageBox.Ok:  
-            self.label.setText("Question button/Ok")  
-        elif button == QMessageBox.Cancel:  
-            self.label.setText("Question button/Cancel")  
+                                      self.tr("Game End\n%s Win!\nQuit or Start A New Game?" % winnername),  
+                                      QMessageBox.Retry|QMessageBox.Close,  
+                                      QMessageBox.Retry)  
+        if button == QMessageBox.Retry:  
+            self.label.setText("Question button/Retry")  
+            self.cam = Gomoku()
+            self.cam.show()
+            self.close()
+            
+        elif button == QMessageBox.Close:  
+            self.label.setText("Question button/Close")  
+            raise SystemExit(0)
         else:  
             return  
-
 
 '''    
 def main():
