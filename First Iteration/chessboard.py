@@ -7,7 +7,7 @@ class chessboard(object):
         def __init__ (self) :
                 self.size = 15
                 self.board = [ [ 0 for i in range(self.size)] for j in range(self.size)] #build a size * size chessboard
-                self.steplist = [];
+                self.steplist = []
         #reset
         def reset (self):
                 #reset value for each point = 0; empty: 0; black: 1; white: 2;
