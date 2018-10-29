@@ -24,7 +24,9 @@ class chessboard(object):
                         return self.board[row][col]
         #put the value of point after each round (fail:0;success:1)
         def changevalue(self,row,col,val):
-                if (self.getvalue(row,col) == 0): #position empty
+                if (row == None) or (col == None):
+                        return 0
+                if (self.getvalue(row,col) == 0) and ((val == 1) or (val == 2)): #position empty
                         self.steplist.append((row,col))
                         self.board[row][col] = val
                         return 1
