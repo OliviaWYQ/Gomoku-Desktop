@@ -24,7 +24,7 @@ class chessboard(object):
                         return self.board[row][col]
         #put the value of point after each round (fail:0;success:1)
         def changevalue(self,row,col,val):
-                if (self.getvalue[row][col] == 0): #position emoty
+                if (self.getvalue(row,col) == 0): #position empty
                         self.steplist.append((row,col))
                         self.board[row][col] = val
                         return 1
