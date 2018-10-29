@@ -18,6 +18,9 @@ public class AuthController {
 
     @RequestMapping(path = "/auth/login",method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
     public @ResponseBody String login(@RequestBody User user){
+        if(user.getUserName()==null || user.getPass()==null){
+            return "Wrong request format";
+        }
         User userToLog = userRepository.findOneByUserName(user.getUserName());
         if(userToLog == null)
             return "User not exists";
@@ -26,6 +29,9 @@ public class AuthController {
 
     @RequestMapping(path = "/auth/signup",method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
     public @ResponseBody String signup(@RequestBody User user){
+        if(user.getUserName()==null || user.getPass()==null){
+            return "Wrong request format";
+        }
         User userToLog = userRepository.findOneByUserName(user.getUserName());
         System.out.println(user.getUserName());
         if(userToLog != null)

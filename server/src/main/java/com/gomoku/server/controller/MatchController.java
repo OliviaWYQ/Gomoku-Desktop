@@ -19,6 +19,7 @@ public class MatchController {
     @RequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
         public @ResponseBody void creatMatch(@RequestBody Match match){
             match.setId();
+            match.encodeMoves();
             matchRepository.save(match);
     }
 
@@ -26,14 +27,22 @@ public class MatchController {
     public @ResponseBody List<Match> searchMatches(@PathVariable String userId){
         //match.setId();
         //matchRepository.save(match);
-        return matchRepository.findByUser1Id(userId);
+        List<Match> matches = matchRepository.findByUser1Id(userId);
+        for(Match m: matches){
+            m.decodeMoves();
+        }
+        return matches;
+        //return matchRepository.findByUser1Id(userId);
     }
 
     @RequestMapping(value = "/byid/{matchId}")
     public @ResponseBody Match searchMatch(@PathVariable String matchId){
         //match.setId();
         //matchRepository.save(match);
-        return matchRepository.findOneByMatchId(matchId);
+        Match match = matchRepository.findOneByMatchId(matchId);
+        match.decodeMoves();
+        return match;
+        //return matchRepository.findOneByMatchId(matchId);
     }
 
 //    @RequestMapping(value = "/info/{userId}")
