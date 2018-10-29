@@ -118,9 +118,9 @@ class Gomoku(QWidget):
         
         #CB input value
         if (self.obj.changevalue(self.i, self.j, self.colornum) == 0):
+            print("Out of Range! (step: %d, x: %d ,y: %d )"  % (self.step, self.i, self.j))
             self.i = None
             self.j = None
-            print("Out of Range!")
         else:
             print('step: %d, 网格坐标: ( x: %d ,y: %d )' % (self.step, self.i, self.j))
             #CB check value

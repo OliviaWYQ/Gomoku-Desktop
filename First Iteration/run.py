@@ -8,7 +8,7 @@ Created on Mon Oct 29 13:45:19 2018
 Main function
 """
 
-from showchessboard3 import *
+from showchessboard4 import *
 
 def main():
     app = QApplication(sys.argv)
