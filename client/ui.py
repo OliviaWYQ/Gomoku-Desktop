@@ -50,7 +50,7 @@ class Window(QMainWindow):
 
         if (r.text == "Success"):
             QMessageBox.warning(self, 'Success', 'Success')
-            self.game = Gomoku()
+            self.game = Gomoku(self.userName.text(), self.serverIp.text())
             self.game.show()
             self.close()
         else:
