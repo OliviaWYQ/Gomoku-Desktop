@@ -4,12 +4,45 @@ we plan to implement a Gomoku game software, which has two modes: game between t
 
 ## Getting Start
 
+### Prerequisites
+
+Python 3.6 installed in client and Oracle JDK8 (java-8-oracle) installed in server.
+
+### Installing
+
+#### Python 3.6
+
+To see which version of Python you have installed:
+```
+$ python --version
+```
+To install python3.6 on Ubuntu:
+```
+$ sudo apt-get update
+$ sudo apt-get install python3.6
+```
+
+#### Oracle JDK 8
+
+Oracle JDK 8 is the latest stable version of Java at time of writing. You can install it on Ubuntu using the following command:
+```
+$ sudo apt-get install oracle-java8-installer
+```
+you can verify your Java version:
+```
+$ javac -version
+```
+There can be multiple Java installations on one server. You can manage Java JDK version:
+```
+$ sudo update-alternatives --config java
+```
+
 ## Running the tests
 
 
 ## Authors
 
-* **Chengqi Dai (cd3046), Yiqian Wang (yw3225), Wenbo Song (ws2505), Zhongkai Sun (zs2341)
+* **Chengqi Dai (cd3046), Yiqian Wang (yw3225), Wenbo Song (ws2505), Zhongkai Sun (zs2341)**
 
 
  
