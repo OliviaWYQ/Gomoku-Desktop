@@ -1,13 +1,13 @@
 # Alpha Gomoku Game 
-
+___
 In this project, we plan to implement a Gomoku game software, which has two modes: game between two people and rivalry between Human and Artifactual Intelligence. The client and user interface will be implemented using Python and the server side will be implemented using Java. To develop further, some reinforcement learning algorithms will be applied in the application to enhance the wisdom of AI chess player. 
-
+___
 ## Getting Start
 
 ### Prerequisites
 
 Python 3.6 installed in client and Oracle JDK8 (java-8-oracle) with Maven installed in server.
-___
+
 ### Installing
 
 #### Python 3.6
@@ -36,6 +36,7 @@ There can be multiple Java installations on one server. You can manage Java JDK 
 ```
 $ sudo update-alternatives --config java
 ```
+
 ##### Setting the JAVA_HOME Environment Variable:
 
 Open .bashrc or /etc/profile to manage $PATH:
@@ -44,7 +45,7 @@ $ vi ~.bashrc
 ```
 or
 ```
-$ vi /etc/profile
+$ sudo vi /etc/profile
 ```
 Add JAVA_HOME:
 ```
@@ -67,7 +68,10 @@ Apache Maven is a software project management and comprehension tool. To install
 ```
 $ sudo apt-get install maven
 ```
-Add MAVEN_HOME to .bashrc or /etc/profile:
+
+#### Setting MAVEN_HOME Environment Variable 
+
+Open .bashrc or /etc/profile:
 ```
 export MAVEN_HOME="/usr/share/maven"
 export PATH=${PATH}:${MAVEN_HOME}/bin
@@ -77,7 +81,6 @@ To verify your installation:
 $ mvn -version
 ```
 
-___
 ## Running the tests
 
 ### Client:
