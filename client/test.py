@@ -22,16 +22,17 @@ def test_chessboard():
         for n in range(5):
                 b_valid1 = obj.changevalue(0,n,1)
                 assert b_valid1==1
-                w_valid1 = obj.changevalue(random.randint(1,15),random.randint(5,15),2)
+                w_valid1 = obj.changevalue(3,2*n,2)
                 assert w_valid1==1
         winner1 = obj.checkwinner()
         assert winner1==1
         #black win 2 (five in a column)
+
         obj.reset()
         for n in range(5):
                 b_valid2 = obj.changevalue(n,0,1)
                 assert b_valid2==1
-                w_valid2 = obj.changevalue(random.randint(5,15),random.randint(1,15),2)
+                w_valid2 = obj.changevalue(2*n,10,2)
                 assert w_valid2==1
         winner2 = obj.checkwinner()
         assert winner2==1
@@ -40,7 +41,7 @@ def test_chessboard():
         for n in range(5):
                 b_valid3 = obj.changevalue(n,n,1)
                 assert b_valid3==1
-                w_valid3 = obj.changevalue(random.randint(5,15),random.randint(5,15),2)
+                w_valid3 = obj.changevalue(8+n,5+2n,2)
                 assert w_valid3==1
         winner3 = obj.checkwinner()
         assert winner3==1
