@@ -1,11 +1,14 @@
-language: python
+matrix:
+  include:
+    - language: python
+      python: "3.6"
+      install:
+      - pip install -U pip
+      - pip install -r requirements.txt
+      script:
+        - pytest ./client/test.py
 
-python:
-  - "3.6"
-
-install:
-  - pip install -U pip
-  - pip install -r requirements.txt
-
-script: 
-  - pytest ./client/test.py
+    - language: java
+      jdk: oraclejdk8
+      script:
+        - mvn clean verify
