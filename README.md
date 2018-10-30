@@ -122,7 +122,7 @@ The post-commit run both python testcase for client and java testcase for server
 
 ### Style Checker Tool:
 
-####pylint
+* [pylint](https://www.pylint.org/)
 
 ### Test Report:
 
