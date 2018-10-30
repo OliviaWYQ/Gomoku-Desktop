@@ -1,13 +1,13 @@
 # Alpha Gomoku Game 
 
-we plan to implement a Gomoku game software, which has two modes: game between two people and rivalry between Human and Artifactual Intelligence. The client and user interface will be implemented using Python and the server side will be implemented using Java. To develop further, some reinforcement learning algorithms will be applied in the application to enhance the wisdom of AI chess player. 
+In this project, we plan to implement a Gomoku game software, which has two modes: game between two people and rivalry between Human and Artifactual Intelligence. The client and user interface will be implemented using Python and the server side will be implemented using Java. To develop further, some reinforcement learning algorithms will be applied in the application to enhance the wisdom of AI chess player. 
 
 ## Getting Start
 
 ### Prerequisites
 
-Python 3.6 installed in client and Oracle JDK8 (java-8-oracle) installed in server.
-
+Python 3.6 installed in client and Oracle JDK8 (java-8-oracle) with Maven installed in server.
+___
 ### Installing
 
 #### Python 3.6
@@ -28,7 +28,7 @@ Oracle JDK 8 is the latest stable version of Java at time of writing. You can in
 ```
 $ sudo apt-get install oracle-java8-installer
 ```
-you can verify your Java version:
+You can verify your Java version:
 ```
 $ javac -version
 ```
@@ -36,7 +36,41 @@ There can be multiple Java installations on one server. You can manage Java JDK 
 ```
 $ sudo update-alternatives --config java
 ```
+Setting the JAVA_HOME Environment Variable:
 
+Open .bashrc or /etc/profile to manage $PATH:
+```
+$ vi ~.bashrc
+```
+or
+```
+$ vi /etc/profile
+```
+Add JAVA_HOME:
+```
+export JAVA_HOME="/usr/lib/jvm/java-8-oracle"
+export PATH=$JAVA_HOME/bin:$PATH
+export CLASSPATH=.:$JAVA_HOME/lib/dt.jar:$JAVAHOME/lib/tools.jar
+```
+Make the changes in $PATH work:
+```
+$ source ~.bashrc
+```
+or
+```
+$ source /etc/profile
+```
+
+### Install Maven
+
+
+Add MAVEN_HOME:
+```
+export MAVEN_HOME="/usr/share/maven"
+export PATH=${PATH}:${MAVEN_HOME}/bin
+```
+
+___
 ## Running the tests
 
 
