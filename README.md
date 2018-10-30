@@ -36,7 +36,7 @@ There can be multiple Java installations on one server. You can manage Java JDK 
 ```
 $ sudo update-alternatives --config java
 ```
-Setting the JAVA_HOME Environment Variable:
+##### Setting the JAVA_HOME Environment Variable:
 
 Open .bashrc or /etc/profile to manage $PATH:
 ```
@@ -63,23 +63,53 @@ $ source /etc/profile
 
 ### Install Maven
 
-
-Add MAVEN_HOME:
+Apache Maven is a software project management and comprehension tool. To install the latest Apache Maven:
+```
+$ sudo apt-get install maven
+```
+Add MAVEN_HOME to .bashrc or /etc/profile:
 ```
 export MAVEN_HOME="/usr/share/maven"
 export PATH=${PATH}:${MAVEN_HOME}/bin
+```
+To verify your installation:
+```
+$ mvn -version
 ```
 
 ___
 ## Running the tests
 
+### Client:
+
+Get to the client forder:
+```
+$ cd client/
+```
+Run Python program:
+```
+$ python ui.py
+```
+Enter the username, password and IPv4 of server, or sign up a new account.
+
+### Server:
+
+Get to the server forder and use Maven to compile and package Java program:
+```
+$ cd server/
+$ mvn clean
+$ mvn compile
+$ mvn package
+```
+Run server:
+```
+java -jar <jarfilename>.jar
+```
 
 ## Authors
 
 * **Chengqi Dai (cd3046), Yiqian Wang (yw3225), Wenbo Song (ws2505), Zhongkai Sun (zs2341)**
 
-
- 
 ## Acknowledgement
 COMSW4156 - ADVANCED SOFTWARE ENGINEERING
 * Prof. Gail Kaiser
