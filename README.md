@@ -10,7 +10,7 @@ Python 3.6 installed in client and Oracle JDK8 (java-8-oracle) with Maven instal
 
 ### Installing
 
-#### Python 3.6
+#### [Python 3.6](https://www.python.org/downloads/release/python-360/)
 
 To see which version of Python you have installed:
 ```
@@ -22,7 +22,7 @@ $ sudo apt-get update
 $ sudo apt-get install python3.6
 ```
 
-#### Oracle JDK 8
+#### [Oracle JDK 8](https://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html)
 
 Oracle JDK 8 is the latest stable version of Java at time of writing. You can install it on Ubuntu using the following command:
 ```
@@ -62,7 +62,7 @@ or
 $ source /etc/profile
 ```
 
-### Install Maven
+### Install [Maven](https://maven.apache.org/)
 
 Apache Maven is a software project management and comprehension tool. To install the latest Apache Maven:
 ```
@@ -118,11 +118,11 @@ The detail for pre-commit test is inside the file "pre-commit".
 
 The detail for post-commit test is inside the file ".travis.yml" including language, version, install and requirements.
 The post-commit run both python testcase for client and java testcase for server.
-"../Gomoku-Desktop/client/test.py" the post-commit build file includes multiple boundary conditions and potential faults test.  * Travis CIcould build our post-commit test and report the job log result.
+"../Gomoku-Desktop/client/test.py" the post-commit build file includes multiple boundary conditions and potential faults test.  [Travis CI](https://travis-ci.org/) could build our post-commit test and report the job log result.
 
 ### Style Checker Tool:
 
-		pylint
+####pylint
 
 ### Test Report:
 
