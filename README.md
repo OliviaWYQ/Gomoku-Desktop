@@ -118,7 +118,7 @@ The detail for pre-commit test is inside the file "pre-commit".
 
 The detail for post-commit test is inside the file ".travis.yml" including language, version, install and requirements.<br />
 The post-commit run both python testcase for client and java testcase for server.<br />
-"../Gomoku-Desktop/client/test.py" the post-commit build file includes multiple boundary conditions and potential faults test.<br />
+"../Gomoku-Desktop/client/test.py" the post-commit file includes multiple boundary conditions and potential faults test.<br />
 [Travis CI](https://travis-ci.org/) could build our post-commit test and report the job log result.
 
 ### Style Checker Tool:
