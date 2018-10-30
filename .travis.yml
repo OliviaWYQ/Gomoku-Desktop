@@ -10,4 +10,6 @@ matrix:
 
     - language: java
       jdk: oraclejdk8
+      before_install: cd server
       before_script: cd server
+      
