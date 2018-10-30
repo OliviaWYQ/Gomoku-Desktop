@@ -127,7 +127,7 @@ The post-commit run both python testcase for client and java testcase for server
 
 ### Test Report:
 
-The report for testcase result is inside the foler [reports](https://github.com/OliviaWYQ/Gomoku-Desktop/tree/master/reports)
+The report for testcase result is inside the folder [reports](https://github.com/OliviaWYQ/Gomoku-Desktop/tree/master/reports)
 * [Style_Checker_output.txt](https://github.com/OliviaWYQ/Gomoku-Desktop/blob/master/reports/Style_Checker_output.txt)  ---- output file from pylint for client (python files)
 * [java_testcase_output.txt](https://github.com/OliviaWYQ/Gomoku-Desktop/blob/master/reports/java_testcase_output.txt)  ---- job log file from Travis CI for server (java files)
 * [python_testcase_output.txt](https://github.com/OliviaWYQ/Gomoku-Desktop/blob/master/reports/python_testcase_output.txt)  ---- job log file from Travis CI for client (python files)
