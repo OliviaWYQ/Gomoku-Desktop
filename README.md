@@ -1,6 +1,6 @@
-# Alpha Gomoku Game 
+# Alpha Gomoku Game
 
-In this project, we plan to implement a Gomoku game software, which has two modes: game between two people and rivalry between Human and Artifactual Intelligence. The client and user interface will be implemented using Python and the server side will be implemented using Java. To develop further, some reinforcement learning algorithms will be applied in the application to enhance the wisdom of AI chess player. 
+In this project, we plan to implement a Gomoku game software, which has two modes: game between two people and rivalry between Human and Artifactual Intelligence. The client and user interface will be implemented using Python and the server side will be implemented using Java. To develop further, some reinforcement learning algorithms will be applied in the application to enhance the wisdom of AI chess player.
 
 ## Getting Start
 
@@ -69,7 +69,7 @@ Apache Maven is a software project management and comprehension tool. To install
 $ sudo apt-get install maven
 ```
 
-#### Setting MAVEN_HOME Environment Variable 
+#### Setting MAVEN_HOME Environment Variable
 
 Open .bashrc or /etc/profile:
 ```
@@ -81,11 +81,11 @@ To verify your installation:
 $ mvn -version
 ```
 
-## Running the tests
+## Running the Program
 
 ### Client:
 
-Get to the client forder:
+Get to the client folder:
 ```
 $ cd client/
 ```
@@ -97,7 +97,7 @@ Enter the username, password and IPv4 of server, or sign up a new account.
 
 ### Server:
 
-Get to the server forder and use Maven to compile and package Java program:
+Get to the server folder and use Maven to compile and package Java program:
 ```
 $ cd server/
 $ mvn clean
@@ -108,7 +108,28 @@ Run server:
 ```
 java -jar <jarfilename>.jar
 ```
+## Code Test
 
+### Pre-commit:
+
+The detail for pre-commit test is inside the file "pre-commit".
+
+### Post-commit CI:
+
+The detail for post-commit test is inside the file ".travis.yml" including language, version, install and requirements.
+The post-commit run both python testcase for client and java testcase for server.
+"../Gomoku-Desktop/client/test.py" the post-commit build file includes multiple boundary conditions and potential faults test.  * Travis CIcould build our post-commit test and report the job log result.
+
+### Style Checker Tool:
+
+		pylint
+
+### Test Report:
+
+The report for testcase result is inside the foler "reports"
+"reports/Style_Checker_output.txt"  ---- output file from pylint for client (python files)
+“reports/java_testcase_output.txt”  ---- job log file from Travis CI for server (java files)
+“reports/python_testcase_output.txt”  ---- job log file from Travis CI for client (python files)
 ## Authors
 
 * **Chengqi Dai (cd3046), Yiqian Wang (yw3225), Wenbo Song (ws2505), Zhongkai Sun (zs2341)**
@@ -117,7 +138,3 @@ java -jar <jarfilename>.jar
 COMSW4156 - ADVANCED SOFTWARE ENGINEERING
 * Prof. Gail Kaiser
 * IA Siddharth P Ramakrishnan
-				
-
-
-
