@@ -41,7 +41,7 @@ def test_chessboard():
         for n in range(5):
                 b_valid3 = obj.changevalue(n,n,1)
                 assert b_valid3==1
-                w_valid3 = obj.changevalue(8+n,5+2n,2)
+                w_valid3 = obj.changevalue(8+n,5+2*n,2)
                 assert w_valid3==1
         winner3 = obj.checkwinner()
         assert winner3==1
