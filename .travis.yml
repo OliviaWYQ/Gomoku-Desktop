@@ -9,6 +9,11 @@ matrix:
         - pytest ./client/test.py
 
     - language: java
+      sudo: true
+      dist: trusty
       jdk: oraclejdk8
-      before_script: cd server
+      before_script: 
+        - cd server
+        - chmod +x mvnw
+  
       
