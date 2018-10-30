@@ -116,9 +116,9 @@ The detail for pre-commit test is inside the file "pre-commit".
 
 ### Post-commit CI:
 
-The detail for post-commit test is inside the file ".travis.yml" including language, version, install and requirements.
-The post-commit run both python testcase for client and java testcase for server.
-"../Gomoku-Desktop/client/test.py" the post-commit build file includes multiple boundary conditions and potential faults test.  [Travis CI](https://travis-ci.org/) could build our post-commit test and report the job log result.
+The detail for post-commit test is inside the file ".travis.yml" including language, version, install and requirements.\n
+The post-commit run both python testcase for client and java testcase for server.\n
+"../Gomoku-Desktop/client/test.py" the post-commit build file includes multiple boundary conditions and potential faults test.\n  [Travis CI](https://travis-ci.org/) could build our post-commit test and report the job log result.
 
 ### Style Checker Tool:
 
@@ -126,10 +126,10 @@ The post-commit run both python testcase for client and java testcase for server
 
 ### Test Report:
 
-The report for testcase result is inside the foler "reports"
-"reports/Style_Checker_output.txt"  ---- output file from pylint for client (python files)
-“reports/java_testcase_output.txt”  ---- job log file from Travis CI for server (java files)
-“reports/python_testcase_output.txt”  ---- job log file from Travis CI for client (python files)
+The report for testcase result is inside the foler [reports](https://github.com/OliviaWYQ/Gomoku-Desktop/tree/master/reports)
+* [Style_Checker_output.txt](https://github.com/OliviaWYQ/Gomoku-Desktop/blob/master/reports/Style_Checker_output.txt)  ---- output file from pylint for client (python files)
+* [java_testcase_output.txt](https://github.com/OliviaWYQ/Gomoku-Desktop/blob/master/reports/java_testcase_output.txt)  ---- job log file from Travis CI for server (java files)
+* [python_testcase_output.txt](https://github.com/OliviaWYQ/Gomoku-Desktop/blob/master/reports/python_testcase_output.txt)  ---- job log file from Travis CI for client (python files)
 ## Authors
 
 * **Chengqi Dai (cd3046), Yiqian Wang (yw3225), Wenbo Song (ws2505), Zhongkai Sun (zs2341)**
