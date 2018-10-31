@@ -1,4 +1,4 @@
-#!/bin/sh
+#!C:/Program\ Files/Git/usr/bin/sh.exe
 #
 # An example hook script to verify what is about to be committed.
 # Called by "git commit" with no arguments.  The hook should
@@ -46,4 +46,6 @@ EOF
 fi
 
 # If there are whitespace errors, print the offending file names and fail.
-exec git diff-index --check --cached $against --
+git diff-index --check --cached $against --
+
+pytest ./client/test.py
