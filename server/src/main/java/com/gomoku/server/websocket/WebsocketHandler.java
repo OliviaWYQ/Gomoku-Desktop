@@ -8,22 +8,13 @@ import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.CopyOnWriteArraySet;
 
 @Component
 public class WebsocketHandler extends TextWebSocketHandler {
 
-    //List<WebSocketSession> sessions = new CopyOnWriteArrayList();CopyOnWriteArraySet
     static private Map<String, GameStatus> rooms = new ConcurrentHashMap<>();
-//
-//    public WebsocketHandler() {
-//        rooms = new ConcurrentHashMap<>();
-//    }
 
     @Override
     public void handleTextMessage(WebSocketSession session, TextMessage message)
@@ -36,15 +27,12 @@ public class WebsocketHandler extends TextWebSocketHandler {
         String userName = session.getHandshakeHeaders().get("userName").get(0);
         if(rooms.containsKey(gameid)){
 
-            // append every move in memory, send the history to new users
-            //rooms.get(gameid).appendHistory(message);
-            int player = rooms.get(gameid).getStone(role);
-
-            String move = rooms.get(gameid).move(player, Integer.parseInt(message.getPayload()));
-            TextMessage toSend = new TextMessage(move);
-
             if((role.equals("m")&&rooms.get(gameid).getMasterName().equals(userName)) ||
                     (role.equals("g")&&rooms.get(gameid).getGuestName().equals(userName))){
+
+                int player = rooms.get(gameid).getStone(role);
+
+                TextMessage toSend = rooms.get(gameid).move(player, message);
 
                 rooms.get(gameid).getGuest().sendMessage(toSend);
                 rooms.get(gameid).getMaster().sendMessage(toSend);
@@ -55,9 +43,12 @@ public class WebsocketHandler extends TextWebSocketHandler {
                         e.printStackTrace();
                     }
                 });
+
             }else{
                 throw new Exception("Invalid message.");
             }
+        }else{
+            throw new Exception("No room.");
         }
     }
 
@@ -83,7 +74,10 @@ public class WebsocketHandler extends TextWebSocketHandler {
             }
             rooms.get(gameid).test();
             if(rooms.get(gameid).ready()){
+
+                // testing info
                 System.out.println("info: ready to start ......");
+
                 rooms.get(gameid).start();
             }
         }else if(role.equals("g")){
@@ -98,9 +92,15 @@ public class WebsocketHandler extends TextWebSocketHandler {
             }else{
                 throw new Exception("The room already has a guest.");
             }
+
+            // testing info
             rooms.get(gameid).test();
+
             if(rooms.get(gameid).ready()){
+
+                // testing info
                 System.out.println("info: ready to start ......");
+
                 rooms.get(gameid).start();
             }
         }else if(role.equals("a")){
@@ -108,10 +108,17 @@ public class WebsocketHandler extends TextWebSocketHandler {
                 throw new Exception("No room.");
             }
             rooms.get(gameid).addAudience(session);
+
+            // send past moves
+            rooms.get(gameid).sendAllMoves(session);
+
+            // testing info
             rooms.get(gameid).test();
         }
 
         rooms.keySet().forEach(ele->{System.out.println(ele);});
+
+        // testing info
         System.out.println(rooms.get(gameid).getMaster());
     }
 
@@ -122,14 +129,19 @@ public class WebsocketHandler extends TextWebSocketHandler {
         String role = session.getHandshakeHeaders().get("role").get(0);
         String gameid = session.getHandshakeHeaders().get("gameid").get(0);
         if(role.equals("m")){
+            // now: ignore the game
             // TODO: judge winner and upload game info
             rooms.remove(gameid);
         }else if(role.equals("g")){
+            // now: ignore the game
             // TODO: judge winner and upload game info
-            rooms.get(gameid).setGuest(null);
+            rooms.remove(gameid);
+            //rooms.get(gameid).setGuest(null);
         }else if(role.equals("a")){
             rooms.get(gameid).getAudience().remove(session);
         }
+
+        // testing info
         rooms.keySet().forEach(ele->{System.out.println(ele);});
 
     }

@@ -32,14 +32,31 @@ public class GameStatus {
         }
     }
 
-    public String move(int player, int pos) throws Exception {
+    public TextMessage move(int player, TextMessage message) throws Exception {
+        int pos = Integer.parseInt(message.getPayload());
         int winFlag = this.gameLogic.move(player, pos);
-        return (winFlag<<24 | pos) + "";
+        TextMessage toSend = new TextMessage((winFlag<<24 | pos) + "");
+
+        // save every move, send to late audience
+        this.appendHistory(toSend);
+
+        return toSend;
     }
 
     private void appendHistory(TextMessage move){
         this.historyMoves.add(move);
     }
+
+    public void sendAllMoves(WebSocketSession audience){
+        this.historyMoves.forEach(m -> {
+            try {
+                audience.sendMessage(m);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
+    }
+
     public void setMasterInfo(String masterName, WebSocketSession masterSession){
         this.masterName = masterName;
         this.master = masterSession;
@@ -79,6 +96,7 @@ public class GameStatus {
         }
     }
 
+    // testing info
     public void test(){
         System.out.println(this.masterName+" $ "+this.guestName+" $ ");
         audience.forEach(ele->{System.out.println(ele);});
@@ -97,63 +115,25 @@ public class GameStatus {
         return master;
     }
 
-    public void setMaster(WebSocketSession master) {
-        this.master = master;
-    }
 
     public WebSocketSession getGuest() {
         return guest;
-    }
-
-    public void setGuest(WebSocketSession guest) {
-        this.guest = guest;
     }
 
     public Set<WebSocketSession> getAudience() {
         return audience;
     }
 
-    public void setAudience(Set<WebSocketSession> audience) {
-        this.audience = audience;
-    }
-
     public String getMasterName() {
         return masterName;
-    }
-
-    public void setMasterName(String masterName) {
-        this.masterName = masterName;
     }
 
     public String getGuestName() {
         return guestName;
     }
 
-    public void setGuestName(String guestName) {
-        this.guestName = guestName;
-    }
-
     public GameLogic getGameLogic() {
         return gameLogic;
     }
 
-    public void setGameLogic(GameLogic gameLogic) {
-        this.gameLogic = gameLogic;
-    }
-
-    public int getMasterStone() {
-        return masterStone;
-    }
-
-    public void setMasterStone(int masterStone) {
-        this.masterStone = masterStone;
-    }
-
-    public int getGuestStone() {
-        return guestStone;
-    }
-
-    public void setGuestStone(int guestStone) {
-        this.guestStone = guestStone;
-    }
 }
