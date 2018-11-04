@@ -22,18 +22,24 @@ public class WebsocketHandler extends TextWebSocketHandler {
 
         System.out.println("message: " + message.getPayload());
 
+        // get handshake info
         String role = session.getHandshakeHeaders().get("role").get(0);
         String gameid = session.getHandshakeHeaders().get("gameid").get(0);
         String userName = session.getHandshakeHeaders().get("userName").get(0);
+
         if(rooms.containsKey(gameid)){
 
+            // only master and guest can put stones
             if((role.equals("m")&&rooms.get(gameid).getMasterName().equals(userName)) ||
                     (role.equals("g")&&rooms.get(gameid).getGuestName().equals(userName))){
 
+                // check whether the stone fit the role
                 int player = rooms.get(gameid).getStone(role);
-
+                // toSend store the info will be send to all players
+                // including winFlag
                 TextMessage toSend = rooms.get(gameid).move(player, message);
 
+                // send to all players
                 rooms.get(gameid).getGuest().sendMessage(toSend);
                 rooms.get(gameid).getMaster().sendMessage(toSend);
                 rooms.get(gameid).getAudience().forEach(s -> {
@@ -55,18 +61,25 @@ public class WebsocketHandler extends TextWebSocketHandler {
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
         super.afterConnectionEstablished(session);
-        //session.getHandshakeHeaders();
+
+        // get handshake info
         String role = session.getHandshakeHeaders().get("role").get(0);
         String gameid = session.getHandshakeHeaders().get("gameid").get(0);
         String userName = session.getHandshakeHeaders().get("userName").get(0);
         int masterStone = Integer.parseInt(session.getHandshakeHeaders().get("masterStone").get(0));
+
         if(role.equals("m")){
+
+            // if the room is not init yet
             if(!rooms.containsKey(gameid)) {
 
-                // may throw invalid stone
+                // create a room, may throw invalid stone
                 rooms.put(gameid, new GameStatus(masterStone));
 
+                // set master info, name and session
                 rooms.get(gameid).setMasterInfo(userName, session);
+
+            // if the room exists
             }else if(rooms.get(gameid).getMaster()==null){
                 rooms.get(gameid).setMasterInfo(userName, session);
             }else{
@@ -81,12 +94,17 @@ public class WebsocketHandler extends TextWebSocketHandler {
                 rooms.get(gameid).start();
             }
         }else if(role.equals("g")){
+
+            // if the room is not init yet
             if(!rooms.containsKey(gameid)) {
 
-                // may throw invalid stone
+                // create a room, may throw invalid stone
                 rooms.put(gameid, new GameStatus(masterStone));
 
+                // set guest info, name and session
                 rooms.get(gameid).setGuestInfo(userName, session);
+
+            // if the room exists
             }else if(rooms.get(gameid).getGuest()==null){
                 rooms.get(gameid).setGuestInfo(userName, session);
             }else{
@@ -129,14 +147,18 @@ public class WebsocketHandler extends TextWebSocketHandler {
         String role = session.getHandshakeHeaders().get("role").get(0);
         String gameid = session.getHandshakeHeaders().get("gameid").get(0);
         if(role.equals("m")){
+
             // now: ignore the game
             // TODO: judge winner and upload game info
             rooms.remove(gameid);
+
         }else if(role.equals("g")){
+
             // now: ignore the game
             // TODO: judge winner and upload game info
             rooms.remove(gameid);
             //rooms.get(gameid).setGuest(null);
+
         }else if(role.equals("a")){
             rooms.get(gameid).getAudience().remove(session);
         }

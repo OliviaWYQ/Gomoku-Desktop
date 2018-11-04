@@ -22,6 +22,8 @@ public class GameStatus {
     private int masterStone;
     private int guestStone;
 
+    // game logic, store the board and stones
+    // check whether a player wins and put the stone correctly
     private GameLogic gameLogic;
 
     private List<TextMessage> historyMoves;
@@ -32,9 +34,14 @@ public class GameStatus {
         }
     }
 
+    // put a stone, and give the message should be send
+    // add winFlag
     public TextMessage move(int player, TextMessage message) throws Exception {
         int pos = Integer.parseInt(message.getPayload());
+
+        // calculate the winFalg
         int winFlag = this.gameLogic.move(player, pos);
+
         TextMessage toSend = new TextMessage((winFlag<<24 | pos) + "");
 
         // save every move, send to late audience
@@ -47,6 +54,7 @@ public class GameStatus {
         this.historyMoves.add(move);
     }
 
+    // send all past moves to a player session, audience usually
     public void sendAllMoves(WebSocketSession audience){
         this.historyMoves.forEach(m -> {
             try {
@@ -81,6 +89,7 @@ public class GameStatus {
         return this.gameLogic.getRound();
     }
 
+    // constructor
     public GameStatus(int masterStone) throws Exception{
         this.gameLogic = new GameLogic();
         this.audience = new HashSet<>();
@@ -102,10 +111,12 @@ public class GameStatus {
         audience.forEach(ele->{System.out.println(ele);});
     }
 
+    // check whether the master and guest session are set
     public boolean ready(){
         return (this.master!=null && this.guest!=null && this.masterName!=null && this.guestName!=null);
     }
 
+    // send game start signal to master and guest
     public void start() throws IOException {
         this.master.sendMessage(new TextMessage("masterstart"));
         this.guest.sendMessage(new TextMessage("gueststart"));
