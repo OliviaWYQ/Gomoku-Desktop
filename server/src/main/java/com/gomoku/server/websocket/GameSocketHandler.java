@@ -12,7 +12,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Component
-public class WebsocketHandler extends TextWebSocketHandler {
+public class GameSocketHandler extends TextWebSocketHandler {
 
     static private Map<String, GameStatus> rooms = new ConcurrentHashMap<>();
 

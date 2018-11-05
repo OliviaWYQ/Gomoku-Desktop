@@ -203,17 +203,13 @@ public class GameLogic {
             for(int i=4; i>=0; i--){
                 y[i] = i<<8;
             }
-            int player = 1<<16;
 
             System.out.println(gl.move(1, 1, 14, 14));System.out.println(gl.move(2, 2, 2, 2));
             System.out.println(gl.move(1, 1, 13, 13));System.out.println(gl.move(2, 2, 4, 2));
             System.out.println(gl.move(1, 1, 12, 12));System.out.println(gl.move(2, 2, 6, 2));
             System.out.println(gl.move(1, 1, 11, 11));System.out.println(gl.move(2, 2, 10, 10));
             System.out.println(gl.move(1, 1, 9, 9));System.out.println(gl.move(2, 2, 6, 5));
-//            gl.move(1,1);
-//            gl.move(1, 2);
-//            gl.move(1,3);
-//            gl.move(1, 4);
+
         }catch (Exception e){
             System.out.println(e);
         }
