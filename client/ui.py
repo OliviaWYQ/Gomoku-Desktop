@@ -66,7 +66,7 @@ class Window(QMainWindow):
         payload["userName"] = username
         payload["pass"] = password
         #payload = {'user':'user', 'pass':'123456'}
-        r = requests.post('http://localhost:8080/auth/signup', json=payload)
+        r = requests.post('http://' + self.serverIp.text() + ':8080/auth/signup', json=payload)
         print(r.text)
         
         print(payload["userName"])
