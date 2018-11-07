@@ -29,6 +29,7 @@ class Window(QMainWindow):
         buttonWindow2.move(100, 200)
         buttonWindow2.clicked.connect(self.handleSignUp)        
         self.pwd = QLineEdit("123", self)
+        self.pwd.setEchoMode(QLineEdit.Password)
         self.pwd.setGeometry(250, 200, 400, 30)
 
         self.serverIp = QLineEdit("localhost", self)
