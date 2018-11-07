@@ -32,7 +32,7 @@ class Window(QMainWindow):
         self.pwd.setEchoMode(QLineEdit.Password)
         self.pwd.setGeometry(250, 200, 400, 30)
 
-        self.serverIp = QLineEdit("localhost", self)
+        self.serverIp = QLineEdit("54.173.206.13", self)
         self.serverIp.setGeometry(250, 300, 400, 30)
 
         self.show()
