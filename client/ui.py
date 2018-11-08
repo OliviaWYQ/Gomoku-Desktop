@@ -30,8 +30,9 @@ class Window(QMainWindow):
         buttonWindow2.clicked.connect(self.handleSignUp)        
         self.pwd = QLineEdit("123", self)
         self.pwd.setGeometry(250, 200, 400, 30)
+        self.pwd.setEchoMode(QLineEdit.Password)
 
-        self.serverIp = QLineEdit("localhost", self)
+        self.serverIp = QLineEdit("54.173.206.13", self)
         self.serverIp.setGeometry(250, 300, 400, 30)
 
         self.show()
@@ -66,7 +67,7 @@ class Window(QMainWindow):
         payload["userName"] = username
         payload["pass"] = password
         #payload = {'user':'user', 'pass':'123456'}
-        r = requests.post('http://localhost:8080/auth/signup', json=payload)
+        r = requests.post('http://' + self.serverIp.text() + ':8080/auth/signup', json=payload)
         print(r.text)
         
         print(payload["userName"])
