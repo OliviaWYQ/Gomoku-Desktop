@@ -91,7 +91,8 @@ $ cd client/
 ```
 Run Python program:
 ```
-$ python ui.py
+$ make
+$ make run
 ```
 Enter the username, password and IPv4 of server, or sign up a new account.
 
