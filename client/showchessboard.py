@@ -111,7 +111,7 @@ class Gomoku(QWidget):
         if self.piece.pos:
             self.i = round((self.piece.pos.x() - margin) / grid_w)
             self.j = round((self.piece.pos.y() - margin) / grid_h)
-        #print('test: step: %d, 网格坐标: ( x: %d ,y: %d, color: %d )' % (self.step, self.i, self.j, self.colornum))
+        #print('test: step: %d, coord: ( x: %d ,y: %d, color: %d )' % (self.step, self.i, self.j, self.colornum))
         
         #CB input value
         if (self.obj.changevalue(self.i, self.j, self.colornum) == 0):
@@ -120,7 +120,7 @@ class Gomoku(QWidget):
             self.j = None
             
         else:
-            print('step: %d, 网格坐标: ( x: %d ,y: %d, color: %d )' % (self.step, self.i, self.j, self.colornum))
+            print('step: %d, coord: ( x: %d ,y: %d, color: %d )' % (self.step, self.i, self.j, self.colornum))
             #CB check value
             self.winnervalue = self.obj.checkwinner()
             print('winner:', self.winnervalue)
@@ -180,8 +180,8 @@ class Gomoku(QWidget):
     def sendMatch(self, winFlag, moves):
         
         payload = {}
-        payload["user1id"] = self.username_b
-        payload["user2id"] = self.username_w
+        payload["user1Id"] = self.username_b
+        payload["user2Id"] = self.username_w
         payload["user1win"] = winFlag
         payload["moves"] = moves
         #payload = {'user':'user', 'pass':'123456'}
