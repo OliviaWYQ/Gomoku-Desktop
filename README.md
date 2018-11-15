@@ -91,7 +91,8 @@ $ cd client/
 ```
 Run Python program:
 ```
-$ python ui.py
+$ make
+$ make run
 ```
 Enter the username, password and IPv4 of server, or sign up a new account.
 
@@ -117,7 +118,7 @@ The detail for pre-commit test is inside the file "pre-commit".
 ### Post-commit CI:
 
 The detail for post-commit test is inside the file [.travis.yml](https://github.com/OliviaWYQ/Gomoku-Desktop/blob/master/.travis.yml) including language, version, install and requirements.<br />
-The post-commit run both python testcase for client and java testcase for server.<br />
+The post-commit run both python testcase for client and java test cases for server.<br />
 [client/test.py](https://github.com/OliviaWYQ/Gomoku-Desktop/blob/master/client/test.py) -- the post-commit file includes multiple boundary conditions and potential faults test.<br />
 [Travis CI](https://travis-ci.org/) could build our post-commit test and report the job log result.
 
