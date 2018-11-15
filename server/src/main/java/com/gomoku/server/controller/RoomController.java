@@ -20,6 +20,7 @@ public class RoomController {
     @Autowired
     RoomRepository roomRepository;
 
+    // Create a new room.
     @RequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
     public @ResponseBody String creatRoom(@RequestBody Room room){
         if(roomRepository.findById(room.getRoomName())==null){
@@ -30,6 +31,7 @@ public class RoomController {
         }
     }
 
+    // Join a room and be an audience.
     @RequestMapping(value = "/join/{roomName}/{userName}")
     public @ResponseBody String joinRoom(@PathVariable("roomName") String roomName,
                                          @PathVariable("userName") String userName){
@@ -49,6 +51,7 @@ public class RoomController {
         }
     }
 
+    // Search all rooms.
     @RequestMapping(value = "/all")
     public @ResponseBody List<Room> searchAllRoom(){
         Iterable<Room> itr = roomRepository.findAll();
@@ -57,6 +60,7 @@ public class RoomController {
         return rooms;
     }
 
+    // Search a room bu room name.
     @RequestMapping(value = "/{roomName}")
     public @ResponseBody Room searchRoomByRoomName(@PathVariable String roomName){
 //        Iterable<Room> itr = roomRepository.findAll();
@@ -64,5 +68,37 @@ public class RoomController {
 //        itr.forEach(e -> rooms.add(e));
         return roomRepository.findById(roomName).get();
     }
+
+    // Try to become a guest, from an audience.
+    @RequestMapping(value = "/beguest/{roomName}/{userName}")
+    public @ResponseBody String becomeGuest(@PathVariable("roomName") String roomName,
+                                         @PathVariable("userName") String userName){
+        Room toModify = roomRepository.findById(roomName).get();
+        if(toModify==null){
+            return "Room not exists.";
+        }
+        if(toModify.getMaster()==userName){
+            return "Is master.";
+        }else if(toModify.getGuest()==userName){
+            return "Is guest.";
+        }else if(toModify.getAudience().contains(userName)){
+            try{
+                toModify.getAudience().remove(userName);
+                toModify.setGuest(userName);
+                roomRepository.save(toModify);
+                return "Success.";
+            }catch (Exception e){
+                toModify.getAudience().add(userName);
+                toModify.setGuest(null);
+                return "Failed.";
+            }
+        }else{
+            return "Be audience first.";
+        }
+    }
+
+    // TODO: Become an audience, from a guest.
+
+    // TODO: Leave a room.
 }
 

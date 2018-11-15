@@ -1,6 +1,8 @@
 package com.gomoku.server.websocket;
 
+import com.gomoku.server.redis.repository.RoomRepository;
 import com.gomoku.server.websocket.model.GameStatus;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
@@ -13,6 +15,10 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Component
 public class GameSocketHandler extends TextWebSocketHandler {
+
+    // TODO: To verify the role of players.
+    @Autowired
+    RoomRepository roomRepository;
 
     static private Map<String, GameStatus> rooms = new ConcurrentHashMap<>();
 
