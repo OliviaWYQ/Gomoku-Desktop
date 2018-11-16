@@ -16,6 +16,14 @@ import java.util.concurrent.ConcurrentHashMap;
 @Component
 public class GameSocketHandler extends TextWebSocketHandler {
 
+    // 5 x
+    // 5 y
+    // 2 player
+    // 2 ensure
+    // 3 winFlag
+    // 8 move num
+    // = 25
+
     // TODO: To verify the role of players.
     @Autowired
     RoomRepository roomRepository;

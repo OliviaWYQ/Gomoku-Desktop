@@ -19,6 +19,31 @@ public class GameLogic {
 
     int next;
 
+    // step no for 2 players
+    // {player==1, player==2}
+    int[] step = {0, 0};
+
+    final int X_OFFSET = 0;
+    final int X_LENGTH = 4;
+    final int X_MASK = 0b1111;
+
+    final int Y_OFFSET = X_OFFSET + X_LENGTH;
+    final int Y_LENGTH = 4;
+    final int Y_MASK = 0b1111;
+
+    final int PLAYER_FLAG_OFFSET = Y_OFFSET + Y_LENGTH;
+    final int PLAYER_FLAG_LENGTH = 2;
+    final int PLAYER_FLAG_MASK = 0b11;
+
+
+    final int STEP_NO_OFFSET = PLAYER_FLAG_OFFSET + PLAYER_FLAG_LENGTH;
+    final int STEP_NO_LENGTH = 8;
+    final int STEP_NO_MASK = 0b1111_1111;
+
+    final int WIN_FLAG_OFFSET = STEP_NO_OFFSET + STEP_NO_LENGTH;
+    final int WIN_FLAG_LENGTH = 3;
+    final int WIN_FLAG_MASK = 0b11;
+
     public GameLogic() {
         board = new int[SIZE][SIZE];
         for(int i=0; i<SIZE; i++){
@@ -39,43 +64,48 @@ public class GameLogic {
         return endFlag;
     }
 
-    public int move(int player, int pos) throws Exception{
+    public int move(int player, int pos) throws Exception {
 
-        // 0000 0000 # 0000 000[1-bit player] # [8-bit y] # [8-bit x]
-        if(player != next || player != pos>>16)
+        if (player != next || player != ((pos >> PLAYER_FLAG_OFFSET) & PLAYER_FLAG_MASK)) {
             throw new Exception("Wrong stone.");
+        } else if(((pos >> STEP_NO_OFFSET) & STEP_NO_MASK) != step[player - 1]) {
+            throw new Exception("Wrong step #.");
+        }
 
-        int x = pos & 255;
-        int y = pos>>8 & 255;
+        step[player - 1]++;
 
-        if(board[x][y] == 0){
+        int x = pos & X_MASK;
+        int y = (pos >> Y_OFFSET) & Y_MASK;
+
+        if (board[x][y] == 0){
             board[x][y] = player;
 
-            next = next==1?2:1;
+            next = next == 1 ? 2 : 1;
 
             stonesNum++;
             setWinFlag(x, y);
-        }else{
+        } else {
             throw new Exception("Invalid move.");
         }
-        return winFlag;
+        return pos + (winFlag << WIN_FLAG_OFFSET);
     }
 
+    // Judge win or not
     private void setWinFlag(int x, int y) throws Exception{
         int stone = board[x][y];
-        if(stone==1 || stone==2){
+        if (stone == 1 || stone == 2){
             int l = 0, r = 0;
             int t = 0, b = 0;
             int lt = 0, rb = 0;
             int lb = 0, rt = 0;
 
-            // TODO: game logic
-            //System.out.println("TODO !!!");
-            //xxxxx
-            for(int i=1; i<=x&&i<=4; i++){
-                if(board[x-i][y] == stone){
+            // game logic
+            // System.out.println("TODO !!!");
+            // xxxxx
+            for(int i = 1; i <= x && i <= 4; i++){
+                if (board[x-i][y] == stone){
                     l++;
-                }else{
+                } else {
                     break;
                 }
             }
@@ -192,6 +222,8 @@ public class GameLogic {
         return winFlag;
     }
 
+
+    // Test cases
     public static void main(String[] args){
         GameLogic gl = new GameLogic();
         try{

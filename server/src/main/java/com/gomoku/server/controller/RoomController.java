@@ -63,9 +63,6 @@ public class RoomController {
     // Search a room bu room name.
     @RequestMapping(value = "/{roomName}")
     public @ResponseBody Room searchRoomByRoomName(@PathVariable String roomName){
-//        Iterable<Room> itr = roomRepository.findAll();
-//        List<Room> rooms = new ArrayList<>();
-//        itr.forEach(e -> rooms.add(e));
         return roomRepository.findById(roomName).get();
     }
 
@@ -86,11 +83,11 @@ public class RoomController {
                 toModify.getAudience().remove(userName);
                 toModify.setGuest(userName);
                 roomRepository.save(toModify);
-                return "Success.";
+                return "Success";
             }catch (Exception e){
                 toModify.getAudience().add(userName);
                 toModify.setGuest(null);
-                return "Failed.";
+                return "Failed";
             }
         }else{
             return "Be audience first.";

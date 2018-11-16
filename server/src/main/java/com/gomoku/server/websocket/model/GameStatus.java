@@ -39,10 +39,8 @@ public class GameStatus {
     public TextMessage move(int player, TextMessage message) throws Exception {
         int pos = Integer.parseInt(message.getPayload());
 
-        // calculate the winFalg
-        int winFlag = this.gameLogic.move(player, pos);
-
-        TextMessage toSend = new TextMessage((winFlag<<24 | pos) + "");
+        // move() return a int, which contains all info, with winFlag
+        TextMessage toSend = new TextMessage(this.gameLogic.move(player, pos) + "");
 
         // save every move, send to late audience
         this.appendHistory(toSend);
