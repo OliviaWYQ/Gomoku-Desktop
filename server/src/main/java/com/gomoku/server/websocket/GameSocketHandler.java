@@ -16,14 +16,6 @@ import java.util.concurrent.ConcurrentHashMap;
 @Component
 public class GameSocketHandler extends TextWebSocketHandler {
 
-    // 5 x
-    // 5 y
-    // 2 player
-    // 2 ensure
-    // 3 winFlag
-    // 8 move num
-    // = 25
-
     // TODO: To verify the role of players.
     @Autowired
     RoomRepository roomRepository;
@@ -31,8 +23,7 @@ public class GameSocketHandler extends TextWebSocketHandler {
     static private Map<String, GameStatus> rooms = new ConcurrentHashMap<>();
 
     @Override
-    public void handleTextMessage(WebSocketSession session, TextMessage message)
-            throws Exception {
+    public void handleTextMessage(WebSocketSession session, TextMessage message){
 
         System.out.println("message: " + message.getPayload());
 
@@ -47,28 +38,35 @@ public class GameSocketHandler extends TextWebSocketHandler {
             if((role.equals("m")&&rooms.get(gameid).getMasterName().equals(userName)) ||
                     (role.equals("g")&&rooms.get(gameid).getGuestName().equals(userName))){
 
-                // check whether the stone fit the role
-                int player = rooms.get(gameid).getStone(role);
-                // toSend store the info will be send to all players
-                // including winFlag
-                TextMessage toSend = rooms.get(gameid).move(player, message);
+                // TODO: contains control signals and position info
+                int info = Integer.parseInt(message.getPayload());
 
-                // send to all players
-                rooms.get(gameid).getGuest().sendMessage(toSend);
-                rooms.get(gameid).getMaster().sendMessage(toSend);
-                rooms.get(gameid).getAudience().forEach(s -> {
-                    try {
-                        s.sendMessage(toSend);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                });
+                // check whether the stone fit the role
+                try{
+                    int player = rooms.get(gameid).getStone(role);
+                    // toSend store the info will be send to all players
+                    // including winFlag
+                    TextMessage toSend = rooms.get(gameid).move(player, message);
+
+                    // send to all players
+                    rooms.get(gameid).getGuest().sendMessage(toSend);
+                    rooms.get(gameid).getMaster().sendMessage(toSend);
+                    rooms.get(gameid).getAudience().forEach(s -> {
+                        try {
+                            s.sendMessage(toSend);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    });
+                } catch (Exception e){
+                    System.out.println(e.getMessage());
+                }
 
             }else{
-                throw new Exception("Invalid message.");
+                System.out.println("Invalid message.");
             }
         }else{
-            throw new Exception("No room.");
+            System.out.println("No room.");
         }
     }
 
@@ -100,13 +98,16 @@ public class GameSocketHandler extends TextWebSocketHandler {
                 throw new Exception("Already has a room.");
             }
             rooms.get(gameid).test();
-            if(rooms.get(gameid).ready()){
 
-                // testing info
-                System.out.println("info: ready to start ......");
+            // start game
+//            if(rooms.get(gameid).ready()){
+//
+//                // testing info
+//                System.out.println("info: ready to start ......");
+//
+//                rooms.get(gameid).start();
+//            }
 
-                rooms.get(gameid).start();
-            }
         }else if(role.equals("g")){
 
             // if the room is not init yet
@@ -128,13 +129,15 @@ public class GameSocketHandler extends TextWebSocketHandler {
             // testing info
             rooms.get(gameid).test();
 
-            if(rooms.get(gameid).ready()){
+            // start game
+//            if(rooms.get(gameid).ready()){
+//
+//                // testing info
+//                System.out.println("info: ready to start ......");
+//
+//                rooms.get(gameid).start();
+//            }
 
-                // testing info
-                System.out.println("info: ready to start ......");
-
-                rooms.get(gameid).start();
-            }
         }else if(role.equals("a")){
             if(!rooms.containsKey(gameid)){
                 throw new Exception("No room.");
@@ -180,5 +183,19 @@ public class GameSocketHandler extends TextWebSocketHandler {
         // testing info
         rooms.keySet().forEach(ele->{System.out.println(ele);});
 
+    }
+
+    // TODO: to strt game after two players are ready
+    private void gameStart(String gameid){
+        if(rooms.get(gameid).ready()){
+
+            // testing info
+            System.out.println("info: ready to start ......");
+            try{
+                rooms.get(gameid).start();
+            } catch (Exception e){
+                System.out.print(e.getMessage());
+            }
+        }
     }
 }

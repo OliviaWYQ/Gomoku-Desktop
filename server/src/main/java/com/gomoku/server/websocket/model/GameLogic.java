@@ -23,6 +23,10 @@ public class GameLogic {
     // {player==1, player==2}
     int[] step = {0, 0};
 
+    // TODO: control flag and control signals
+    // if the message is negative, the message is a control signal
+    // (we use the symbol bit to present the control flag)
+    // or, it is a position message
     final int X_OFFSET = 0;
     final int X_LENGTH = 4;
     final int X_MASK = 0b1111;
@@ -257,5 +261,7 @@ public class GameLogic {
         }catch (Exception e){
             System.out.println(e);
         }
+
+        System.out.println((1<<31)-0b1000_0000_0000_0000_0000_0000_0000_0000);
     }
 }

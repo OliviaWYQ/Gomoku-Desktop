@@ -22,6 +22,21 @@ public class Room implements Serializable{
         this.roomName = roomName;
         this.master = master;
         this.audience = new HashSet<>();
+
+        this.playing = false;
+        this.guest = null;
+    }
+
+    public boolean isValid(){
+        if(master == null || roomName == null || master.isEmpty() || roomName.isEmpty()){
+            return false;
+        }
+        if(audience == null){
+            audience = new HashSet<>();
+        }
+        guest = null;
+        playing = false;
+        return true;
     }
 
     public boolean joinRoom(String audience){
@@ -51,7 +66,7 @@ public class Room implements Serializable{
     }
 
     public boolean guestTryWatch(String guest){
-        if(this.guest==guest){
+        if(this.guest.equals(guest)){
             try{
                 this.audience.add(guest);
                 this.guest = null;
@@ -67,9 +82,9 @@ public class Room implements Serializable{
     }
 
     public boolean leave(String userName){
-        if(userName == this.master){
+        if(this.master.equals(userName)){
             return false;
-        }else if(userName == this.guest){
+        }else if(this.guest.equals(userName)){
             if(this.playing){
                 // TODO: master win?
                 return false;
@@ -125,7 +140,7 @@ public class Room implements Serializable{
         return guest;
     }
 
-    public void setGuest(String guest) {
+    public synchronized void setGuest(String guest) {
         this.guest = guest;
     }
 
@@ -139,5 +154,4 @@ public class Room implements Serializable{
     public void setAudience(Set<String> audience) {
         this.audience = audience;
     }
-
 }
