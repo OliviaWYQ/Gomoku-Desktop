@@ -31,6 +31,7 @@ public class GameLogic {
     final int Y_LENGTH = 4;
     final int Y_MASK = 0b1111;
 
+    // player could be 1 or 2
     final int PLAYER_FLAG_OFFSET = Y_OFFSET + Y_LENGTH;
     final int PLAYER_FLAG_LENGTH = 2;
     final int PLAYER_FLAG_MASK = 0b11;
@@ -72,13 +73,12 @@ public class GameLogic {
             throw new Exception("Wrong step #.");
         }
 
-        step[player - 1]++;
-
         int x = pos & X_MASK;
         int y = (pos >> Y_OFFSET) & Y_MASK;
 
         if (board[x][y] == 0){
             board[x][y] = player;
+            step[player - 1]++;
 
             next = next == 1 ? 2 : 1;
 
@@ -87,6 +87,9 @@ public class GameLogic {
         } else {
             throw new Exception("Invalid move.");
         }
+
+        // test
+        System.out.println("win flag: " + winFlag);
         return pos + (winFlag << WIN_FLAG_OFFSET);
     }
 
@@ -236,11 +239,20 @@ public class GameLogic {
                 y[i] = i<<8;
             }
 
-            System.out.println(gl.move(1, 1, 14, 14));System.out.println(gl.move(2, 2, 2, 2));
-            System.out.println(gl.move(1, 1, 13, 13));System.out.println(gl.move(2, 2, 4, 2));
-            System.out.println(gl.move(1, 1, 12, 12));System.out.println(gl.move(2, 2, 6, 2));
-            System.out.println(gl.move(1, 1, 11, 11));System.out.println(gl.move(2, 2, 10, 10));
-            System.out.println(gl.move(1, 1, 9, 9));System.out.println(gl.move(2, 2, 6, 5));
+            System.out.println(gl.move(1, 0b00000000_01_0000_0000));
+            System.out.println(gl.move(2, 0b00000000_10_0001_0001));
+
+            System.out.println(gl.move(1, 0b00000001_01_0000_0001));
+            System.out.println(gl.move(2, 0b00000001_10_0010_0010));
+
+            System.out.println(gl.move(1, 0b00000010_01_0000_0010));
+            System.out.println(gl.move(2, 0b00000010_10_0100_0100));
+
+            System.out.println(gl.move(1, 0b00000011_01_0000_0011));
+            System.out.println(gl.move(2, 0b00000011_10_1000_1000));
+
+            System.out.println(gl.move(1, 0b00000100_01_0000_0100));
+            System.out.println(gl.move(2, 0b00000100_10_1100_1100));
 
         }catch (Exception e){
             System.out.println(e);
