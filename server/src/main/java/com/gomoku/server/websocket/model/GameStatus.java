@@ -37,6 +37,9 @@ public class GameStatus {
     // put a stone, and give the message should be send
     // add winFlag
     public TextMessage move(int player, TextMessage message) throws Exception {
+        if(! ready()){
+            throw new Exception("Game not starts yet.");
+        }
         int pos = Integer.parseInt(message.getPayload());
         if (pos < 0){
             throw new Exception("Control signal, not moving signal.");
@@ -53,6 +56,9 @@ public class GameStatus {
     // put a stone, and give the message should be send
     // add winFlag
     public TextMessage move(int player, int pos) throws Exception {
+        if(! ready()){
+            throw new Exception("Game not start yet.");
+        }
         if (pos < 0){
             throw new Exception("Control signal, not moving signal.");
         }
@@ -120,6 +126,23 @@ public class GameStatus {
         }
     }
 
+    // constructor
+    public GameStatus(int masterStone, String masterName, WebSocketSession masterSession) throws Exception{
+        this.gameLogic = new GameLogic();
+        this.audience = new HashSet<>();
+        this.historyMoves = new ArrayList<>();
+        if(masterStone == 1){
+            this.masterStone = 1;
+            this.guestStone = 2;
+        }else if(masterStone == 2){
+            this.masterStone = 2;
+            this.guestStone = 1;
+        }else{
+            throw new Exception("Invalid stones setting.");
+        }
+        setMasterInfo(masterName, masterSession);
+    }
+
     // testing info
     public void test(){
         System.out.println(this.masterName+" $ "+this.guestName+" $ ");
@@ -132,9 +155,13 @@ public class GameStatus {
     }
 
     // send game start signal to master and guest
-    public void start() throws IOException {
+    public void start() throws Exception {
+        if (! ready()){
+            throw new Exception("Someone unready.");
+        }
         this.master.sendMessage(new TextMessage("masterstart"));
         this.guest.sendMessage(new TextMessage("gueststart"));
+
     }
 
     public WebSocketSession getMaster() {

@@ -14,12 +14,17 @@ public class WebSocketConfig implements WebSocketConfigurer {
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
         registry.addHandler(getGameSocket(), "/playing");
-
+        registry.addHandler(getRoomSocket(), "/room");
     }
 
     @Bean
     public WebSocketHandler getGameSocket(){
         return new GameSocketHandler();
+    }
+
+    @Bean
+    public WebSocketHandler getRoomSocket(){
+        return new RoomSocketHandler();
     }
 
 }

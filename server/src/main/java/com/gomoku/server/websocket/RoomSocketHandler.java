@@ -14,13 +14,14 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Component
-public class GameSocketHandler extends TextWebSocketHandler {
+public class RoomSocketHandler extends TextWebSocketHandler {
+
 
     // TODO: To verify the role of players.
-    //@Autowired
-    //RoomRepository roomRepository;
+    @Autowired
+    RoomRepository roomRepository;
 
-    static volatile private Map<String, GameStatus> rooms = new ConcurrentHashMap<>();
+    static private Map<String, GameStatus> rooms = new ConcurrentHashMap<>();
 
     @Override
     public void handleTextMessage(WebSocketSession session, TextMessage message){
@@ -49,6 +50,7 @@ public class GameSocketHandler extends TextWebSocketHandler {
                     switch (infoByInt){
                         case -1:
                             // master ready
+
                             break;
                         case -2:
                             // guest ready
@@ -100,13 +102,8 @@ public class GameSocketHandler extends TextWebSocketHandler {
     }
 
     @Override
-    public void afterConnectionEstablished(WebSocketSession session){
-        try{
-            super.afterConnectionEstablished(session);
-        } catch (Exception e){
-            System.out.println(e.getMessage());
-            return;
-        }
+    public void afterConnectionEstablished(WebSocketSession session) throws Exception {
+        super.afterConnectionEstablished(session);
 
         // get handshake info
         String role = session.getHandshakeHeaders().get("role").get(0);
@@ -116,64 +113,58 @@ public class GameSocketHandler extends TextWebSocketHandler {
 
         if(role.equals("m")){
 
-            // create a room and set master info, name and session
-            // may throw invalid stone
-            try {
-                rooms.put(gameid, new GameStatus(masterStone, userName, session));
-            } catch (Exception e){
-                System.out.println(e.getMessage());
-                return;
-            }
+            // if the room is not init yet
+            if(!rooms.containsKey(gameid)) {
 
+                // create a room, may throw invalid stone
+                rooms.put(gameid, new GameStatus(masterStone));
+
+                // set master info, name and session
+                rooms.get(gameid).setMasterInfo(userName, session);
+
+                // if the room exists
+            }else if(rooms.get(gameid).getMaster()==null){
+                rooms.get(gameid).setMasterInfo(userName, session);
+            }else{
+                throw new Exception("Already has a room.");
+            }
             rooms.get(gameid).test();
 
-            // start game
-            gameStart(gameid);
+
 
         }else if(role.equals("g")){
-            while(!rooms.containsKey(gameid)){
-                try{
-                    System.out.println("sleep");
-                    Thread.sleep(200);
-                } catch (Exception e){
-                    System.out.println(e.getMessage());
-                }
-            }
-            if(rooms.get(gameid).getGuest()==null){
+
+            // if the room is not init yet
+            if(!rooms.containsKey(gameid)) {
+
+                // create a room, may throw invalid stone
+                rooms.put(gameid, new GameStatus(masterStone));
+
+                // set guest info, name and session
+                rooms.get(gameid).setGuestInfo(userName, session);
+
+                // if the room exists
+            }else if(rooms.get(gameid).getGuest()==null){
                 rooms.get(gameid).setGuestInfo(userName, session);
             }else{
-                System.out.println("The room already has a guest.");
+                throw new Exception("The room already has a guest.");
             }
-//            // if the room is not init yet
-//            if(!rooms.containsKey(gameid)) {
-//
-//                // create a room, may throw invalid stone
-//                try {
-//                    rooms.put(gameid, new GameStatus(masterStone));
-//                } catch (Exception e){
-//                    System.out.println(e.getMessage());
-//                    return;
-//                }
-//
-//                // set guest info, name and session
-//                rooms.get(gameid).setGuestInfo(userName, session);
-//
-//            // if the room exists
-//            }else if(rooms.get(gameid).getGuest()==null){
-//                rooms.get(gameid).setGuestInfo(userName, session);
-//            }else{
-//                System.out.println("The room already has a guest.");
-//            }
 
             // testing info
             rooms.get(gameid).test();
 
             // start game
-            gameStart(gameid);
+//            if(rooms.get(gameid).ready()){
+//
+//                // testing info
+//                System.out.println("info: ready to start ......");
+//
+//                rooms.get(gameid).start();
+//            }
 
         }else if(role.equals("a")){
             if(!rooms.containsKey(gameid)){
-                System.out.println("No room.");
+                throw new Exception("No room.");
             }
             rooms.get(gameid).addAudience(session);
 
@@ -218,17 +209,6 @@ public class GameSocketHandler extends TextWebSocketHandler {
 
     }
 
-    // TODO: to strt game after two players are ready
-    private void gameStart(String gameid){
-        if(rooms.get(gameid).ready()){
 
-            // testing info
-            System.out.println("Info: GameId: " + gameid + ", ready to start ......");
-            try{
-                rooms.get(gameid).start();
-            } catch (Exception e){
-                System.out.print(e.getMessage());
-            }
-        }
-    }
+
 }

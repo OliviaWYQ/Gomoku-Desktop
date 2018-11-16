@@ -5,15 +5,40 @@ import time
 async def hello(uri, header, timeout):
     async with websockets.connect(uri, extra_headers=header) as ws:
         flag = ""
-        # await ws.send("567")
         print("pas")
         flag = await ws.recv()
         print(f"< {flag}")
         time.sleep(2)
-        await ws.send(str(65536+10))
-        while(flag != "end"):
-            flag = await ws.recv()
-            print(f"< {flag}")
+
+        await ws.send(str(256))
+        flag = await ws.recv()
+        print(f"< {flag}")
+        flag = await ws.recv()
+        print(f"< {flag}")
+
+        await ws.send(str(1281))
+        flag = await ws.recv()
+        print(f"< {flag}")
+        flag = await ws.recv()
+        print(f"< {flag}")
+
+        await ws.send(str(2306))
+        flag = await ws.recv()
+        print(f"< {flag}")
+        flag = await ws.recv()
+        print(f"< {flag}")
+
+        await ws.send(str(3331))
+        flag = await ws.recv()
+        print(f"< {flag}")
+        flag = await ws.recv()
+        print(f"< {flag}")
+
+        await ws.send(str(4356))
+        flag = await ws.recv()
+        print(f"< {flag}")
+        
+        
         time.sleep(timeout)
         ws.close()
 

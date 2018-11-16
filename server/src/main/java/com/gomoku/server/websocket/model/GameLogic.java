@@ -263,5 +263,19 @@ public class GameLogic {
         }
 
         System.out.println((1<<31)-0b1000_0000_0000_0000_0000_0000_0000_0000);
+        System.out.println(0b00000000_01_0000_0000);
+        System.out.println(0b00000000_10_0001_0001);
+
+        System.out.println(0b00000001_01_0000_0001);
+        System.out.println(0b00000001_10_0010_0010);
+
+        System.out.println(0b00000010_01_0000_0010);
+        System.out.println(0b00000010_10_0100_0100);
+
+        System.out.println(0b00000011_01_0000_0011);
+        System.out.println(0b00000011_10_1000_1000);
+
+        System.out.println(0b00000100_01_0000_0100);
+        System.out.println(0b00000100_10_1100_1100);
     }
 }
