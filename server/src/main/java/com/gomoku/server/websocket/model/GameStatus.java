@@ -38,7 +38,24 @@ public class GameStatus {
     // add winFlag
     public TextMessage move(int player, TextMessage message) throws Exception {
         int pos = Integer.parseInt(message.getPayload());
+        if (pos < 0){
+            throw new Exception("Control signal, not moving signal.");
+        }
+        // move() return a int, which contains all info, with winFlag
+        TextMessage toSend = new TextMessage(this.gameLogic.move(player, pos) + "");
 
+        // save every move, send to late audience
+        this.appendHistory(toSend);
+
+        return toSend;
+    }
+
+    // put a stone, and give the message should be send
+    // add winFlag
+    public TextMessage move(int player, int pos) throws Exception {
+        if (pos < 0){
+            throw new Exception("Control signal, not moving signal.");
+        }
         // move() return a int, which contains all info, with winFlag
         TextMessage toSend = new TextMessage(this.gameLogic.move(player, pos) + "");
 
