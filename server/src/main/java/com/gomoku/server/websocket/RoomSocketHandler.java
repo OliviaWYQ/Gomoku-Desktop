@@ -1,5 +1,6 @@
 package com.gomoku.server.websocket;
 
+import com.gomoku.server.redis.model.Room;
 import com.gomoku.server.redis.repository.RoomRepository;
 import com.gomoku.server.websocket.model.GameStatus;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,11 @@ public class RoomSocketHandler extends TextWebSocketHandler {
     @Autowired
     RoomRepository roomRepository;
 
+    final String JOIN_PREFIX = "J";
+    final String LEAVE_PREFIX = "L";
+    final String DELETE_SIGNAL = "D";
+    final String START_SIGNAL = "S";
+
     static private Map<String, GameStatus> rooms = new ConcurrentHashMap<>();
 
     @Override
@@ -30,74 +36,70 @@ public class RoomSocketHandler extends TextWebSocketHandler {
 
         // get handshake info
         String role = session.getHandshakeHeaders().get("role").get(0);
-        String gameid = session.getHandshakeHeaders().get("gameid").get(0);
+        String roomName = session.getHandshakeHeaders().get("roomName").get(0);
         String userName = session.getHandshakeHeaders().get("userName").get(0);
 
-        if(rooms.containsKey(gameid)){
+        String command = message.getPayload();
 
-            // only master and guest can put stones
-            // TODO: and send control signals
-            if((role.equals("m")&&rooms.get(gameid).getMasterName().equals(userName)) ||
-                    (role.equals("g")&&rooms.get(gameid).getGuestName().equals(userName))){
+        Room room = roomRepository.findById(roomName).get();
 
-                // TODO: contains control signals and position info
-                int infoByInt = Integer.parseInt(message.getPayload());
-                if (infoByInt < 0){
-
-                    GameStatus toControl = rooms.get(gameid);
-
-                    // control signal
-                    switch (infoByInt){
-                        case -1:
-                            // master ready
-
-                            break;
-                        case -2:
-                            // guest ready
-                            break;
-                        case -3:
-                            // master unready
-                            break;
-                        case -4:
-                            // guest unready
-                            break;
-                        case -5:
-                            // master: try to start game
-                            break;
-                        default:
-                            // send a certain step to the use
-                            break;
-
+        if(command.equals("join")){
+            if(room.getGuest() == null) {
+                room.setGuest(userName);
+                roomRepository.save(room);
+                try{
+                    if(roomRepository.findById(roomName).get().getGuest().equals(userName)){
+                        TextMessage toSend = new TextMessage(JOIN_PREFIX + userName);
+                        session.sendMessage(toSend);
+                        rooms.get(roomName).getMaster().sendMessage(toSend);
                     }
-                } else {
-                    // moving signal
-                    // check whether the stone fit the role
-                    try{
-                        int player = rooms.get(gameid).getStone(role);
-                        // toSend store the info will be send to all players
-                        // including winFlag
-                        TextMessage toSend = rooms.get(gameid).move(player, infoByInt);
+                } catch (Exception e){
+                    System.out.println(e.getMessage());
+                }
+            }
 
-                        // send moving signal (with win flag) to all players
-                        rooms.get(gameid).getGuest().sendMessage(toSend);
-                        rooms.get(gameid).getMaster().sendMessage(toSend);
-                        rooms.get(gameid).getAudience().forEach(s -> {
-                            try {
-                                s.sendMessage(toSend);
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-                        });
-                    } catch (Exception e){
-                        System.out.println(e.getMessage());
-                    }
+        }else if(command.equals("leave")){
+            if (!room.isPlaying() && room.getGuest().equals(userName)){
+                room.setGuest(null);
+
+                roomRepository.save(room);
+                try{
+                    TextMessage toSend = new TextMessage(LEAVE_PREFIX + userName);
+                    session.sendMessage(toSend);
+                    rooms.get(roomName).getMaster().sendMessage(toSend);
+
+                } catch (Exception e){
+                    System.out.println(e.getMessage());
                 }
 
-            }else{
-                System.out.println("Invalid message.");
             }
-        }else{
-            System.out.println("No room.");
+        }else if(command.equals("delete")){
+            if (!room.isPlaying() && room.getMaster().equals(userName)){
+                roomRepository.delete(room);
+                try{
+                    TextMessage toSend = new TextMessage(DELETE_SIGNAL);
+                    session.sendMessage(toSend);
+                    rooms.get(roomName).getMaster().sendMessage(toSend);
+
+                } catch (Exception e){
+                    System.out.println(e.getMessage());
+                }
+            }
+        }else if(command.equals("start")){
+
+            if(room.getMaster().equals(userName) && (room.getGuest() != null)){
+                room.setPlaying(true);
+                try{
+
+                    TextMessage toSend = new TextMessage(START_SIGNAL);
+                    session.sendMessage(toSend);
+                    rooms.get(roomName).getGuest().sendMessage(toSend);
+
+                } catch (Exception e){
+                    System.out.println(e.getMessage());
+                }
+            }
+
         }
     }
 
@@ -107,78 +109,78 @@ public class RoomSocketHandler extends TextWebSocketHandler {
 
         // get handshake info
         String role = session.getHandshakeHeaders().get("role").get(0);
-        String gameid = session.getHandshakeHeaders().get("gameid").get(0);
+        String roomName = session.getHandshakeHeaders().get("roomName").get(0);
         String userName = session.getHandshakeHeaders().get("userName").get(0);
         int masterStone = Integer.parseInt(session.getHandshakeHeaders().get("masterStone").get(0));
 
         if(role.equals("m")){
 
             // if the room is not init yet
-            if(!rooms.containsKey(gameid)) {
+            if(!rooms.containsKey(roomName)) {
 
                 // create a room, may throw invalid stone
-                rooms.put(gameid, new GameStatus(masterStone));
+                rooms.put(roomName, new GameStatus(masterStone));
 
                 // set master info, name and session
-                rooms.get(gameid).setMasterInfo(userName, session);
+                rooms.get(roomName).setMasterInfo(userName, session);
 
                 // if the room exists
-            }else if(rooms.get(gameid).getMaster()==null){
-                rooms.get(gameid).setMasterInfo(userName, session);
+            }else if(rooms.get(roomName).getMaster()==null){
+                rooms.get(roomName).setMasterInfo(userName, session);
             }else{
                 throw new Exception("Already has a room.");
             }
-            rooms.get(gameid).test();
+            rooms.get(roomName).test();
 
 
 
         }else if(role.equals("g")){
 
             // if the room is not init yet
-            if(!rooms.containsKey(gameid)) {
+            if(!rooms.containsKey(roomName)) {
 
                 // create a room, may throw invalid stone
-                rooms.put(gameid, new GameStatus(masterStone));
+                rooms.put(roomName, new GameStatus(masterStone));
 
                 // set guest info, name and session
-                rooms.get(gameid).setGuestInfo(userName, session);
+                rooms.get(roomName).setGuestInfo(userName, session);
 
                 // if the room exists
-            }else if(rooms.get(gameid).getGuest()==null){
-                rooms.get(gameid).setGuestInfo(userName, session);
+            }else if(rooms.get(roomName).getGuest()==null){
+                rooms.get(roomName).setGuestInfo(userName, session);
             }else{
                 throw new Exception("The room already has a guest.");
             }
 
             // testing info
-            rooms.get(gameid).test();
+            rooms.get(roomName).test();
 
             // start game
-//            if(rooms.get(gameid).ready()){
+//            if(rooms.get(roomName).ready()){
 //
 //                // testing info
 //                System.out.println("info: ready to start ......");
 //
-//                rooms.get(gameid).start();
+//                rooms.get(roomName).start();
 //            }
 
         }else if(role.equals("a")){
-            if(!rooms.containsKey(gameid)){
+            if(!rooms.containsKey(roomName)){
                 throw new Exception("No room.");
             }
-            rooms.get(gameid).addAudience(session);
+            rooms.get(roomName).addAudience(session);
 
             // send past moves
-            rooms.get(gameid).sendAllMoves(session);
+            rooms.get(roomName).sendAllMoves(session);
 
             // testing info
-            rooms.get(gameid).test();
+            rooms.get(roomName).test();
         }
 
         rooms.keySet().forEach(ele->{System.out.println(ele);});
 
         // testing info
-        System.out.println(rooms.get(gameid).getMaster());
+        System.out.println(rooms.get(roomName).getMaster());
     }
 
     @Override
@@ -186,22 +188,22 @@ public class RoomSocketHandler extends TextWebSocketHandler {
         super.afterConnectionClosed(session, status);
         // System.out.println("closing: "+session.getHandshakeHeaders().get("role"));
         String role = session.getHandshakeHeaders().get("role").get(0);
-        String gameid = session.getHandshakeHeaders().get("gameid").get(0);
+        String roomName = session.getHandshakeHeaders().get("roomName").get(0);
         if(role.equals("m")){
 
             // now: ignore the game
             // TODO: judge winner and upload game info
-            rooms.remove(gameid);
+            rooms.remove(roomName);
 
         }else if(role.equals("g")){
 
             // now: ignore the game
             // TODO: judge winner and upload game info
-            rooms.remove(gameid);
-            //rooms.get(gameid).setGuest(null);
+            rooms.remove(roomName);
+            //rooms.get(roomName).setGuest(null);
 
         }else if(role.equals("a")){
-            rooms.get(gameid).getAudience().remove(session);
+            rooms.get(roomName).getAudience().remove(session);
         }
 
         // testing info
