@@ -80,7 +80,7 @@ public class GameSocketHandlerTests {
 
         HttpHeaders masterHeader = new HttpHeaders();
         masterHeader.add("role", "m");
-        masterHeader.add("gameid", "123#456");
+        masterHeader.add("roomName", "123#456");
         masterHeader.add("userName", "123");
         masterHeader.add("masterStone", "1");
 
@@ -88,7 +88,7 @@ public class GameSocketHandlerTests {
 
         HttpHeaders guestHeader = new HttpHeaders();
         guestHeader.add("role", "g");
-        guestHeader.add("gameid", "123#456");
+        guestHeader.add("roomName", "123#456");
         guestHeader.add("userName", "456");
         guestHeader.add("masterStone", "1");
 
@@ -97,35 +97,39 @@ public class GameSocketHandlerTests {
         Assert.assertEquals(masterHeader, masterSession.getHandshakeHeaders());
         Assert.assertEquals(guestHeader, guestSession.getHandshakeHeaders());
 
-        masterSession.sendMessage(new TextMessage(new byte[]{'6','5','5','3','6'}));
+        guestSession.sendMessage(new TextMessage("-2"));
         Thread.sleep(100);
-        Assert.assertEquals("65536", messageMemory);
-        guestSession.sendMessage(new TextMessage(new byte[]{'1','3','1','0','7','3'}));
+        masterSession.sendMessage(new TextMessage("-1"));
         Thread.sleep(100);
-        Assert.assertEquals("131073", messageMemory);
-        masterSession.sendMessage(new TextMessage(new byte[]{'6','5','7','9','2'}));
+        masterSession.sendMessage(new TextMessage(new byte[]{'2','5','6'}));
         Thread.sleep(100);
-        Assert.assertEquals("65792", messageMemory);
-        guestSession.sendMessage(new TextMessage(new byte[]{'1','3','1','0','7','4'}));
+        Assert.assertEquals("256", messageMemory);
+        guestSession.sendMessage(new TextMessage(new byte[]{'5','2','9'}));
         Thread.sleep(100);
-        Assert.assertEquals("131074", messageMemory);
-        masterSession.sendMessage(new TextMessage(new byte[]{'6','6','0','4','8'}));
+        Assert.assertEquals("529", messageMemory);
+        masterSession.sendMessage(new TextMessage(new byte[]{'1','2','8','1'}));
         Thread.sleep(100);
-        Assert.assertEquals("66048", messageMemory);
-        guestSession.sendMessage(new TextMessage(new byte[]{'1','3','1','0','7','5'}));
+        Assert.assertEquals("1281", messageMemory);
+        guestSession.sendMessage(new TextMessage(new byte[]{'1','5','7','0'}));
         Thread.sleep(100);
-        Assert.assertEquals("131075", messageMemory);
-        masterSession.sendMessage(new TextMessage(new byte[]{'6','6','3','0','4'}));
+        Assert.assertEquals("1570", messageMemory);
+        masterSession.sendMessage(new TextMessage(new byte[]{'2','3','0','6'}));
         Thread.sleep(100);
-        Assert.assertEquals("66304", messageMemory);
-        guestSession.sendMessage(new TextMessage(new byte[]{'1','3','1','0','7','6'}));
+        Assert.assertEquals("2306", messageMemory);
+        guestSession.sendMessage(new TextMessage(new byte[]{'2','6','2','8'}));
         Thread.sleep(100);
-        Assert.assertEquals("131076", messageMemory);
-        masterSession.sendMessage(new TextMessage(new byte[]{'6','6','5','6','0'}));
+        Assert.assertEquals("2628", messageMemory);
+        masterSession.sendMessage(new TextMessage(new byte[]{'3','3','3','1'}));
         Thread.sleep(100);
-        Assert.assertEquals("16843776", messageMemory);
+        Assert.assertEquals("3331", messageMemory);
+        guestSession.sendMessage(new TextMessage(new byte[]{'3','7','2','0'}));
+        Thread.sleep(100);
+        Assert.assertEquals("3720", messageMemory);
+        masterSession.sendMessage(new TextMessage(new byte[]{'4','3','5','6'}));
+        Thread.sleep(100);
+        Assert.assertEquals("266500", messageMemory);
         Thread.sleep(500);
-        Assert.assertEquals(10, messageCounter/2);
+        Assert.assertEquals(11, messageCounter/2);
 
         guestSession.close();
         masterSession.close();

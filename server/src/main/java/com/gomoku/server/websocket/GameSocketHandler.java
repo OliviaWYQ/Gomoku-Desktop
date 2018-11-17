@@ -47,7 +47,7 @@ public class GameSocketHandler extends TextWebSocketHandler {
         String roomName = session.getHandshakeHeaders().get("roomName").get(0);
         String userName = session.getHandshakeHeaders().get("userName").get(0);
 
-        if(rooms.containsKey(roomName) && rooms.get(roomName).ready()){
+        if(rooms.containsKey(roomName)){
 
             // only master and guest can put stones
             // TODO: and send control signals
