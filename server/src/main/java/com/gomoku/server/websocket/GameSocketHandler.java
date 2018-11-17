@@ -27,12 +27,15 @@ public class GameSocketHandler extends TextWebSocketHandler {
     final int GUEST_UNREADY_SIGNAL = -3;
     final int GUEST_LEAVE_SIGNAL = -4;
     final int MASTER_DELETE_SIGNAL = -5;
+    final int END_SIGNAL = -6;
 
     final TextMessage START_SIGNAL_MESSAGE = new TextMessage(START_SIGNAL + "");
     final TextMessage GUEST_READY_SIGNALL_MESSAGE = new TextMessage(GUEST_READY_SIGNAL + "");
     final TextMessage GUEST_UNREADY_SIGNAL_MESSAGE = new TextMessage(GUEST_UNREADY_SIGNAL + "");
     final TextMessage GUEST_LEAVE_SIGNAL_MESSAGE = new TextMessage(GUEST_LEAVE_SIGNAL + "");
     final TextMessage MASTER_DELETE_SIGNAL_MESSAGE = new TextMessage(MASTER_DELETE_SIGNAL + "");
+    final TextMessage END_SIGNAL_MESSAGE = new TextMessage(END_SIGNAL + "");
+
 
     @Override
     public void handleTextMessage(WebSocketSession session, TextMessage message){
@@ -52,6 +55,14 @@ public class GameSocketHandler extends TextWebSocketHandler {
                     (role.equals("g")&&rooms.get(roomName).getGuestName().equals(userName))){
 
                 // TODO: contains control signals and position info
+                if (message.getPayload().charAt(0) == 'J'){
+                    try {
+                        rooms.get(roomName).getMaster().sendMessage(message);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    return;
+                }
                 int infoByInt = Integer.parseInt(message.getPayload());
                 if (infoByInt < 0){
 
@@ -220,14 +231,16 @@ public class GameSocketHandler extends TextWebSocketHandler {
 
             // now: ignore the game
             // TODO: judge winner and upload game info
+            // TODO: send end signal
             rooms.remove(roomName);
 
         }else if(role.equals("g")){
 
             // now: ignore the game
             // TODO: judge winner and upload game info
-            rooms.remove(roomName);
-            //rooms.get(roomName).setGuest(null);
+            // TODO: send end signal
+            //rooms.remove(roomName);
+            rooms.get(roomName).setGuest(null);
 
         }else if(role.equals("a")){
             rooms.get(roomName).getAudience().remove(session);
