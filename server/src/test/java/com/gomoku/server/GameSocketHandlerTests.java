@@ -128,8 +128,6 @@ public class GameSocketHandlerTests {
         masterSession.sendMessage(new TextMessage(new byte[]{'4','3','5','6'}));
         Thread.sleep(100);
         Assert.assertEquals("266500", messageMemory);
-        Thread.sleep(500);
-        Assert.assertEquals(11, messageCounter/2);
 
         guestSession.close();
         masterSession.close();
