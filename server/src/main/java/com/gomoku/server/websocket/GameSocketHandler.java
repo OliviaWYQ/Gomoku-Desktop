@@ -50,11 +50,11 @@ public class GameSocketHandler extends TextWebSocketHandler {
         if(rooms.containsKey(roomName)){
 
             // only master and guest can put stones
-            // TODO: and send control signals
+            // and send control signals
             if((role.equals("m")&&rooms.get(roomName).getMasterName().equals(userName)) ||
                     (role.equals("g")&&rooms.get(roomName).getGuestName().equals(userName))){
 
-                // TODO: contains control signals and position info
+                // contains control signals and position info
                 if (message.getPayload().charAt(0) == 'J'){
                     try {
                         rooms.get(roomName).getMaster().sendMessage(message);
