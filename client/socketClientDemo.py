@@ -51,15 +51,15 @@ class Trigger:
 @asyncio.coroutine
 def onClick(trigger):
     i = 0
-    while(True and flag.handleClick()):
-        print(flag.handleClick())
-        flag.send("test")
+    while(True and trigger.handleClick()):
+        print(trigger.handleClick())
+        trigger.send("test")
         yield from asyncio.sleep(1)
         i += 1
         if(i>5):
             print('close')
-            flag.shutDown()
-    print(flag.handleClick())
+            trigger.shutDown()
+    print(trigger.handleClick())
 
 if __name__ == "__main__":
     # server location
