@@ -21,6 +21,7 @@ public class Match {
         this.matchId = user1Id + '@' + user2Id + '@' + System.currentTimeMillis();
     }
 
+    // TODO: seems we can put en/decode in client
     public void encodeMoves(){
         encodedMoves = new ArrayList<>();
         for(List<Integer> pair: moves){

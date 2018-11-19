@@ -16,6 +16,7 @@ public class MatchController {
     @Autowired
     MatchRepository matchRepository;
 
+    // TODO: seems we can delete it cause now serve upload matches' info to DB
     @RequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
         public @ResponseBody void creatMatch(@RequestBody Match match){
             match.setId();
