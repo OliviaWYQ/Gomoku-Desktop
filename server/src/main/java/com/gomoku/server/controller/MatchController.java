@@ -16,22 +16,24 @@ public class MatchController {
     @Autowired
     MatchRepository matchRepository;
 
-    // TODO: seems we can delete it cause now serve upload matches' info to DB
+    // deleted function: seems we can delete it cause now serve upload matches' info to DB
+    /*
     @RequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
         public @ResponseBody void creatMatch(@RequestBody Match match){
             match.setId();
             match.encodeMoves();
             matchRepository.save(match);
     }
+    */
 
     @RequestMapping(value = "/byuser/{userId}")
     public @ResponseBody List<Match> searchMatches(@PathVariable String userId){
         //match.setId();
         //matchRepository.save(match);
         List<Match> matches = matchRepository.findByUser1Id(userId);
-        for(Match m: matches){
+        /*for(Match m: matches){
             m.decodeMoves();
-        }
+        }*/
         return matches;
         //return matchRepository.findByUser1Id(userId);
     }
@@ -41,7 +43,7 @@ public class MatchController {
         //match.setId();
         //matchRepository.save(match);
         Match match = matchRepository.findOneByMatchId(matchId);
-        match.decodeMoves();
+        //match.decodeMoves();
         return match;
         //return matchRepository.findOneByMatchId(matchId);
     }

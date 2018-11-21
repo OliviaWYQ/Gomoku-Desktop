@@ -1,7 +1,6 @@
 package com.gomoku.server.websocket;
 
-import com.gomoku.server.redis.model.Room;
-import com.gomoku.server.redis.repository.RoomRepository;
+import com.gomoku.server.mongo.repository.MatchRepository;
 import com.gomoku.server.websocket.model.GameStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -16,9 +15,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Component
 public class GameSocketHandler extends TextWebSocketHandler {
-
-    @Autowired
-    RoomRepository roomRepository;
 
     static volatile private Map<String, GameStatus> rooms = new ConcurrentHashMap<>();
 
@@ -36,6 +32,8 @@ public class GameSocketHandler extends TextWebSocketHandler {
     final TextMessage MASTER_DELETE_SIGNAL_MESSAGE = new TextMessage(MASTER_DELETE_SIGNAL + "");
     final TextMessage END_SIGNAL_MESSAGE = new TextMessage(END_SIGNAL + "");
 
+    @Autowired
+    MatchRepository matchRepository;
 
     @Override
     public void handleTextMessage(WebSocketSession session, TextMessage message){
@@ -56,12 +54,19 @@ public class GameSocketHandler extends TextWebSocketHandler {
 
                 // contains control signals and position info
                 if (message.getPayload().charAt(0) == 'J'){
-                    try {
-                        rooms.get(roomName).getMaster().sendMessage(message);
-                    } catch (IOException e) {
-                        e.printStackTrace();
+                    if(role.equals("g")){
+                        try {
+
+                            // test info
+                            System.out.println("guest name: " + rooms.get(roomName).getGuestName());
+
+                            rooms.get(roomName).getMaster().sendMessage(message);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
                     }
                     return;
+
                 }
                 int infoByInt = Integer.parseInt(message.getPayload());
                 if (infoByInt < 0){
@@ -126,6 +131,8 @@ public class GameSocketHandler extends TextWebSocketHandler {
                         // including winFlag
                         TextMessage toSend = rooms.get(roomName).move(player, infoByInt);
 
+                        System.out.println("From GameSocketHandler: " + toSend.getPayload());
+
                         // send moving signal (with win flag) to all players
                         rooms.get(roomName).getGuest().sendMessage(toSend);
                         rooms.get(roomName).getMaster().sendMessage(toSend);
@@ -136,6 +143,10 @@ public class GameSocketHandler extends TextWebSocketHandler {
                                 e.printStackTrace();
                             }
                         });
+                        if(rooms.get(roomName).getWinFlag() != 0){
+                            System.out.println("save!");
+                            matchRepository.save(rooms.get(roomName).summaryMatch());
+                        }
                     } catch (Exception e){
                         System.out.println(e.getMessage());
                     }

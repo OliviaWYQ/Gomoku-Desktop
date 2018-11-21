@@ -6,6 +6,13 @@ async def hello(uri, header, timeout):
     async with websockets.connect(uri, extra_headers=header) as ws:
         flag = ""
         print("pas")
+
+        # send name
+        await ws.send("Jguest")
+
+        # send ready signal
+        await ws.send(str(-2))
+        # receive start signal
         flag = await ws.recv()
         print(f"< {flag}")
 
@@ -30,6 +37,8 @@ async def hello(uri, header, timeout):
         flag = await ws.recv()
         print(f"< {flag}")
         await ws.send(str(3720))
+        flag = await ws.recv()
+        print(f"< {flag}")
         flag = await ws.recv()
         print(f"< {flag}")
 
