@@ -42,33 +42,21 @@ public class MatchControllerTests {
     private MatchController matchController;
 
     @Test
-    public void testInsertMatch() throws Exception {
-        //String json = "{\"userName\": \"123\",\"pass\": \"123\"}";
+    public void testSearch() throws Exception {
         RequestBuilder requestBuilder = MockMvcRequestBuilders
-                .post("/match")
-                .accept(MediaType.APPLICATION_JSON)
-                .content("{\"user1Id\": \"123\",\"user2Id\": \"Guest\",\"moves\": [[1,1],[2,2]],\"user1win\": 1}")
-                .contentType(APPLICATION_JSON_UTF8);
+                .get("/match/byuser/123");
 
         MvcResult result = mockMvc.perform(requestBuilder).andReturn();
 
         MockHttpServletResponse response = result.getResponse();
         Assert.assertEquals(200, response.getStatus());
-    }
 
-    @Test
-    public void testSearch() throws Exception {
-        //String json = "{\"userName\": \"123\",\"pass\": \"123\"}";
+        requestBuilder = MockMvcRequestBuilders
+                .get("/match/byid/123#456");
 
-        RequestBuilder requestBuilder = MockMvcRequestBuilders
-                .post("/match")
-                .accept(MediaType.APPLICATION_JSON)
-                .content("{\"user1Id\": \"123\",\"user2Id\": \"Guest\",\"moves\": [[1,1],[2,2]],\"user1win\": 1}")
-                .contentType(APPLICATION_JSON_UTF8);
+        result = mockMvc.perform(requestBuilder).andReturn();
 
-        MvcResult result = mockMvc.perform(requestBuilder).andReturn();
-
-        MockHttpServletResponse response = result.getResponse();
+        response = result.getResponse();
         Assert.assertEquals(200, response.getStatus());
     }
 
