@@ -2,13 +2,17 @@ import sys
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
-from showchessboard import *
+#from showchessboard import *
+from hall import *
 import requests
+
+IP = "localhost"
+#IP = "54.173.206.13"
 
 class Window(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.title = "App"
+        self.title = "Gomoku"
         self.top = 100
         self.left = 100
         self.width = 600
@@ -33,7 +37,7 @@ class Window(QMainWindow):
         self.pwd.setGeometry(100, 200, 400, 30)
         self.pwd.setEchoMode(QLineEdit.Password)
 
-        self.serverIp = QLineEdit("54.173.206.13", self)
+        self.serverIp = QLineEdit(IP, self)
         self.serverIp.setGeometry(100, 400, 400, 30)
 
         self.show()
@@ -52,8 +56,8 @@ class Window(QMainWindow):
 
         if (r.text == "Success"):
             #QMessageBox.warning(self, 'Success', 'Success')
-            self.game = Gomoku(self.userName.text(), self.serverIp.text())
-            self.game.show()
+            self.hall = GameHall(self.userName.text(), self.serverIp.text())
+            self.hall.show()
             self.close()
         else:
             QMessageBox.warning(self, 'Error', 'Bad user or password')

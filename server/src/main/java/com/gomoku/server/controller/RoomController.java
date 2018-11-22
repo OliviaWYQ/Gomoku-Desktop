@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Controller
@@ -26,11 +27,14 @@ public class RoomController {
         if(!room.isValid()){
             return "Failed, invalid message format.";
         }
-        if(roomRepository.findById(room.getRoomName())==null){
+
+        // if .get() not found, it will throws a exception
+        try{
+            Room temp = roomRepository.findById(room.getRoomName()).get();
+            return "User already created a room.";
+        }catch (NoSuchElementException e){
             roomRepository.save(room);
             return "Success";
-        }else{
-            return "User already created a room.";
         }
     }
 
@@ -38,29 +42,34 @@ public class RoomController {
     @RequestMapping(value = "/join/{roomName}/{userName}")
     public @ResponseBody String joinRoom(@PathVariable("roomName") String roomName,
                                          @PathVariable("userName") String userName){
-        Room toJoin = roomRepository.findById(roomName).get();
-        if (toJoin == null){
+
+        // if .get() not found, it will throws a exception
+        try{
+            Room toJoin = roomRepository.findById(roomName).get();
+
+            if (toJoin.getMaster().equals(userName)){
+                return "You're master of the room.";
+            }
+            if (toJoin.getGuest().equals(userName)){
+                return "Success";
+            } else if(toJoin.getGuest()==null || toJoin.getGuest().isEmpty()){
+                try {
+                    toJoin.setGuest(userName);
+                    toJoin.setRoomStatus("Full");
+                    roomRepository.save(toJoin);
+                    if(roomRepository.findById(userName).get().getGuest().equals(userName)){
+                        return "Success";
+                    }
+                } catch (Exception e){
+                    return e.getMessage();
+                }
+            }
+
+            return "There is already a guest.";
+        } catch (NoSuchElementException e){
             return "Room not found.";
         }
-        if (toJoin.getMaster().equals(userName)){
-            return "You're master of the room.";
-        }
-        if (toJoin.getGuest().equals(userName)){
-            return "Success";
-        } else if(toJoin.getGuest()==null || toJoin.getGuest().isEmpty()){
-            try {
-                toJoin.setGuest(userName);
-                toJoin.setRoomStatus(Room.getFullStatus());
-                roomRepository.save(toJoin);
-                if(roomRepository.findById(userName).get().getGuest().equals(userName)){
-                    return "Success";
-                }
-            } catch (Exception e){
-                return e.getMessage();
-            }
-        }
 
-        return "There is already a guest.";
 
     }
 
@@ -68,29 +77,33 @@ public class RoomController {
     @RequestMapping(value = "/leave/{roomName}/{userName}")
     public @ResponseBody String leaveRoom(@PathVariable("roomName") String roomName,
                                          @PathVariable("userName") String userName){
-        Room toLeave = roomRepository.findById(roomName).get();
-        if (toLeave == null){
+        // if .get() not found, it will throws a exception
+        try{
+            Room toLeave = roomRepository.findById(roomName).get();
+
+            if (toLeave.getMaster().equals(userName)){
+                return "You're master of the room.";
+            }
+            if (toLeave.getGuest().equals(userName)){
+                return "Success";
+            } else if(toLeave.getGuest() == null || toLeave.getGuest().isEmpty()){
+                try {
+                    toLeave.setGuest(null);
+                    toLeave.setRoomStatus("Open");
+                    roomRepository.save(toLeave);
+                    if(roomRepository.findById(userName).get().getGuest().equals(userName)){
+                        return "Success";
+                    }
+                } catch (Exception e){
+                    return e.getMessage();
+                }
+            }
+
+            return "There is already a guest.";
+        } catch (NoSuchElementException e){
             return "Room not found.";
         }
-        if (toLeave.getMaster().equals(userName)){
-            return "You're master of the room.";
-        }
-        if (toLeave.getGuest().equals(userName)){
-            return "Success";
-        } else if(toLeave.getGuest() == null || toLeave.getGuest().isEmpty()){
-            try {
-                toLeave.setGuest(null);
-                toLeave.setRoomStatus(Room.getDefaultStatus());
-                roomRepository.save(toLeave);
-                if(roomRepository.findById(userName).get().getGuest().equals(userName)){
-                    return "Success";
-                }
-            } catch (Exception e){
-                return e.getMessage();
-            }
-        }
 
-        return "There is already a guest.";
 
     }
 
@@ -98,18 +111,20 @@ public class RoomController {
     @RequestMapping(value = "/delete/{roomName}/{userName}")
     public @ResponseBody String deleteRoom(@PathVariable("roomName") String roomName,
                                           @PathVariable("userName") String userName){
-        Room toDelete = roomRepository.findById(roomName).get();
-        if (toDelete == null){
+        // if .get() not found, it will throws a exception
+        try{
+            Room toDelete = roomRepository.findById(roomName).get();
+
+            if (!toDelete.getMaster().equals(userName)){
+                return "You're not a master.";
+            }
+
+            roomRepository.delete(toDelete);
+
+            return "Success";
+        } catch (NoSuchElementException e){
             return "Success";
         }
-        if (!toDelete.getMaster().equals(userName)){
-            return "You're not a master.";
-        }
-
-        roomRepository.delete(toDelete);
-
-        return "Success";
-
     }
 
 
