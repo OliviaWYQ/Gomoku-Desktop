@@ -4,14 +4,16 @@ from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 from showchessboard import *
 import requests
+from hall import GameHallWindow
 
-class GameRoom(QWidget):
-    def __init__(self, roomName, userName, serverIp):
+class GameRoomWindow(QWidget):
+    def __init__(self, roomName, userName, serverIp, isMaster):
         super().__init__()
         self.layout = QHBoxLayout()
         self.roomName = roomName
         self.serverIp = serverIp
         self.userName = userName
+        self.isMaster = isMaster
 
         self.title = "Game Hall"
         self.top = 100
@@ -20,9 +22,8 @@ class GameRoom(QWidget):
         self.height = 200
 
         self.InitUI()
-    
-    def InitUI(self):
 
+    def InitUI(self):
         self.setWindowTitle(self.title)
         self.setGeometry(self.top, self.left, self.width, self.height)
 
@@ -30,17 +31,17 @@ class GameRoom(QWidget):
         self.colors.addItems(["Balck", "White"])
         self.colors.setGeometry(250, 40, 100, 20)
 
-        startButton = QPushButton('Start', self)
-        startButton.move(400, 34)
-        startButton.clicked.connect(self.handleStart)
+        self.startButton = QPushButton('Start', self)
+        self.startButton.move(400, 34)
+        self.startButton.clicked.connect(self.handleStart)
 
-        leaveButton = QPushButton('Leave', self)
-        leaveButton.move(250, 94)
-        leaveButton.clicked.connect(self.handleLeave)
+        self.leaveButton = QPushButton('Leave', self)
+        self.leaveButton.move(250, 94)
+        self.leaveButton.clicked.connect(self.handleLeave)
 
-        readyButton = QPushButton('Ready', self)
-        readyButton.move(400, 94)
-        readyButton.clicked.connect(self.handleReady)
+        self.readyButton = QPushButton('Ready', self)
+        self.readyButton.move(400, 94)
+        self.readyButton.clicked.connect(self.handleReady)
 
         self.show()
 
@@ -93,7 +94,7 @@ class GameRoom(QWidget):
 
 ########################### Create Room  ##############################
 
-class CreateRoom(QWidget):
+class CreateRoomWindow(QWidget):
     def __init__(self, masterName, serverIp):
         super().__init__()
         self.serverIp = serverIp
@@ -111,15 +112,25 @@ class CreateRoom(QWidget):
         self.setWindowTitle(self.title)
         self.setGeometry(self.top, self.left, self.width, self.height)
 
-        createButton = QPushButton('Create', self)
-        createButton.move(100, 180)
-        createButton.clicked.connect(self.handleCreate)
+        self.createButton = QPushButton('Create', self)
+        self.createButton.move(100, 180)
+        self.createButton.clicked.connect(self.handleCreate)
+
+        self.createButton = QPushButton('Back', self)
+        self.createButton.move(200, 180)
+        self.createButton.clicked.connect(self.handleBack)
 
         self.roomName = QLineEdit("Enter room name", self)
         self.roomName.setGeometry(100, 100, 400, 30)
 
         self.show()
 
+    @pyqtSlot()
+    def handleBack(self):
+        self.hallFromCreate = GameHallWindow(self.masterName, self.serverIp)
+        self.hallFromCreate.show()
+        self.close()
+    
     @pyqtSlot()
     def handleCreate(self):
 
@@ -130,7 +141,7 @@ class CreateRoom(QWidget):
         result = requests.post('http://' + self.serverIp + ':8080/room', json=payload)
         
         if(result.text == "Success"):
-            self.gameRoom = GameRoom(self.roomName.text(), self.masterName, self.serverIp)
+            self.gameRoom = GameRoomWindow(self.roomName.text(), self.masterName, self.serverIp, True)
             self.gameRoom.show()
             self.close()
         else:

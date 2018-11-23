@@ -2,8 +2,7 @@ import sys
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
-#from showchessboard import *
-from hall import *
+from hall import GameHallWindow
 import requests
 
 IP = "localhost"
@@ -56,7 +55,7 @@ class Window(QMainWindow):
 
         if (r.text == "Success"):
             #QMessageBox.warning(self, 'Success', 'Success')
-            self.hall = GameHall(self.userName.text(), self.serverIp.text())
+            self.hall = GameHallWindow(self.userName.text(), self.serverIp.text())
             self.hall.show()
             self.close()
         else:
