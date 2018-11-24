@@ -19,9 +19,9 @@ class GameHallWindow(QWidget):
         self.width = 700
         self.height = 500
 
-        self.InitUI()
+        self.initUI()
 
-    def InitUI(self):
+    def initUI(self):
         self.setWindowTitle(self.title)
         self.setGeometry(self.top, self.left, self.width, self.height)
 

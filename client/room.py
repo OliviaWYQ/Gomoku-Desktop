@@ -4,7 +4,8 @@ from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 from showchessboard import *
 import requests
-import websocket
+
+from ws4py.client.threadedclient import WebSocketClient
 
 START_SIGNAL = -1
 GUEST_READY_SIGNAL = -2
@@ -12,6 +13,16 @@ GUEST_UNREADY_SIGNAL = -3
 GUEST_LEAVE_SIGNAL = -4
 MASTER_DELETE_SIGNAL = -5
 END_SIGNAL = -6
+
+class socketCli(WebSocketClient):
+    def opened(self):
+        self.send("open")
+ 
+    def closed(self, code, reason=None):
+        print("Closed down", code, reason)
+ 
+    def received_message(self, m):
+        print("recv:", m)
 
 class GameRoomWindow(QWidget):
     def __init__(self, roomName, userName, serverIp, isMaster):
@@ -28,10 +39,10 @@ class GameRoomWindow(QWidget):
         self.width = 600
         self.height = 200
 
-        self.InitUI()
+        self.initUI()
         self.initSocket()
 
-    def InitUI(self):
+    def initUI(self):
         self.setWindowTitle(self.title)
         self.setGeometry(self.top, self.left, self.width, self.height)
 
@@ -57,48 +68,19 @@ class GameRoomWindow(QWidget):
         self.show()
 
     def initSocket(self):
-        # server location
-        # should be 'ws://theIpOfServer:8080/playing'
-        # '/test' is just for test 
-        self.uri = 'ws://' + self.serverIp + ':8080/test'
-        #uri = 'ws://' + self.serverIp + ':8080/playing'
-        # role can be: "m" for master, "g" for guest, "a" for audience
-        # if master use balck stone, "masterStone:1", if white, "masterStone:2"
-        if self.colors.currentText() == 'Black':
-            masterStone = '1'
-        else:
-            masterStone = '2'
-        if self.isMaster:
-            role = 'm'
-        else:
-            role = 'g'
-
-        self.header = ["role:"+role, "roomName:"+self.roomName, "userName"+self.userName, "masterStone:"+masterStone]
-        print(self.header)
-
-        websocket.enableTrace(True)
-        self.ws = websocket.WebSocket()
-        self.ws.connect(self.uri,
-                header=self.header)
-        self.ws.on_message = self.on_message
+        self.ws = socketCli('ws://localhost:8080/test')
+        self.ws.connect()
+        self.ws.send("my test...")
+        # self.ws.run_forever()
 
     def on_message(self, ws, message):
         print('got')
         print(message)
         self.close()
 
-
-
     @pyqtSlot()
     def handleStart(self):
         self.ws.send("start")
-        # trigger = Trigger(uri=uri, header=header)
-
-        # # for test
-        # # modify with pyqt
-        # loop = asyncio.get_event_loop()
-        # tasks = [onClick(trigger)]
-        # loop.run_until_complete(asyncio.wait(tasks))
 
     @pyqtSlot()
     def handleLeave(self):
@@ -185,8 +167,5 @@ class CreateRoomWindow(QWidget):
             self.close()
         else:
             QMessageBox.warning(self, 'Error', result.text)
-
-
-
 
     

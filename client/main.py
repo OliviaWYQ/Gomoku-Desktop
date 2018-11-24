@@ -16,9 +16,9 @@ class Window(QMainWindow):
         self.left = 100
         self.width = 600
         self.height = 500
-        self.InitUI()
+        self.initUI()
 
-    def InitUI(self):
+    def initUI(self):
         self.setWindowTitle(self.title)
         self.setGeometry(self.top, self.left, self.width, self.height)
 
