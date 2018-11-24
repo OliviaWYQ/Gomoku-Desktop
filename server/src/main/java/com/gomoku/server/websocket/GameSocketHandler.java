@@ -25,6 +25,10 @@ public class GameSocketHandler extends TextWebSocketHandler {
     final int MASTER_DELETE_SIGNAL = -5;
     final int END_SIGNAL = -6;
 
+    // TODO: change stone setting signals
+    final int BLACK_STONE_SIGNAL = -7;
+    final int WHITE_STONE_SIGNAL = -8;
+
     final TextMessage START_SIGNAL_MESSAGE = new TextMessage(START_SIGNAL + "");
     final TextMessage GUEST_READY_SIGNALL_MESSAGE = new TextMessage(GUEST_READY_SIGNAL + "");
     final TextMessage GUEST_UNREADY_SIGNAL_MESSAGE = new TextMessage(GUEST_UNREADY_SIGNAL + "");
@@ -32,7 +36,9 @@ public class GameSocketHandler extends TextWebSocketHandler {
     final TextMessage MASTER_DELETE_SIGNAL_MESSAGE = new TextMessage(MASTER_DELETE_SIGNAL + "");
     final TextMessage END_SIGNAL_MESSAGE = new TextMessage(END_SIGNAL + "");
 
-    @Autowired
+    final TextMessage BLACK_STONE_SIGNAL_MESSAGE = new TextMessage(BLACK_STONE_SIGNAL + "");
+    final TextMessage WHITE_STONE_SIGNAL_MESSAGE = new TextMessage(WHITE_STONE_SIGNAL + "");
+
     MatchRepository matchRepository;
 
     @Override
@@ -117,10 +123,25 @@ public class GameSocketHandler extends TextWebSocketHandler {
                                 e.printStackTrace();
                             }
                             break;
+                        case BLACK_STONE_SIGNAL:
+                            try {
+                                rooms.get(roomName).setStones(true);
+                                rooms.get(roomName).getGuest().sendMessage(BLACK_STONE_SIGNAL_MESSAGE);
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                            break;
+                        case WHITE_STONE_SIGNAL:
+                            try {
+                                rooms.get(roomName).setStones(false);
+                                rooms.get(roomName).getGuest().sendMessage(WHITE_STONE_SIGNAL_MESSAGE);
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                            break;
                         default:
                             // TODO: send a certain step to the use
                             break;
-
                     }
                 } else {
                     // moving signal

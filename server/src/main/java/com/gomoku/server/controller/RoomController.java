@@ -31,7 +31,7 @@ public class RoomController {
         // if .get() not found, it will throws a exception
         try{
             Room temp = roomRepository.findById(room.getRoomName()).get();
-            return "User already created a room.";
+            return "Room name already existed.";
         }catch (NoSuchElementException e){
             roomRepository.save(room);
             return "Success";

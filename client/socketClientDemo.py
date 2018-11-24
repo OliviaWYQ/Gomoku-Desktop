@@ -6,7 +6,7 @@ import websocket
 
 # function to handle the message received from server
 def on_message(ws, message):
-        print("got")
+    print("got")
 
 class Trigger:
     

@@ -23,6 +23,7 @@ public class RoomSocketHandler extends TextWebSocketHandler {
     public void handleTextMessage(WebSocketSession session, TextMessage message){
         System.out.println(message.getPayload());
         try {
+            System.out.println("sent!");
             this.ws.sendMessage(new TextMessage(message.getPayload()+" from server"));
         } catch (IOException e) {
             e.printStackTrace();

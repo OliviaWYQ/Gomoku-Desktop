@@ -228,12 +228,22 @@ public class GameStatus {
                     this.guestName,
                     this.gameLogic.getMoves(),
                     this.gameLogic.getWinFlag());
-        else if(masterStone==2 && guestStone==2)
+        else if(masterStone==2 && guestStone==1)
             return new Match(this.guestName,
                     this.masterName,
                     this.gameLogic.getMoves(),
                     this.gameLogic.getWinFlag());
         else
             return null;
+    }
+
+    public void setStones(boolean masterBlack){
+        if (masterBlack){
+            this.masterStone = 1;
+            this.guestStone = 2;
+        } else {
+            this.masterStone = 2;
+            this.guestStone = 1;
+        }
     }
 }
