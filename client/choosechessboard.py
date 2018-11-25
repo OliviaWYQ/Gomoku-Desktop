@@ -63,6 +63,7 @@ class ChooseBtn(QWidget):
         self.GroupBox0 = QGroupBox()
         layout0 = QHBoxLayout()
         self.GroupBox0.setLayout(layout0)
+        layout0.addWidget(choosetext)
         # put img
         self.GroupBox1 = QGroupBox()
         layout1 = QGridLayout()
