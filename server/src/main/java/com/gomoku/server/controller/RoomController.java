@@ -50,17 +50,18 @@ public class RoomController {
             if (toJoin.getMaster().equals(userName)){
                 return "You're master of the room.";
             }
-            if (toJoin.getGuest().equals(userName)){
+            if (toJoin.getGuest() != null && toJoin.getGuest().equals(userName)){
                 return "Success";
-            } else if(toJoin.getGuest()==null || toJoin.getGuest().isEmpty()){
+            } else if(toJoin.getGuest() == null || toJoin.getGuest().isEmpty()){
                 try {
                     toJoin.setGuest(userName);
                     toJoin.setRoomStatus("Full");
                     roomRepository.save(toJoin);
-                    if(roomRepository.findById(userName).get().getGuest().equals(userName)){
+                    if(roomRepository.findById(roomName).get().getGuest().equals(userName)){
                         return "Success";
                     }
                 } catch (Exception e){
+                    System.out.println("Failed!");
                     return e.getMessage();
                 }
             }

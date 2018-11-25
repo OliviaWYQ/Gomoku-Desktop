@@ -118,6 +118,7 @@ public class GameSocketHandler extends TextWebSocketHandler {
                             // master delete
                             try {
                                 rooms.get(roomName).getMaster().sendMessage(MASTER_DELETE_SIGNAL_MESSAGE);
+                                rooms.get(roomName).getGuest().sendMessage(MASTER_DELETE_SIGNAL_MESSAGE);
                                 rooms.remove(roomName);
                             } catch (IOException e) {
                                 e.printStackTrace();

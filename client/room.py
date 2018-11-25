@@ -13,6 +13,9 @@ GUEST_UNREADY_SIGNAL = -3
 GUEST_LEAVE_SIGNAL = -4
 MASTER_DELETE_SIGNAL = -5
 END_SIGNAL = -6
+# TODO: change stone setting signals
+BLACK_STONE_SIGNAL = -7
+WHITE_STONE_SIGNAL = -8
 
 START_SIGNAL_MESSAGE = '-1'
 GUEST_READY_SIGNAL_MESSAGE = '-2'
@@ -20,6 +23,9 @@ GUEST_UNREADY_SIGNAL_MESSAGE = '-3'
 GUEST_LEAVE_SIGNAL_MESSAGE = '-4'
 MASTER_DELETE_SIGNAL_MESSAGE = '-5'
 END_SIGNAL_MESSAGE = '-6'
+# TODO: change stone setting signals
+BLACK_STONE_SIGNAL_MESSAGE = '-7'
+WHITE_STONE_SIGNAL_MESSAGE = '-8'
 
 class socketCli(WebSocketClient):
     def hook(self, toInfluence):
@@ -66,9 +72,10 @@ class GameRoomWindow(QWidget):
         self.setGeometry(self.top, self.left, self.width, self.height)
 
         self.colors = QComboBox(self)
-        self.colors.addItems(["Balck", "White"])
+        self.colors.addItems(["Black", "White"])
         self.colors.setGeometry(250, 40, 100, 20)
         self.colors.setEnabled(self.isMaster)
+        self.colors.currentIndexChanged.connect(self.handleColorChange)
 
         self.startButton = QPushButton('Start', self)
         self.startButton.move(400, 34)
@@ -104,7 +111,6 @@ class GameRoomWindow(QWidget):
                     # END_SIGNAL = -6
                     
                     if self.isMaster:
-                        print(signal)
                         if signal == GUEST_READY_SIGNAL:
                             print("ready")
                             self.ready = True
@@ -120,11 +126,26 @@ class GameRoomWindow(QWidget):
                         else:
                             print("Unvalid master control signal.")
                     else:
-                        pass
+                        if signal == START_SIGNAL:
+                            # TODO: start the game
+                            # start the game
+                            pass
+                        elif signal == MASTER_DELETE_SIGNAL:
+                            self.backHook()
+                            self.close()
+                            # QMessageBox.warning(self, 'Error', 'Room was deleted...')
+                            # self.backHook()
+                            # self.close()
+                        elif signal == BLACK_STONE_SIGNAL:
+                            self.colors.setCurrentIndex(self.colors.findText('Black'))
+                        elif signal == WHITE_STONE_SIGNAL:
+                            self.colors.setCurrentIndex(self.colors.findText('White'))
+                        else:
+                            print("Unvalid guest control signal.")
                     # control signal
                 else:
                     # should not be processed now
-                    print("Moving signal, we are not start yet.")
+                    print("Moving signal, game does not start yet.")
             except:
                 print("Unvalid message format.")
 
@@ -154,37 +175,50 @@ class GameRoomWindow(QWidget):
         self.ws = socketCli(self.uri, headers=self.headers)
         self.ws.connect()
         self.ws.hook(self)
-        # self.ws.send("my test...")
-        # self.ws.run_forever()
+
+    @pyqtSlot()
+    def handleColorChange(self):
+        # TODO: we need to send info to redis
+        print ("we need to send info to redis")
+
+        if self.colors.currentText() == 'Black':
+            self.ws.send(BLACK_STONE_SIGNAL_MESSAGE)
+        else:
+            self.ws.send(WHITE_STONE_SIGNAL_MESSAGE)
+
 
     @pyqtSlot()
     def handleStart(self):
-        #self.ws.send("start")
-        pass
+        # TODO: we need to send info to redis
+        print ("we need to send info to redis")
+
+        self.ws.send(START_SIGNAL_MESSAGE)
+        
 
     @pyqtSlot()
     def handleLeave(self):
         # TODO: we need to send info to redis
         print ("we need to send info to redis")
+
         # payload = {}
         # payload["master"] = self.userName.text()
         # payload["roomName"] = self.pwd.text()
         # result = requests.post('http://' + self.serverIp.text() + ':8080/auth/login', json=payload)
         if self.isMaster:
-            pass
+            self.ws.send(MASTER_DELETE_SIGNAL_MESSAGE)
+            self.backHook()
+            self.close()
         else:
-            reply = QMessageBox.question(self, 'Exit', 'You sure to exit?',
-                QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
-            if reply == QMessageBox.Yes:
-                self.ws.send(GUEST_LEAVE_SIGNAL_MESSAGE)
-                self.backHook()
-                self.close()
+            self.ws.send(GUEST_LEAVE_SIGNAL_MESSAGE)
+            self.backHook()
+            self.close()
 
 
     @pyqtSlot()
     def handleReady(self):
         # TODO: we need to send info to redis
         print ("we need to send info to redis")
+
         # payload = {}
         # payload["master"] = self.userName.text()
         # payload["roomName"] = self.pwd.text()
