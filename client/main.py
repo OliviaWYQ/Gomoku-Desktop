@@ -59,7 +59,7 @@ class Window(QMainWindow):
             self.hall.show()
             self.close()
         else:
-            QMessageBox.warning(self, 'Error', 'Bad user or password')
+            QMessageBox.warning(self, 'Error', 'Unexisted user or wrong password')
 
     @pyqtSlot()
     def handleSignUp(self):

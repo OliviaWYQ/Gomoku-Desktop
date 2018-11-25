@@ -2,7 +2,7 @@ import sys
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
-from showchessboard import *
+from showchessboard import Gomoku
 import requests
 
 from ws4py.client.threadedclient import WebSocketClient
@@ -13,7 +13,6 @@ GUEST_UNREADY_SIGNAL = -3
 GUEST_LEAVE_SIGNAL = -4
 MASTER_DELETE_SIGNAL = -5
 END_SIGNAL = -6
-# TODO: change stone setting signals
 BLACK_STONE_SIGNAL = -7
 WHITE_STONE_SIGNAL = -8
 
@@ -23,7 +22,6 @@ GUEST_UNREADY_SIGNAL_MESSAGE = '-3'
 GUEST_LEAVE_SIGNAL_MESSAGE = '-4'
 MASTER_DELETE_SIGNAL_MESSAGE = '-5'
 END_SIGNAL_MESSAGE = '-6'
-# TODO: change stone setting signals
 BLACK_STONE_SIGNAL_MESSAGE = '-7'
 WHITE_STONE_SIGNAL_MESSAGE = '-8'
 
@@ -42,8 +40,13 @@ class socketCli(WebSocketClient):
         self.toInfluence.handleMessage(message.data.decode("utf-8"))
 
 class GameRoomWindow(QWidget):
+
+    start_game_signal = pyqtSignal()
+
     def __init__(self, roomName, masterName, guestName, serverIp, isMaster, backHook):
         super().__init__()
+        
+        self.start_game_signal.connect(self.start_game)
 
         self.backHook = backHook
 
@@ -52,6 +55,7 @@ class GameRoomWindow(QWidget):
         self.serverIp = serverIp
         #self.userName = userName
         self.isMaster = isMaster
+        self.masterStone = 1
 
         self.masterName = masterName
         self.guestName = guestName
@@ -102,6 +106,7 @@ class GameRoomWindow(QWidget):
         else:
             try:
                 signal = int(message)
+                print("signal", signal)
                 if signal < 0:
                     # START_SIGNAL = -1
                     # GUEST_READY_SIGNAL = -2
@@ -114,30 +119,37 @@ class GameRoomWindow(QWidget):
                         if signal == GUEST_READY_SIGNAL:
                             print("ready")
                             self.ready = True
+                            self.startButton.setEnabled(self.ready)
                             self.readyButton.setText("Ready")
                         elif signal == GUEST_UNREADY_SIGNAL:
                             print("unready")
                             self.ready = False
+                            self.startButton.setEnabled(self.ready)
                             self.readyButton.setText("Unready")
                         elif signal == GUEST_LEAVE_SIGNAL:
                             self.ready = False
+                            self.startButton.setEnabled(self.ready)
                             self.readyButton.setText("Unready")
                             self.guestName = None
+                        elif signal == START_SIGNAL:
+                            # TODO: start the game
+                            print("try to start")
+                            self.start_game_signal.emit()
                         else:
                             print("Unvalid master control signal.")
                     else:
                         if signal == START_SIGNAL:
                             # TODO: start the game
-                            # start the game
-                            pass
+                            print("try to start")
+                            self.start_game_signal.emit()
                         elif signal == MASTER_DELETE_SIGNAL:
                             self.backHook()
                             self.close()
-                            # QMessageBox.warning(self, 'Error', 'Room was deleted...')
-                            # self.backHook()
-                            # self.close()
+                            # TODO: pop a message box
                         elif signal == BLACK_STONE_SIGNAL:
+                            self.masterStone = 1
                             self.colors.setCurrentIndex(self.colors.findText('Black'))
+                            self.masterStone = 2
                         elif signal == WHITE_STONE_SIGNAL:
                             self.colors.setCurrentIndex(self.colors.findText('White'))
                         else:
@@ -149,6 +161,22 @@ class GameRoomWindow(QWidget):
             except:
                 print("Unvalid message format.")
 
+    @pyqtSlot()
+    def start_game(self):
+        # return to hall after the match
+        # if return to room, must init socket, reset the toInfluence by calling hook()
+        backHook = self.backHook
+
+        self.game_board = Gomoku(self.isMaster, 
+                                self.roomName,
+                                self.masterName, 
+                                self.guestName, 
+                                self.masterStone, 
+                                self.serverIp, 
+                                self.ws, 
+                                backHook)
+        self.game_board.show()
+        self.close()
 
     def initSocket(self):
         self.uri = 'ws://' + self.serverIp + ':8080/playing'
@@ -156,10 +184,11 @@ class GameRoomWindow(QWidget):
         # uri = 'ws://' + self.serverIp + ':8080/playing'
         # role can be: "m" for master, "g" for guest, "a" for audience
         # if master use balck stone, "masterStone:1", if white, "masterStone:2"
-        if self.colors.currentText() == 'Black':
-            masterStone = '1'
-        else:
-            masterStone = '2'
+
+        # if self.colors.currentText() == 'Black':
+        #     masterStone = '1'
+        # else:
+        #     masterStone = '2'
 
         if self.isMaster:
             role = 'm'
@@ -171,10 +200,15 @@ class GameRoomWindow(QWidget):
         self.headers = [("role", role), 
             ("roomName", self.roomName),
             ("userName", userName),
-            ("masterStone", masterStone)]
+            ("masterStone", self.masterStone)]
         self.ws = socketCli(self.uri, headers=self.headers)
         self.ws.connect()
         self.ws.hook(self)
+
+        if not self.isMaster:
+            print("before send join")
+            self.ws.send('J'+self.guestName)
+            print("sent join")
 
     @pyqtSlot()
     def handleColorChange(self):
@@ -182,8 +216,10 @@ class GameRoomWindow(QWidget):
         print ("we need to send info to redis")
 
         if self.colors.currentText() == 'Black':
+            self.masterStone = 1
             self.ws.send(BLACK_STONE_SIGNAL_MESSAGE)
         else:
+            self.masterStone = 2
             self.ws.send(WHITE_STONE_SIGNAL_MESSAGE)
 
 

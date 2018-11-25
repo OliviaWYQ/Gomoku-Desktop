@@ -24,8 +24,6 @@ public class GameSocketHandler extends TextWebSocketHandler {
     final int GUEST_LEAVE_SIGNAL = -4;
     final int MASTER_DELETE_SIGNAL = -5;
     final int END_SIGNAL = -6;
-
-    // TODO: change stone setting signals
     final int BLACK_STONE_SIGNAL = -7;
     final int WHITE_STONE_SIGNAL = -8;
 
