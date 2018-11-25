@@ -31,6 +31,7 @@ class Gomoku(QWidget):
         self.chooseboard = QPixmap('chessboard/chessboard14.png')
         self.width_chessboard = 715
         self.height_chessboard = 689
+
         # 9*9
         if self.cbty == 9:
             self.chooseboard = QPixmap('chessboard/chessboard8.png')
@@ -47,6 +48,7 @@ class Gomoku(QWidget):
             self.cbnum = 14
         else:
             print('error cbnum!')
+
         # other
         self.D_piece = 36
         self.R_piece = self.D_piece / 2

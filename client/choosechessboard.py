@@ -50,6 +50,7 @@ class ChooseBtn(QWidget):
         choosetext = QLabel(self)
         choosetext.setText("Costomize Your Chessboard Size And Username Font Type")
         choosetext.setFont(QFont("Roman times", 16, QFont.Bold))
+
         # img
         cb8 = QLabel(self)
         cb8.setPixmap(self.cb8)
@@ -59,11 +60,13 @@ class ChooseBtn(QWidget):
         self.bt1.clicked.connect(self.Action)
         self.bt1.resize(self.bt1.sizeHint())
         self.bt1.move(505, 3)
+
         # put text
         self.GroupBox0 = QGroupBox()
         layout0 = QHBoxLayout()
         self.GroupBox0.setLayout(layout0)
         layout0.addWidget(choosetext)
+
         # put img
         self.GroupBox1 = QGroupBox()
         layout1 = QGridLayout()
@@ -71,21 +74,23 @@ class ChooseBtn(QWidget):
         layout1.addWidget(cb8, 1, 0)
         layout1.addWidget(cb14, 1, 1)
 
-        # button1 for 8*8
+        # button1 for 9*9
         self.b1 = QRadioButton("9*9 chessboard")
         self.b1.setFont(QFont("Roman times", 16, QFont.Bold))
         self.b1.toggled.connect(lambda:self.btnstate(self.b1))
-        # button2 for 14*14
+        # button2 for 15*15
         self.b2 = QRadioButton("15*15 chessboard")
         self.b2.setFont(QFont("Roman times", 16, QFont.Bold))
         self.b2.setChecked(True)
         self.b2.toggled.connect(lambda:self.btnstate(self.b2))
+
         # put button
         self.GroupBox2 = QGroupBox()
         layout2 = QHBoxLayout()
         self.GroupBox2.setLayout(layout2)
         layout2.addWidget(self.b1)
         layout2.addWidget(self.b2)
+
         # button3 for Roman Times
         self.b3 = QRadioButton(self.type1)
         self.b3.setChecked(True)

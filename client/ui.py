@@ -29,7 +29,7 @@ class Window(QMainWindow):
 
         buttonWindow2 = QPushButton('sign up', self)
         buttonWindow2.move(100, 200)
-        buttonWindow2.clicked.connect(self.handleSignUp)        
+        buttonWindow2.clicked.connect(self.handleSignUp)
         self.pwd = QLineEdit("123", self)
         self.pwd.setEchoMode(QLineEdit.Password)
         self.pwd.setGeometry(250, 200, 400, 30)
@@ -47,7 +47,6 @@ class Window(QMainWindow):
         #payload = {'user':'user', 'pass':'123456'}
         r = requests.post('http://' + self.serverIp.text() + ':8080/auth/login', json=payload)
         print(r.text)
-        
         print(payload["userName"])
 
         if (r.text == "Success"):
@@ -70,7 +69,6 @@ class Window(QMainWindow):
         #payload = {'user':'user', 'pass':'123456'}
         r = requests.post('http://' + self.serverIp.text() + ':8080/auth/signup', json=payload)
         print(r.text)
-        
         print(payload["userName"])
 
         if r.text == "Success":
