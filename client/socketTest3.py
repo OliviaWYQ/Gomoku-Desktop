@@ -15,4 +15,4 @@ async def hello(uri, header, timeout):
         time.sleep(timeout)
         ws.close()
 
-asyncio.get_event_loop().run_until_complete(hello('ws://localhost:8080/playing', {"role": "a", "gameid":"123#456", "userName":"777", "masterStone":"1"}, 20))
+asyncio.get_event_loop().run_until_complete(hello('ws://localhost:8080/playing', {"role": "a", "roomName":"123#456", "userName":"777", "masterStone":"1"}, 20))

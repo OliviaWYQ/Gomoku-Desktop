@@ -8,13 +8,38 @@ async def hello(uri, header, timeout):
         print("pas")
         flag = await ws.recv()
         print(f"< {flag}")
+
         flag = await ws.recv()
         print(f"< {flag}")
-        time.sleep(5)
-        for i in range(5):
-            print(i)
-            await ws.send(str(131072+i))
+        await ws.send(str(529))
+        flag = await ws.recv()
+        print(f"< {flag}")
+
+        flag = await ws.recv()
+        print(f"< {flag}")
+        await ws.send(str(1570))
+        flag = await ws.recv()
+        print(f"< {flag}")
+
+        flag = await ws.recv()
+        print(f"< {flag}")
+        await ws.send(str(2628))
+        flag = await ws.recv()
+        print(f"< {flag}")
+
+        flag = await ws.recv()
+        print(f"< {flag}")
+        await ws.send(str(3720))
+        flag = await ws.recv()
+        print(f"< {flag}")
+
+        # flag = await ws.recv()
+        # print(f"< {flag}")
+        # await ws.send(str(4812))
+        # flag = await ws.recv()
+        # print(f"< {flag}")
+        
         time.sleep(timeout)
         ws.close()
 
-asyncio.get_event_loop().run_until_complete(hello('ws://localhost:8080/playing', {"role": "g", "gameid":"123#456", "userName":"456", "masterStone":"1"}, 40))
+asyncio.get_event_loop().run_until_complete(hello('ws://localhost:8080/playing', {"role": "g", "roomName":"123#456", "userName":"456", "masterStone":"1"}, 40))

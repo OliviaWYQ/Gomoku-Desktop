@@ -22,6 +22,8 @@ public class GameStatus {
     private int masterStone;
     private int guestStone;
 
+    private boolean guestReady;
+
     // game logic, store the board and stones
     // check whether a player wins and put the stone correctly
     private GameLogic gameLogic;
@@ -37,12 +39,33 @@ public class GameStatus {
     // put a stone, and give the message should be send
     // add winFlag
     public TextMessage move(int player, TextMessage message) throws Exception {
+        if(! ready()){
+            throw new Exception("Game not starts yet.");
+        }
         int pos = Integer.parseInt(message.getPayload());
+        if (pos < 0){
+            throw new Exception("Control signal, not moving signal.");
+        }
+        // move() return a int, which contains all info, with winFlag
+        TextMessage toSend = new TextMessage(this.gameLogic.move(player, pos) + "");
 
-        // calculate the winFalg
-        int winFlag = this.gameLogic.move(player, pos);
+        // save every move, send to late audience
+        this.appendHistory(toSend);
 
-        TextMessage toSend = new TextMessage((winFlag<<24 | pos) + "");
+        return toSend;
+    }
+
+    // put a stone, and give the message should be send
+    // add winFlag
+    public TextMessage move(int player, int pos) throws Exception {
+        if(! ready()){
+            throw new Exception("Game not start yet.");
+        }
+        if (pos < 0){
+            throw new Exception("Control signal, not moving signal.");
+        }
+        // move() return a int, which contains all info, with winFlag
+        TextMessage toSend = new TextMessage(this.gameLogic.move(player, pos) + "");
 
         // save every move, send to late audience
         this.appendHistory(toSend);
@@ -93,6 +116,7 @@ public class GameStatus {
     public GameStatus(int masterStone) throws Exception{
         this.gameLogic = new GameLogic();
         this.audience = new HashSet<>();
+        this.guestReady = false;
         this.historyMoves = new ArrayList<>();
         if(masterStone == 1){
             this.masterStone = 1;
@@ -105,6 +129,24 @@ public class GameStatus {
         }
     }
 
+    // constructor
+    public GameStatus(int masterStone, String masterName, WebSocketSession masterSession) throws Exception{
+        this.gameLogic = new GameLogic();
+        this.audience = new HashSet<>();
+        this.guestReady = false;
+        this.historyMoves = new ArrayList<>();
+        if(masterStone == 1){
+            this.masterStone = 1;
+            this.guestStone = 2;
+        }else if(masterStone == 2){
+            this.masterStone = 2;
+            this.guestStone = 1;
+        }else{
+            throw new Exception("Invalid stones setting.");
+        }
+        setMasterInfo(masterName, masterSession);
+    }
+
     // testing info
     public void test(){
         System.out.println(this.masterName+" $ "+this.guestName+" $ ");
@@ -113,14 +155,19 @@ public class GameStatus {
 
     // check whether the master and guest session are set
     public boolean ready(){
-        return (this.master!=null && this.guest!=null && this.masterName!=null && this.guestName!=null);
+        return (this.master!=null && this.guest!=null && this.masterName!=null && this.guestName!=null && this.guestReady);
     }
 
     // send game start signal to master and guest
-    public void start() throws IOException {
-        this.master.sendMessage(new TextMessage("masterstart"));
-        this.guest.sendMessage(new TextMessage("gueststart"));
-    }
+    // Important: moved this function to GameSocketHandler
+//    public void start() throws Exception {
+//        if (! ready()){
+//            throw new Exception("Someone unready.");
+//        }
+//        this.master.sendMessage(new TextMessage("masterstart"));
+//        this.guest.sendMessage(new TextMessage("gueststart"));
+//
+//    }
 
     public WebSocketSession getMaster() {
         return master;
@@ -147,4 +194,19 @@ public class GameStatus {
         return gameLogic;
     }
 
+    public boolean isGuestReady() {
+        return guestReady;
+    }
+
+    public void setGuestReady(boolean guestReady) {
+        this.guestReady = guestReady;
+    }
+
+    public void setGuest(WebSocketSession guest) {
+        this.guest = guest;
+    }
+
+    public void setGuestName(String guestName) {
+        this.guestName = guestName;
+    }
 }
