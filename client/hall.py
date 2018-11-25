@@ -24,7 +24,7 @@ class GameHallWindow(QWidget):
     def initUI(self):
         self.setWindowTitle(self.title)
         self.setGeometry(self.top, self.left, self.width, self.height)
-
+        
         self.createButton = QPushButton('Create', self)
         self.createButton.move(580, 20)
         self.createButton.clicked.connect(self.handleCreate)
@@ -105,7 +105,7 @@ class GameHallWindow(QWidget):
 
     @pyqtSlot()
     def handleCreate(self):
-        self.createRoomPage = CreateRoomWindow(self.userName, self.serverIp)
+        self.createRoomPage = CreateRoomWindow(self.userName, self.serverIp, self.show)
         self.createRoomPage.show()
         self.close()
 
@@ -115,8 +115,7 @@ class GameHallWindow(QWidget):
         action = self.actionButton.text()
         print(action)
         if action == "Join":
-            # try to join the game as a guest
-            pass
+            self.joinRoom()
         elif action == "Watch":
             # try to watch the game
             pass
@@ -145,4 +144,26 @@ class GameHallWindow(QWidget):
         except:
             self.actionButton.setEnabled(False)
             self.actionButton.setText("Action")
+
+    def joinRoom(self):
+
+        selectedRow = self.roomsObserved.currentRow()
+        try:
+            roomName = self.roomsObserved.item(selectedRow, 0).text()
+            
+            uri = "http://" + self.serverIp + ':8080/room/join/' + roomName + '/' + self.userName
+
+            result = requests.get(uri)
+
+            print('from server: '+ result.text)
+            
+            if(result.text == "Success"):
+                masterName = self.roomList[selectedRow + self.currentPage * 10]["master"]
+                self.gameRoom = GameRoomWindow(roomName, masterName, self.userName, self.serverIp, False, self.show)
+                self.gameRoom.show()
+                self.close()
+            else:
+                QMessageBox.warning(self, 'Error', result.text)
+        except:
+            QMessageBox.warning(self, 'Error', "Try again.")
 
