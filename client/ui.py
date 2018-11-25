@@ -3,6 +3,8 @@ from PyQt5.QtGui     import *
 from PyQt5.QtCore    import *
 from PyQt5.QtWidgets import *
 from showchessboard import *
+from smallchessboard import *
+from manual import *
 import requests
 
 class Window(QMainWindow):
@@ -31,16 +33,14 @@ class Window(QMainWindow):
         self.pwd = QLineEdit("123", self)
         self.pwd.setEchoMode(QLineEdit.Password)
         self.pwd.setGeometry(250, 200, 400, 30)
-        self.pwd.setEchoMode(QLineEdit.Password)
 
-        self.serverIp = QLineEdit("54.173.206.13", self)
+        self.serverIp = QLineEdit("localhost", self)
         self.serverIp.setGeometry(250, 300, 400, 30)
 
         self.show()
 
     @pyqtSlot()
     def handleLogin(self):
-    
         payload = {}
         payload["userName"] = self.userName.text()
         payload["pass"] = self.pwd.text()
@@ -52,7 +52,7 @@ class Window(QMainWindow):
 
         if (r.text == "Success"):
             QMessageBox.warning(self, 'Success', 'Success')
-            self.game = Gomoku(self.userName.text(), self.serverIp.text())
+            self.game = manual(self.userName.text(), self.serverIp.text())
             self.game.show()
             self.close()
         else:
