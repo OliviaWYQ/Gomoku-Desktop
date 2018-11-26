@@ -9,9 +9,7 @@ from choosechessboard import ChooseBtn
 class Gomoku(QWidget):
     def __init__(self, userName, serverIp, mycbtype, myfonttype):
         super().__init__()
-
         self.start_game_signal.connect(self.showGameEnd)
-
         self.step_no = 0
         self.oth_step = 0
         self.isMaster = isMaster
@@ -32,6 +30,7 @@ class Gomoku(QWidget):
         self.chooseboard = QPixmap('chessboard/chessboard14.png')
         self.width_chessboard = 715
         self.height_chessboard = 689
+        self.bgmusic = musicplayer()
 
         # 9*9
         if self.cbty == 9:
@@ -130,6 +129,13 @@ class Gomoku(QWidget):
         Player_w.setText("White:    " + self.username_w)
         Player_w.move(750, self.height_chessboard - 230)
         Player_w.setFont(QFont(self.myfont, 16, QFont.Bold))
+
+    def addmusic(self):
+        try:
+            # background music
+            self.bgmusic.start()
+        except KeyboardInterrupt:
+            self.bgmusic.stop()
 
     def gamestart(self):
         #game start
@@ -240,6 +246,7 @@ def main():
     app = QApplication(sys.argv)
     mygame = Gomoku("12345", "54.173.206.13", 9, 'Roman times')
     mygame.show()
+    mygame.addmusic()
     sys.exit(app.exec_())
 
 if __name__ == '__main__':
