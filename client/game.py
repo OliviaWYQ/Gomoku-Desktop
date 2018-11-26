@@ -16,7 +16,7 @@ GRID_H = (HEIGHT_CHESSBOARD - (MARGIN* 2)) / 14
 # main gaming UI
 class Gomoku(QWidget):
 
-    start_game_signal = pyqtSignal(int)
+    end_game_signal = pyqtSignal(int)
 
     def __init__(self, 
                 isMaster, 
@@ -26,10 +26,13 @@ class Gomoku(QWidget):
                 masterStone, 
                 serverIp, 
                 websocket, 
-                backHook):
+                backHook,
+                watch_game=False):
         super().__init__()
 
-        self.start_game_signal.connect(self.showGameEnd)
+        self.end_game_signal.connect(self.showGameEnd)
+
+        self.watch_game = watch_game
 
         self.step_no = 0
         self.oth_step = 0
@@ -41,7 +44,17 @@ class Gomoku(QWidget):
             self.userName = guestName
 
         self.roomName = roomName
+
+        # if self.watch_game:
+        #     uri = 'ws://' + serverIp + ':8080/playing'
+            
+        #     headers = [("role", 'a'), 
+        #         ("roomName", roomName),
+        #         ("userName", websocket),
+        #         ("masterStone", 1)]
+        # else:
         self.ws = websocket
+
         self.backHook = backHook
         self.serverIp = serverIp
 
@@ -58,15 +71,17 @@ class Gomoku(QWidget):
             self.my_stone = 1
         else:
             self.my_stone = 2
-
+        
+        #self.ws = socketCli(uri, headers=headers)
+        
         self.resetSocketHook()
 
         self.restart()
 
     def restart(self):    
         #CB init
-        self.obj = CB()
-        self.obj.reset()
+        # self.obj = CB()
+        # self.obj.reset()
         self.winnervalue = 0
         self.showchessboard()
 
@@ -120,6 +135,9 @@ class Gomoku(QWidget):
             self.color = self.black
         else:
             self.color = self.white
+        
+        if self.watch_game:
+            self.ws.connect()
         # self.colornum = 1
     
     def mouseReleaseEvent(self, event):
@@ -130,31 +148,10 @@ class Gomoku(QWidget):
             if self.piece.pos:
                 self.i = round((self.piece.pos.x() - MARGIN) / GRID_W)
                 self.j = round((self.piece.pos.y() - MARGIN) / GRID_H)
-            #print('test: step: %d, coord: ( x: %d ,y: %d, color: %d )' % (self.step, self.i, self.j, self.colornum))
-            
-            # #CB input value
-            # if (self.obj.changevalue(self.i, self.j, self.colornum) == 0):
-            #     print("Invalid! (step: %d, x: %d ,y: %d, color: %d)"  % (self.step, self.i, self.j, self.colornum))
-            #     self.i = None
-            #     self.j = None
-                
-            # else:
-            #     print('step: %d, coord: ( x: %d ,y: %d, color: %d )' % (self.step, self.i, self.j, self.colornum))
-            #     #CB check value
-            #     self.winnervalue = self.obj.checkwinner()
-            #     print('winner:', self.winnervalue)
-            #     if self.winnervalue != 0:
-            #         self.paint(event)
-            #         self.showGameEnd(self.winnervalue)
-            #     else:
-            #         self.paint(event)
-            #         self.nextstep()
-            # self.update()
+
             toSend = self.encode(self.i, self.j)
 
             self.ws.send(toSend)
-
-            
 
     def encode(self, x, y):
         message = x
@@ -177,6 +174,9 @@ class Gomoku(QWidget):
         y = MARGIN + j * GRID_H - R_PIECE
         self.put[self.step_no + self.oth_step].setGeometry(x, y, D_PIECE, D_PIECE) # draw piece to grid
 
+        if self.watch_game:
+            self.step_no += 1
+
     def put_a_stone(self, pos_by_int):
         x = pos_by_int & 0b1111
         y = (pos_by_int >> 4) & 0b1111
@@ -190,70 +190,69 @@ class Gomoku(QWidget):
             self.paint(x, y, self.black)
         else:
             self.paint(x, y, self.white)
-
-        if self.my_stone == player:
-            self.step_no = step + 1
-            self.putStone = False
-        else:
-            self.oth_step = step + 1
-            self.putStone = True
+        if not self.watch_game:
+            if self.my_stone == player:
+                self.step_no = step + 1
+                self.putStone = False
+            else:
+                self.oth_step = step + 1
+                self.putStone = True
         if win_flag == 0:
             pass
         elif win_flag == 1:
             print("black win")
-            self.start_game_signal.emit(1)
+            self.end_game_signal.emit(1)
         elif win_flag == 2:
             print("white win")
-            self.start_game_signal.emit(2)
+            self.end_game_signal.emit(2)
         elif win_flag == 3:
             print("LOL")
-        # if self.winnervalue != 0:
-        #     if player == 1:
-        #         self.paint(x, y, self.black)
-        #     else:
-        #         self.paint(x, y, self.white)
-        #     self.showGameEnd(self.winnervalue)
-        # else:
-        #     self.paint(event)
-        #     self.nextstep()
+            self.end_game_signal.emit(3)
+
         self.update()
-                
-    # def nextstep(self):
-    #     # next step
-    #     self.step += 1
-    #     # change color
-    #     if self.color == self.black:
-    #         self.color = self.white
-    #         self.colornum = 2
-    #     else:
-    #         self.color = self.black
-    #         self.colornum = 1
     
     @pyqtSlot(int)
     def showGameEnd(self, winner):
-        #self.sendMatch(winner, self.obj.sendsteps())
-        if winner == 1:
-            winnername = self.username_b
-        elif winner == 2:
-            winnername = self.username_w
-        else:
-            winnername = "TIE GAME! None of You"
-        self.label = QLabel("About Qt MessageBox")  
-        button = QMessageBox.question(self,"Gomoku Game Information",  
-                                      self.tr("Game End\n%s Win!\nQuit or Start A New Game?" % winnername),  
-                                      QMessageBox.Retry|QMessageBox.Close,  
-                                      QMessageBox.Retry)  
-        if button == QMessageBox.Retry:  
-            self.label.setText("Question button/Retry")
-            self.cam = Gomoku(self.username_b, self.serverIp)
-            self.cam.show()
-            self.close()
-            
-        elif button == QMessageBox.Close:  
-            self.label.setText("Question button/Close")  
-            raise SystemExit(0)
-        else:  
+        if self.watch_game:
+            if winner == 3:
+                info = "Draw. lol"
+            elif winner == 1:
+                info = "Black win!"
+            elif winner == 2:
+                info = "White win!"
+            elif winner == 6:
+                info = "Someone quitted."
+            button = QMessageBox.question(self,"Info",  
+                                      info,  
+                                      QMessageBox.Ok,  
+                                      QMessageBox.Ok)
+            if button == QMessageBox.Ok:
+                self.backHook()
+                self.close()
+            else:
+                self.close()
+                raise SystemExit(0)
             return
+
+        if winner == 3:
+            info = "Draw. lol"
+        else:
+            if winner == 6:
+                info = "Your opponent quitted."
+            elif winner == self.my_stone:
+                info = "You win! Nice!"
+            else:
+                info = "You lose."
+        button = QMessageBox.question(self,"Info",  
+                                      info,  
+                                      QMessageBox.Ok,  
+                                      QMessageBox.Ok)
+        if button == QMessageBox.Ok:
+            self.backHook()
+            self.close()
+        else:
+            self.close()
+            raise SystemExit(0)
 
     def resetSocketHook(self):
         self.ws.hook(self)
@@ -275,8 +274,7 @@ class Gomoku(QWidget):
                     # END_SIGNAL = -6
                     
                     if signal == -6:
-                        # TODO: received end signal, end the game
-                        pass
+                        self.end_game_signal.emit(6)
                     else:
                         print("Should not receive other control signals: ", signal)
                 else:
@@ -284,25 +282,3 @@ class Gomoku(QWidget):
                     self.put_a_stone(signal)
             except:
                 print("Unvalid message format.")
-
-
-    # server will upload the match
-    # client need do nothing
-    # def sendMatch(self, winFlag, moves):
-    #     payload = {}
-    #     payload["user1Id"] = self.username_b
-    #     payload["user2Id"] = self.username_w
-    #     payload["user1win"] = winFlag
-    #     payload["moves"] = moves
-    #     #payload = {'user':'user', 'pass':'123456'}
-    #     r = requests.post('http://' + self.serverIp + ':8080/match', json=payload)
-        
-    #     # print(payload)
-
-    #     # if (r.text == "Success"):
-    #     #     QMessageBox.warning(self, 'Success', 'Success')
-    #     #     self.game = Gomoku(self.userName.text())
-    #     #     self.game.show()
-    #     #     self.close()
-    #     # else:
-    #     #     QMessageBox.warning(self, 'Error', 'Bad user or password')

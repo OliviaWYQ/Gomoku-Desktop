@@ -2,7 +2,7 @@ import sys
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
-from showchessboard import Gomoku
+from game import Gomoku
 import requests
 
 from ws4py.client.threadedclient import WebSocketClient
@@ -84,7 +84,7 @@ class GameRoomWindow(QWidget):
         self.startButton = QPushButton('Start', self)
         self.startButton.move(400, 34)
         self.startButton.clicked.connect(self.handleStart)
-        self.startButton.setEnabled(self.isMaster)
+        self.startButton.setEnabled(False)
 
         self.leaveButton = QPushButton('Leave', self)
         self.leaveButton.move(250, 94)
@@ -119,12 +119,12 @@ class GameRoomWindow(QWidget):
                         if signal == GUEST_READY_SIGNAL:
                             print("ready")
                             self.ready = True
-                            self.startButton.setEnabled(self.ready)
+                            self.startButton.setEnabled(True)
                             self.readyButton.setText("Ready")
                         elif signal == GUEST_UNREADY_SIGNAL:
                             print("unready")
                             self.ready = False
-                            self.startButton.setEnabled(self.ready)
+                            self.startButton.setEnabled(False)
                             self.readyButton.setText("Unready")
                         elif signal == GUEST_LEAVE_SIGNAL:
                             self.ready = False
@@ -214,6 +214,7 @@ class GameRoomWindow(QWidget):
     def handleColorChange(self):
         # TODO: we need to send info to redis
         print ("we need to send info to redis")
+        #res = requests.get('http://' + self.serverIp.text() + ':8080/auth/login', json=payload)
 
         if self.colors.currentText() == 'Black':
             self.masterStone = 1
@@ -241,14 +242,21 @@ class GameRoomWindow(QWidget):
         # payload["roomName"] = self.pwd.text()
         # result = requests.post('http://' + self.serverIp.text() + ':8080/auth/login', json=payload)
         if self.isMaster:
-            self.ws.send(MASTER_DELETE_SIGNAL_MESSAGE)
-            self.backHook()
-            self.close()
+            res = requests.get('http://' + self.serverIp + ':8080/room/delete/'+ self.roomName + '/' + self.masterName)
+            if res.text == 'Success':
+                self.ws.send(MASTER_DELETE_SIGNAL_MESSAGE)
+                self.backHook()
+                self.close()
+            else:
+                print(res.text)
         else:
-            self.ws.send(GUEST_LEAVE_SIGNAL_MESSAGE)
-            self.backHook()
-            self.close()
-
+            res = requests.get('http://' + self.serverIp + ':8080/room/leave/'+ self.roomName + '/' + self.guestName)
+            if res.text == 'Success':
+                self.ws.send(GUEST_LEAVE_SIGNAL_MESSAGE)
+                self.backHook()
+                self.close()
+            else:
+                print(res.text)
 
     @pyqtSlot()
     def handleReady(self):

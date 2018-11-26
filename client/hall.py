@@ -2,8 +2,9 @@ import sys
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
-from room import GameRoomWindow, CreateRoomWindow
+from room import GameRoomWindow, CreateRoomWindow, socketCli
 import requests
+from game import Gomoku
 
 class GameHallWindow(QWidget):
     def __init__(self, userName, serverIp):
@@ -118,7 +119,35 @@ class GameHallWindow(QWidget):
             self.joinRoom()
         elif action == "Watch":
             # try to watch the game
-            pass
+            self.watch_game()
+
+    def watch_game(self):
+        selectedRow = self.roomsObserved.currentRow()
+        masterName = self.roomList[selectedRow + self.currentPage * 10]["master"]
+        guestName = self.roomList[selectedRow + self.currentPage * 10]["guest"]
+        roomName = self.roomsObserved.item(selectedRow, 0).text()
+
+        uri = 'ws://' + self.serverIp + ':8080/playing'
+        
+        headers = [("role", 'a'), 
+            ("roomName", roomName),
+            ("userName", self.userName),
+            ("masterStone", 1)]
+
+        self.ws = socketCli(uri, headers=headers)
+        # self.ws.hook(self)
+
+        self.game_board = Gomoku(True, 
+                                roomName,
+                                masterName, 
+                                guestName, 
+                                1, 
+                                self.serverIp, 
+                                self.ws, 
+                                self.show,
+                                True)
+        self.game_board.show()
+        self.close()
 
     @pyqtSlot()
     def handleExit(self):
@@ -136,7 +165,7 @@ class GameHallWindow(QWidget):
             self.actionButton.setEnabled(True)
             if selectStatus == 'Open':
                 self.actionButton.setText("Join")
-            elif selectSatus == 'Playing':
+            elif selectStatus == 'Playing':
                 self.actionButton.setText("Watch")
             else:
                 self.actionButton.setEnabled(False)

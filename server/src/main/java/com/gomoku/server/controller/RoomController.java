@@ -85,14 +85,14 @@ public class RoomController {
             if (toLeave.getMaster().equals(userName)){
                 return "You're master of the room.";
             }
-            if (toLeave.getGuest().equals(userName)){
+            if (toLeave.getGuest() == null || toLeave.getGuest().isEmpty()){
                 return "Success";
-            } else if(toLeave.getGuest() == null || toLeave.getGuest().isEmpty()){
+            } else if(toLeave.getGuest().equals(userName)){
                 try {
                     toLeave.setGuest(null);
                     toLeave.setRoomStatus("Open");
                     roomRepository.save(toLeave);
-                    if(roomRepository.findById(userName).get().getGuest().equals(userName)){
+                    if(roomRepository.findById(roomName).get().getGuest() == null){
                         return "Success";
                     }
                 } catch (Exception e){
@@ -104,8 +104,6 @@ public class RoomController {
         } catch (NoSuchElementException e){
             return "Room not found.";
         }
-
-
     }
 
     // Delete a room.

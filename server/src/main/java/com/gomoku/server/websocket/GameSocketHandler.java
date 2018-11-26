@@ -1,6 +1,8 @@
 package com.gomoku.server.websocket;
 
 import com.gomoku.server.mongo.repository.MatchRepository;
+import com.gomoku.server.redis.model.Room;
+import com.gomoku.server.redis.repository.RoomRepository;
 import com.gomoku.server.websocket.model.GameStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -37,7 +39,11 @@ public class GameSocketHandler extends TextWebSocketHandler {
     final TextMessage BLACK_STONE_SIGNAL_MESSAGE = new TextMessage(BLACK_STONE_SIGNAL + "");
     final TextMessage WHITE_STONE_SIGNAL_MESSAGE = new TextMessage(WHITE_STONE_SIGNAL + "");
 
+    @Autowired
     MatchRepository matchRepository;
+
+    @Autowired
+    RoomRepository roomRepository;
 
     @Override
     public void handleTextMessage(WebSocketSession session, TextMessage message){
@@ -81,6 +87,11 @@ public class GameSocketHandler extends TextWebSocketHandler {
                     switch (infoByInt) {
                         case START_SIGNAL:
                             // start
+                            Room toStart = roomRepository.findById(roomName).get();
+
+                            toStart.setRoomStatus("Playing");
+                            roomRepository.save(toStart);
+
                             gameStart(roomName);
                             break;
                         case GUEST_READY_SIGNAL:
@@ -255,7 +266,9 @@ public class GameSocketHandler extends TextWebSocketHandler {
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
         super.afterConnectionClosed(session, status);
+        System.out.println("socket closed.");
         // System.out.println("closing: "+session.getHandshakeHeaders().get("role"));
+        String userName = session.getHandshakeHeaders().get("userName").get(0);
         String role = session.getHandshakeHeaders().get("role").get(0);
         String roomName = session.getHandshakeHeaders().get("roomName").get(0);
         if(role.equals("m")){
@@ -263,7 +276,21 @@ public class GameSocketHandler extends TextWebSocketHandler {
             // now: ignore the game
             // TODO: judge winner and upload game info
             // TODO: send end signal
-            rooms.remove(roomName);
+            Room toModify = roomRepository.findById(roomName).get();
+            if (toModify != null){
+                rooms.get(roomName).getGuest().sendMessage(END_SIGNAL_MESSAGE);
+                rooms.get(roomName).getAudience().forEach(audienceSession -> {
+                    try {
+                        audienceSession.sendMessage(END_SIGNAL_MESSAGE);
+                    } catch (Exception e){
+                        System.out.println(e.getMessage());
+                    }
+                });
+
+                rooms.remove(roomName);
+
+                roomRepository.delete(toModify);
+            }
 
         }else if(role.equals("g")){
 
@@ -271,7 +298,24 @@ public class GameSocketHandler extends TextWebSocketHandler {
             // TODO: judge winner and upload game info
             // TODO: send end signal
             //rooms.remove(roomName);
-            rooms.get(roomName).setGuest(null);
+            Room toModify = roomRepository.findById(roomName).get();
+            if (toModify != null) {
+                if (toModify.getRoomStatus().equals("Playing")) {
+                    rooms.get(roomName).getGuest().sendMessage(END_SIGNAL_MESSAGE);
+                    rooms.get(roomName).getAudience().forEach(audienceSession -> {
+                        try {
+                            audienceSession.sendMessage(END_SIGNAL_MESSAGE);
+                        } catch (Exception e) {
+                            System.out.println(e.getMessage());
+                        }
+                    });
+                    rooms.remove(roomName);
+
+                    roomRepository.delete(toModify);
+                } else {
+                    rooms.get(roomName).setGuest(null);
+                }
+            }
 
         }else if(role.equals("a")){
             rooms.get(roomName).getAudience().remove(session);
