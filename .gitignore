@@ -1,2 +1,6 @@
 .DS_Store
 .cache
+.vscode
+.vscode/
+.idea
+.idea/

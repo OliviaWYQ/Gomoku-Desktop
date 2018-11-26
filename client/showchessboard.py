@@ -1,28 +1,29 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Created on Thu Oct 29 10:40:38 2018
-
-@author: yiqianwang
-
-Gomoku Game
-First Iteration
-chessboard UI
-"""
-
-import sys
-from PyQt5.QtWidgets import QWidget, QApplication, QLabel, QVBoxLayout, QMessageBox
+from PyQt5.QtWidgets import QWidget, QLabel, QMessageBox
 from PyQt5.QtGui import QPixmap, QIcon, QFont
-from PyQt5.QtCore import Qt
-from chessboard import chessboard as CB
+from PyQt5.QtCore import Qt, pyqtSignal, pyqtSlot
 import requests
 #from login import *
 from choosechessboard import ChooseBtn
 
+# main gaming UI
 class Gomoku(QWidget):
     def __init__(self, userName, serverIp, mycbtype, myfonttype):
         super().__init__()
-        #username_b = userName
+
+        self.start_game_signal.connect(self.showGameEnd)
+
+        self.step_no = 0
+        self.oth_step = 0
+        self.isMaster = isMaster
+
+        if self.isMaster:
+            self.userName = masterName
+        else:
+            self.userName = guestName
+
+        self.roomName = roomName
+        self.ws = websocket
+        self.backHook = backHook
         self.serverIp = serverIp
         self.username_b = userName
         self.username_w = "Guest"

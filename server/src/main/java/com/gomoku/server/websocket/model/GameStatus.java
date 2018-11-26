@@ -1,7 +1,10 @@
 package com.gomoku.server.websocket.model;
 
+import com.gomoku.server.mongo.model.Match;
+import com.gomoku.server.mongo.repository.MatchRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.stereotype.Component;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 
@@ -12,6 +15,7 @@ import java.util.List;
 import java.util.Set;
 
 public class GameStatus {
+
     private WebSocketSession master;
     private WebSocketSession guest;
     private Set<WebSocketSession> audience;
@@ -208,5 +212,38 @@ public class GameStatus {
 
     public void setGuestName(String guestName) {
         this.guestName = guestName;
+    }
+
+    public List<Integer> getMoves(){
+        return new ArrayList<>(this.gameLogic.getMoves());
+    }
+
+    public int getWinFlag(){
+        return this.gameLogic.getWinFlag();
+    }
+
+    public Match summaryMatch(){
+        if(this.masterStone==1 && this.guestStone==2)
+            return new Match(this.masterName,
+                    this.guestName,
+                    this.gameLogic.getMoves(),
+                    this.gameLogic.getWinFlag());
+        else if(masterStone==2 && guestStone==1)
+            return new Match(this.guestName,
+                    this.masterName,
+                    this.gameLogic.getMoves(),
+                    this.gameLogic.getWinFlag());
+        else
+            return null;
+    }
+
+    public void setStones(boolean masterBlack){
+        if (masterBlack){
+            this.masterStone = 1;
+            this.guestStone = 2;
+        } else {
+            this.masterStone = 2;
+            this.guestStone = 1;
+        }
     }
 }

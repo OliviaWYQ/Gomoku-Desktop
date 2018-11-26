@@ -19,15 +19,19 @@ public class Room implements Serializable{
     private boolean ready;
     private String roomStatus;
 
-    final static String ROOM_DEFAULT_STATUS = "Open";
-    final static String ROOM_FULL_STATUS = "Full";
-    final static String ROOM_PLAYING_STATUS = "Playing";
-
     private boolean playing;
 
     public Room(String roomName, String master){
         this.roomName = roomName;
         this.master = master;
+
+        this.playing = false;
+        this.guest = null;
+    }
+
+    public Room(){
+        this.roomName = null;
+        this.master = null;
 
         this.playing = false;
         this.guest = null;
@@ -40,31 +44,31 @@ public class Room implements Serializable{
         this.guest = null;
         this.playing = false;
         this.ready = false;
-        this.roomStatus = ROOM_DEFAULT_STATUS;
+        this.roomStatus = "Open";
         return true;
-    }
-
-    public boolean isPlaying() {
-        return playing;
-    }
-
-    public void setPlaying(boolean playing) {
-        this.playing = playing;
     }
 
     public String getRoomName() {
         return roomName;
     }
 
+    public void setRoomName(String roomName) {
+        this.roomName = roomName;
+    }
+
     public String getMaster() {
         return master;
+    }
+
+    public void setMaster(String master) {
+        this.master = master;
     }
 
     public String getGuest() {
         return guest;
     }
 
-    public synchronized void setGuest(String guest) {
+    public void setGuest(String guest) {
         this.guest = guest;
     }
 
@@ -84,15 +88,11 @@ public class Room implements Serializable{
         this.roomStatus = roomStatus;
     }
 
-    public static String getDefaultStatus() {
-        return ROOM_DEFAULT_STATUS;
+    public boolean isPlaying() {
+        return playing;
     }
 
-    public static String getFullStatus() {
-        return ROOM_FULL_STATUS;
-    }
-
-    public static String getPlayingStatus() {
-        return ROOM_PLAYING_STATUS;
+    public void setPlaying(boolean playing) {
+        this.playing = playing;
     }
 }

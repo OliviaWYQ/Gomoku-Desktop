@@ -36,7 +36,10 @@ public class AuthController {
         System.out.println(user.getUserName());
         if(userToLog != null)
             return "User name already exists";
-        user.encodePass();
+
+        // init rank score, win rate
+        // and encode the password
+        user.beforeSave();
         userRepository.save(user);
         return "Success";
     }

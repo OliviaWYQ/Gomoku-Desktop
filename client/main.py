@@ -2,22 +2,23 @@ import sys
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
-from showchessboard import *
-from smallchessboard import *
-from manual import *
+from hall import GameHallWindow
 import requests
+
+IP = "localhost"
+#IP = "54.173.206.13"
 
 class Window(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.title = "App"
+        self.title = "Gomoku"
         self.top = 100
         self.left = 100
         self.width = 600
         self.height = 500
-        self.InitUI()
+        self.initUI()
 
-    def InitUI(self):
+    def initUI(self):
         self.setWindowTitle(self.title)
         self.setGeometry(self.top, self.left, self.width, self.height)
 
@@ -28,34 +29,37 @@ class Window(QMainWindow):
         self.userName.setGeometry(100, 100, 400, 30)
 
         buttonWindow2 = QPushButton('sign up', self)
-        buttonWindow2.move(100, 200)
-        buttonWindow2.clicked.connect(self.handleSignUp)
+        buttonWindow2.move(400, 300)
+        buttonWindow2.clicked.connect(self.handleSignUp)        
         self.pwd = QLineEdit("123", self)
         self.pwd.setEchoMode(QLineEdit.Password)
-        self.pwd.setGeometry(250, 200, 400, 30)
+        self.pwd.setGeometry(100, 200, 400, 30)
+        self.pwd.setEchoMode(QLineEdit.Password)
 
-        self.serverIp = QLineEdit("localhost", self)
-        self.serverIp.setGeometry(250, 300, 400, 30)
+        self.serverIp = QLineEdit(IP, self)
+        self.serverIp.setGeometry(100, 400, 400, 30)
 
         self.show()
 
     @pyqtSlot()
     def handleLogin(self):
+    
         payload = {}
         payload["userName"] = self.userName.text()
         payload["pass"] = self.pwd.text()
         #payload = {'user':'user', 'pass':'123456'}
         r = requests.post('http://' + self.serverIp.text() + ':8080/auth/login', json=payload)
         print(r.text)
+        
         print(payload["userName"])
 
         if (r.text == "Success"):
-            QMessageBox.warning(self, 'Success', 'Success')
-            self.game = manual(self.userName.text(), self.serverIp.text())
-            self.game.show()
+            #QMessageBox.warning(self, 'Success', 'Success')
+            self.hall = GameHallWindow(self.userName.text(), self.serverIp.text())
+            self.hall.show()
             self.close()
         else:
-            QMessageBox.warning(self, 'Error', 'Bad user or password')
+            QMessageBox.warning(self, 'Error', 'Unexisted user or wrong password')
 
     @pyqtSlot()
     def handleSignUp(self):
@@ -69,6 +73,7 @@ class Window(QMainWindow):
         #payload = {'user':'user', 'pass':'123456'}
         r = requests.post('http://' + self.serverIp.text() + ':8080/auth/signup', json=payload)
         print(r.text)
+        
         print(payload["userName"])
 
         if r.text == "Success":

@@ -1,5 +1,7 @@
 package com.gomoku.server.websocket.model;
 
+import com.gomoku.server.mongo.repository.MatchRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 
 import java.util.ArrayList;
@@ -10,44 +12,44 @@ public class GameLogic {
     final int SIZE = 15;
     final int FULL = 15*15;
 
-    int stonesNum;
-    int[][] board;
-    boolean endFlag;
-    int winFlag;
-    List<Integer> moves;
-    int round;
+    private int stonesNum;
+    private int[][] board;
+    private boolean endFlag;
+    private int winFlag;
+    private List<Integer> moves;
+    private int round;
 
-    int next;
+    private int next;
 
     // step no for 2 players
     // {player==1, player==2}
-    int[] step = {0, 0};
+    private int[] step = {0, 0};
 
     // TODO: control flag and control signals
     // if the message is negative, the message is a control signal
     // (we use the symbol bit to present the control flag)
     // or, it is a position message
-    final int X_OFFSET = 0;
-    final int X_LENGTH = 4;
-    final int X_MASK = 0b1111;
+    private final int X_OFFSET = 0;
+    private final int X_LENGTH = 4;
+    private final int X_MASK = 0b1111;
 
-    final int Y_OFFSET = X_OFFSET + X_LENGTH;
-    final int Y_LENGTH = 4;
-    final int Y_MASK = 0b1111;
+    private final int Y_OFFSET = X_OFFSET + X_LENGTH;
+    private final int Y_LENGTH = 4;
+    private final int Y_MASK = 0b1111;
 
     // player could be 1 or 2
-    final int PLAYER_FLAG_OFFSET = Y_OFFSET + Y_LENGTH;
-    final int PLAYER_FLAG_LENGTH = 2;
-    final int PLAYER_FLAG_MASK = 0b11;
+    private final int PLAYER_FLAG_OFFSET = Y_OFFSET + Y_LENGTH;
+    private final int PLAYER_FLAG_LENGTH = 2;
+    private final int PLAYER_FLAG_MASK = 0b11;
 
 
-    final int STEP_NO_OFFSET = PLAYER_FLAG_OFFSET + PLAYER_FLAG_LENGTH;
-    final int STEP_NO_LENGTH = 8;
+    private final int STEP_NO_OFFSET = PLAYER_FLAG_OFFSET + PLAYER_FLAG_LENGTH;
+    private final int STEP_NO_LENGTH = 8;
     final int STEP_NO_MASK = 0b1111_1111;
 
-    final int WIN_FLAG_OFFSET = STEP_NO_OFFSET + STEP_NO_LENGTH;
-    final int WIN_FLAG_LENGTH = 3;
-    final int WIN_FLAG_MASK = 0b11;
+    private final int WIN_FLAG_OFFSET = STEP_NO_OFFSET + STEP_NO_LENGTH;
+    private final int WIN_FLAG_LENGTH = 3;
+    private final int WIN_FLAG_MASK = 0b11;
 
     public GameLogic() {
         board = new int[SIZE][SIZE];
@@ -70,7 +72,9 @@ public class GameLogic {
     }
 
     public int move(int player, int pos) throws Exception {
-
+        if(this.winFlag != 0){
+            throw new Exception("Match already completed.");
+        }
         if (player != next || player != ((pos >> PLAYER_FLAG_OFFSET) & PLAYER_FLAG_MASK)) {
             throw new Exception("Wrong stone.");
         } else if(((pos >> STEP_NO_OFFSET) & STEP_NO_MASK) != step[player - 1]) {
@@ -81,6 +85,10 @@ public class GameLogic {
         int y = (pos >> Y_OFFSET) & Y_MASK;
 
         if (board[x][y] == 0){
+
+            // record every step, to save in DB
+            moves.add(pos);
+
             board[x][y] = player;
             step[player - 1]++;
 
@@ -88,6 +96,7 @@ public class GameLogic {
 
             stonesNum++;
             setWinFlag(x, y);
+
         } else {
             throw new Exception("Invalid move.");
         }
@@ -229,6 +238,13 @@ public class GameLogic {
         return winFlag;
     }
 
+    public int getWinFlag() {
+        return winFlag;
+    }
+
+    public List<Integer> getMoves(){
+        return this.moves;
+    }
 
     // Test cases
     public static void main(String[] args){

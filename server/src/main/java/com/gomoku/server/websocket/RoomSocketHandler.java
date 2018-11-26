@@ -22,7 +22,14 @@ public class RoomSocketHandler extends TextWebSocketHandler {
     @Override
     public void handleTextMessage(WebSocketSession session, TextMessage message){
         System.out.println(message.getPayload());
+        String role = session.getHandshakeHeaders().get("role").get(0);
+        String roomName = session.getHandshakeHeaders().get("roomName").get(0);
+        String userName = session.getHandshakeHeaders().get("userName").get(0);
+        System.out.println(role);
+        System.out.println(roomName);
+        System.out.println(userName);
         try {
+            System.out.println("sent!");
             this.ws.sendMessage(new TextMessage(message.getPayload()+" from server"));
         } catch (IOException e) {
             e.printStackTrace();
