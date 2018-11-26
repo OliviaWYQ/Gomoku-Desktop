@@ -3,7 +3,7 @@ from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 from showchessboard import *
-from smallchessboard import *
+#from smallchessboard import *
 from manual import *
 import requests
 
