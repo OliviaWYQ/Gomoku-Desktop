@@ -101,7 +101,7 @@ public class GameSocketHandlerTests {
         guestSession.sendMessage(new TextMessage("-2"));
         Thread.sleep(100);
         masterSession.sendMessage(new TextMessage("-1"));
-        Thread.sleep(100);
+        Thread.sleep(1000);
         masterSession.sendMessage(new TextMessage(new byte[]{'2','5','6'}));
         Thread.sleep(100);
         Assert.assertEquals("256", messageMemory);

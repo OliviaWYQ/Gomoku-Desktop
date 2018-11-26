@@ -181,9 +181,13 @@ public class GameSocketHandler extends TextWebSocketHandler {
                         });
                         if(rooms.get(roomName).getWinFlag() != 0){
                             System.out.println("save!");
-                            Room toDelete = roomRepository.findById(roomName).get();
-                            roomRepository.delete(toDelete);
-                            matchRepository.save(rooms.get(roomName).summaryMatch());
+                            try{
+                                Room toDelete = roomRepository.findById(roomName).get();
+                                roomRepository.delete(toDelete);
+                                matchRepository.save(rooms.get(roomName).summaryMatch());
+                            } catch (Exception e){
+                                return;
+                            }
                         }
                     } catch (Exception e){
                         System.out.println(e.getMessage());

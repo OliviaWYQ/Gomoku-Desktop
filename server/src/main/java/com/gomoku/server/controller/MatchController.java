@@ -27,7 +27,7 @@ public class MatchController {
     */
 
     @RequestMapping(value = "/byuser/{userId}")
-    public @ResponseBody List<Match> searchMatches(@PathVariable String userId){
+    public @ResponseBody List<Match> searchMatches(@PathVariable("userId") String userId){
         //match.setId();
         //matchRepository.save(match);
         List<Match> matches = matchRepository.findByUser1Id(userId);
@@ -39,7 +39,7 @@ public class MatchController {
     }
 
     @RequestMapping(value = "/byid/{matchId}")
-    public @ResponseBody Match searchMatch(@PathVariable String matchId){
+    public @ResponseBody Match searchMatch(@PathVariable("matchId") String matchId){
         //match.setId();
         //matchRepository.save(match);
         Match match = matchRepository.findOneByMatchId(matchId);

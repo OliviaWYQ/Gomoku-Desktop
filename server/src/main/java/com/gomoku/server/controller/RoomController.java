@@ -190,7 +190,7 @@ public class RoomController {
 
     // Search a room by room name.
     @RequestMapping(value = "/{roomName}")
-    public @ResponseBody Room searchRoomByRoomName(@PathVariable String roomName){
+    public @ResponseBody Room searchRoomByRoomName(@PathVariable("roomName") String roomName){
         return roomRepository.findById(roomName).get();
     }
 
