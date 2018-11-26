@@ -13,6 +13,7 @@ import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Component
@@ -87,10 +88,14 @@ public class GameSocketHandler extends TextWebSocketHandler {
                     switch (infoByInt) {
                         case START_SIGNAL:
                             // start
-                            Room toStart = roomRepository.findById(roomName).get();
+                            try{
+                                Room toStart = roomRepository.findById(roomName).get();
 
-                            toStart.setRoomStatus("Playing");
-                            roomRepository.save(toStart);
+                                toStart.setRoomStatus("Playing");
+                                roomRepository.save(toStart);
+                            } catch (Exception e){
+                                System.out.println(e.getMessage());
+                            }
 
                             gameStart(roomName);
                             break;
@@ -176,6 +181,8 @@ public class GameSocketHandler extends TextWebSocketHandler {
                         });
                         if(rooms.get(roomName).getWinFlag() != 0){
                             System.out.println("save!");
+                            Room toDelete = roomRepository.findById(roomName).get();
+                            roomRepository.delete(toDelete);
                             matchRepository.save(rooms.get(roomName).summaryMatch());
                         }
                     } catch (Exception e){
@@ -276,20 +283,24 @@ public class GameSocketHandler extends TextWebSocketHandler {
             // now: ignore the game
             // TODO: judge winner and upload game info
             // TODO: send end signal
-            Room toModify = roomRepository.findById(roomName).get();
-            if (toModify != null){
-                rooms.get(roomName).getGuest().sendMessage(END_SIGNAL_MESSAGE);
-                rooms.get(roomName).getAudience().forEach(audienceSession -> {
-                    try {
-                        audienceSession.sendMessage(END_SIGNAL_MESSAGE);
-                    } catch (Exception e){
-                        System.out.println(e.getMessage());
-                    }
-                });
+            try{
+                Room toModify = roomRepository.findById(roomName).get();
+                if (toModify != null){
+                    rooms.get(roomName).getGuest().sendMessage(END_SIGNAL_MESSAGE);
+                    rooms.get(roomName).getAudience().forEach(audienceSession -> {
+                        try {
+                            audienceSession.sendMessage(END_SIGNAL_MESSAGE);
+                        } catch (Exception e){
+                            System.out.println(e.getMessage());
+                        }
+                    });
 
-                rooms.remove(roomName);
+                    rooms.remove(roomName);
 
-                roomRepository.delete(toModify);
+                    roomRepository.delete(toModify);
+                }
+            } catch (NoSuchElementException e){
+                return;
             }
 
         }else if(role.equals("g")){
@@ -298,23 +309,27 @@ public class GameSocketHandler extends TextWebSocketHandler {
             // TODO: judge winner and upload game info
             // TODO: send end signal
             //rooms.remove(roomName);
-            Room toModify = roomRepository.findById(roomName).get();
-            if (toModify != null) {
-                if (toModify.getRoomStatus().equals("Playing")) {
-                    rooms.get(roomName).getGuest().sendMessage(END_SIGNAL_MESSAGE);
-                    rooms.get(roomName).getAudience().forEach(audienceSession -> {
-                        try {
-                            audienceSession.sendMessage(END_SIGNAL_MESSAGE);
-                        } catch (Exception e) {
-                            System.out.println(e.getMessage());
-                        }
-                    });
-                    rooms.remove(roomName);
+            try{
+                Room toModify = roomRepository.findById(roomName).get();
+                if (toModify != null) {
+                    if (toModify.getRoomStatus().equals("Playing")) {
+                        rooms.get(roomName).getGuest().sendMessage(END_SIGNAL_MESSAGE);
+                        rooms.get(roomName).getAudience().forEach(audienceSession -> {
+                            try {
+                                audienceSession.sendMessage(END_SIGNAL_MESSAGE);
+                            } catch (Exception e) {
+                                System.out.println(e.getMessage());
+                            }
+                        });
+                        rooms.remove(roomName);
 
-                    roomRepository.delete(toModify);
-                } else {
-                    rooms.get(roomName).setGuest(null);
+                        roomRepository.delete(toModify);
+                    } else {
+                        rooms.get(roomName).setGuest(null);
+                    }
                 }
+            } catch (NoSuchElementException e){
+                return;
             }
 
         }else if(role.equals("a")){
