@@ -98,6 +98,8 @@ $ make run
 ```
 Enter the username, password and IPv4 of server, or sign up a new account.
 
+We use PyQt5 to build the UI, and use Pygame to play the background music. You can press SPACE to pause or unpause the music.
+
 ### Server:
 
 Get to the server folder and use Maven to compile and package Java program:
