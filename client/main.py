@@ -6,7 +6,7 @@ from hall import GameHallWindow
 import requests
 
 #IP = "localhost"
-IP = "54.173.206.13"
+IP = "52.207.232.53"
 
 class Window(QMainWindow):
     def __init__(self):
