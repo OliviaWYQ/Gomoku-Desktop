@@ -7,7 +7,9 @@ In this project, we plan to implement a Gomoku game software, which has two mode
 ### Prerequisites
 
 Python 3.6 installed in client and Oracle JDK8 (java-8-oracle) with Maven installed in server.
-
+```
+pip install -r requirements.txt
+```
 ### Installing
 
 #### [Python 3.6](https://www.python.org/downloads/release/python-360/)

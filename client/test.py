@@ -4,7 +4,7 @@ import random
 from chessboard import *# imports chessboard.py
 
 def test_chessboard():
-        obj = chessboard()
+        obj = chessboard(15)
         obj.reset()
         #position out of range check
         t1 = obj.changevalue(-1,-1,1)
