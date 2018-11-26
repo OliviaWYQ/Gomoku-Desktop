@@ -37,7 +37,7 @@ class musicplayer(QThread):
 
     def stop(self):
         pygame.mixer.music.stop()
-
+'''
 def main():
     try:
         bgmusic = musicplayer()
@@ -47,3 +47,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+'''
