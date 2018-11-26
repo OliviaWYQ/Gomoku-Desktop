@@ -97,6 +97,7 @@ public class GameSocketHandlerTests {
         Assert.assertEquals(masterHeader, masterSession.getHandshakeHeaders());
         Assert.assertEquals(guestHeader, guestSession.getHandshakeHeaders());
 
+        Thread.sleep(100);
         guestSession.sendMessage(new TextMessage("-2"));
         Thread.sleep(100);
         masterSession.sendMessage(new TextMessage("-1"));
