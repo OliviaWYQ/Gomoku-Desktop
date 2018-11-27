@@ -77,3 +77,8 @@ class chessboard(object):
         #return size
         def getsize(self):
             return self.size
+
+
+        def setsize(self,size):
+            self.size = size
+            return 0
