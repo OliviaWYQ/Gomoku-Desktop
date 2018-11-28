@@ -5,9 +5,8 @@ matrix:
       install:
       - pip install -U pip
       - pip install -r requirements.txt
-      - sh ./test/travis_config/travis_setup.sh
+      - sh ./travis_setup.sh
       script:
-        - pytest ./client/test.py
         - sh ./travis_run.sh
       after_success:
         coveralls
