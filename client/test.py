@@ -1,4 +1,4 @@
-import io
+geimport io
 import os
 import random
 from chessboard import *# imports chessboard.py
@@ -54,5 +54,34 @@ def test_chessboard():
         winner4 = obj.checkwinner()
         assert winner4 == 2
         obj.reset()
+        #test the loop
+        #test inside loop first 
+        # black five in a polyline
+		for n in range(5):
+				b_valid5 = obj.changevalue(n,n,1)
+				assert b_valid5==1
+				w_valid5 = obj.changevalue(5,2*n,2)
+				assert w_valid5==1
+		b_valid5 = obj.changevalue(0,1,1)
+		assert b_valid5==1
+		b_valid5 = obj.changevalue(0,2,1)
+		assert b_valid5==1
+		b_valid5 = obj.changevalue(0,3,1)
+		assert b_valid5==1
+		b_valid5 = obj.changevalue(1,0,1)
+		assert b_valid5==1
+		b_valid5 = obj.changevalue(2,0,1)
+		assert b_valid5==1
+		looptest = obj.five_in_line(2,0,0,(1,1))
+		assert looptest== False
+		looptest = obj.five_in_line(1,0,0,(0,1))
+		assert looptest== False
+		looptest = obj.five_in_line(1,0,0,(1,0))
+		assert looptest== False
+		looptest = obj.five_in_line(1,0,0,(1,1))
+		assert looptest== True
+		
+		winnertest = obj.checkwinner
+		assert winnertest == 1
 
 test_chessboard()
