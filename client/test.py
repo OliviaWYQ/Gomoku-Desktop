@@ -80,8 +80,7 @@ def test_chessboard():
 		assert looptest== False
 		looptest = obj.five_in_line(1,0,0,(1,1))
 		assert looptest== True
-		
-		winnertest = obj.checkwinner
+		winnertest = obj.checkwinner()
 		assert winnertest == 1
 
 test_chessboard()
