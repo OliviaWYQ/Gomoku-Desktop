@@ -8,7 +8,7 @@ matrix:
       - sh ./test/travis_config/travis_setup.sh
       script:
         - pytest ./client/test.py
-        - sh ./test/travis_config/travis_run.sh
+        - sh ./travis_run.sh
       after_success:
         coveralls
 
