@@ -5,8 +5,12 @@ matrix:
       install:
       - pip install -U pip
       - pip install -r requirements.txt
+      - sh ./test/travis_config/travis_setup.sh
       script:
         - pytest ./client/test.py
+        - sh ./test/travis_config/travis_run.sh
+      after_success:
+        coveralls
 
     - language: java
       sudo: true
