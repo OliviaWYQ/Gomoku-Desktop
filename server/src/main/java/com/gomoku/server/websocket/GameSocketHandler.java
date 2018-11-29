@@ -31,7 +31,7 @@ public class GameSocketHandler extends TextWebSocketHandler {
     final int WHITE_STONE_SIGNAL = -8;
 
     final TextMessage START_SIGNAL_MESSAGE = new TextMessage(START_SIGNAL + "");
-    final TextMessage GUEST_READY_SIGNALL_MESSAGE = new TextMessage(GUEST_READY_SIGNAL + "");
+    final TextMessage GUEST_READY_SIGNAL_MESSAGE = new TextMessage(GUEST_READY_SIGNAL + "");
     final TextMessage GUEST_UNREADY_SIGNAL_MESSAGE = new TextMessage(GUEST_UNREADY_SIGNAL + "");
     final TextMessage GUEST_LEAVE_SIGNAL_MESSAGE = new TextMessage(GUEST_LEAVE_SIGNAL + "");
     final TextMessage MASTER_DELETE_SIGNAL_MESSAGE = new TextMessage(MASTER_DELETE_SIGNAL + "");
@@ -103,7 +103,7 @@ public class GameSocketHandler extends TextWebSocketHandler {
                             // guest ready
                             rooms.get(roomName).setGuestReady(true);
                             try {
-                                rooms.get(roomName).getMaster().sendMessage(GUEST_READY_SIGNALL_MESSAGE);
+                                rooms.get(roomName).getMaster().sendMessage(GUEST_READY_SIGNAL_MESSAGE);
                             } catch (IOException e) {
                                 e.printStackTrace();
                             }
@@ -286,23 +286,24 @@ public class GameSocketHandler extends TextWebSocketHandler {
 
             // now: ignore the game
             // TODO: judge winner and upload game info
-            // TODO: send end signal
+            // send end signal
             try{
                 Room toModify = roomRepository.findById(roomName).get();
-                if (toModify != null){
-                    rooms.get(roomName).getGuest().sendMessage(END_SIGNAL_MESSAGE);
-                    rooms.get(roomName).getAudience().forEach(audienceSession -> {
-                        try {
-                            audienceSession.sendMessage(END_SIGNAL_MESSAGE);
-                        } catch (Exception e){
-                            System.out.println(e.getMessage());
-                        }
-                    });
 
-                    rooms.remove(roomName);
+                rooms.get(roomName).getGuest().sendMessage(END_SIGNAL_MESSAGE);
+                rooms.get(roomName).getAudience().forEach(audienceSession -> {
+                    try {
+                        audienceSession.sendMessage(END_SIGNAL_MESSAGE);
+                    } catch (Exception e){
+                        System.out.println(e.getMessage());
+                    }
+                });
 
-                    roomRepository.delete(toModify);
-                }
+                // delete the session in socket controller
+                rooms.remove(roomName);
+                // delete the hall info from redis
+                roomRepository.delete(toModify);
+
             } catch (NoSuchElementException e){
                 return;
             }
@@ -311,7 +312,7 @@ public class GameSocketHandler extends TextWebSocketHandler {
 
             // now: ignore the game
             // TODO: judge winner and upload game info
-            // TODO: send end signal
+            // send end signal
             //rooms.remove(roomName);
             try{
                 Room toModify = roomRepository.findById(roomName).get();
