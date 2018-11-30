@@ -13,7 +13,7 @@ from PyQt5.QtWidgets import QWidget, QPushButton,\
     QTableWidgetItem, QHeaderView
 import requests
 
-from room import GameRoomWindow, CreateRoomWindow, socketCli
+from room import GameRoomWindow, CreateRoomWindow, SocketCli
 from game import Gomoku
 
 class GameHallWindow(QWidget):
@@ -157,11 +157,11 @@ class GameHallWindow(QWidget):
             ("userName", self.username),\
             ("masterStone", 1)]
 
-        self.ws = socketCli(uri, headers=headers)
-        # self.ws.hook(self)
+        self.web_socket = SocketCli(uri, headers=headers)
+        # self.web_socket.hook(self)
 
         self.game_board = Gomoku(True, room_name, master_name,\
-            guest_name, 1, self.server_ip, self.ws,\
+            guest_name, 1, self.server_ip, self.web_socket,\
             self.show, True)
         self.game_board.show()
         self.close()

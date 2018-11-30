@@ -1,8 +1,6 @@
 from PyQt5.QtWidgets import QWidget, QLabel, QMessageBox
 from PyQt5.QtGui import QPixmap, QIcon, QFont
 from PyQt5.QtCore import Qt, pyqtSignal, pyqtSlot
-import requests
-from chessboard import chessboard as CB
 
 D_PIECE = 36
 R_PIECE = D_PIECE / 2
@@ -12,83 +10,77 @@ MARGIN = 20
 GRID_W = (WIDTH_CHESSBOARD - (MARGIN * 2)) / 14
 GRID_H = (HEIGHT_CHESSBOARD - (MARGIN* 2)) / 14
 
-
-# main gaming UI
 class Gomoku(QWidget):
+    # main gaming UI
 
     end_game_signal = pyqtSignal(int)
 
-    def __init__(self, 
-                isMaster, 
-                roomName,  
-                masterName, 
-                guestName, 
-                masterStone, 
-                serverIp, 
-                websocket, 
-                backHook,
+    def __init__(self, is_master, room_name,\
+                master_name, guest_name,\
+                master_stone, server_ip,\
+                web_socket, back_hook,\
                 watch_game=False):
         super().__init__()
 
-        self.end_game_signal.connect(self.showGameEnd)
+        self.end_game_signal.connect(self.show_game_end)
 
         self.watch_game = watch_game
 
         self.step_no = 0
         self.oth_step = 0
-        self.isMaster = isMaster
+        self.is_master = is_master
 
-        if self.isMaster:
-            self.userName = masterName
+        if self.is_master:
+            self.user_name = master_name
         else:
-            self.userName = guestName
+            self.user_name = guest_name
 
-        self.roomName = roomName
+        self.room_name = room_name
 
         # if self.watch_game:
-        #     uri = 'ws://' + serverIp + ':8080/playing'
-            
-        #     headers = [("role", 'a'), 
-        #         ("roomName", roomName),
-        #         ("userName", websocket),
+        #     uri = 'ws://' + server_ip + ':8080/playing'
+
+        #     headers = [("role", 'a'),
+        #         ("roomName", room_name),
+        #         ("userName", web_socket),
         #         ("masterStone", 1)]
         # else:
-        self.ws = websocket
+        self.web_socket = web_socket
 
-        self.backHook = backHook
-        self.serverIp = serverIp
+        self.back_hook = back_hook
+        self.server_ip = server_ip
 
-        if masterStone == 1:
-            self.username_b = masterName
-            self.username_w = guestName
-            self.putStone = self.isMaster
+        if master_stone == 1:
+            self.username_b = master_name
+            self.username_w = guest_name
+            self.put_stone = self.is_master
         else:
-            self.username_w = masterName
-            self.username_b = guestName
-            self.putStone = not self.isMaster
+            self.username_w = master_name
+            self.username_b = guest_name
+            self.put_stone = not self.is_master
 
-        if self.putStone:
+        if self.put_stone:
             self.my_stone = 1
         else:
             self.my_stone = 2
-        
-        #self.ws = socketCli(uri, headers=headers)
-        
-        self.resetSocketHook()
+
+        #self.web_socket = SocketCli(uri, headers=headers)
+
+        self.reset_socket_hook()
 
         self.restart()
 
-    def restart(self):    
+    def restart(self):
         #CB init
         # self.obj = CB()
         # self.obj.reset()
         self.winnervalue = 0
-        self.showchessboard()
+        self.show_chess_board()
 
-        self.gamestart()
+        self.game_start()
         self.setMouseTracking(True)
-    
-    def showchessboard(self):
+
+    def show_chess_board(self):
         # init user interface
         self.setGeometry(330, 70, WIDTH_CHESSBOARD + 200, HEIGHT_CHESSBOARD) # set window size
         self.setWindowTitle("Gomoku Game") # set window title
@@ -96,8 +88,8 @@ class Gomoku(QWidget):
         self.chessboard14 = QPixmap('chessboard/chessboard14.png') # set background
         self.black = QPixmap('chessboard/black.png') # set black piece
         self.white = QPixmap('chessboard/white.png') # set white piece
-        self.manyblack = QPixmap('chessboard/manyblack.png') # set many black
-        self.manywhite = QPixmap('chessboard/manywhite.png') # set many white
+        self.many_black = QPixmap('chessboard/manyblack.png') # set many black
+        self.many_white = QPixmap('chessboard/manywhite.png') # set many white
         self.setCursor(Qt.PointingHandCursor) # set mouse shape
         # show chessboard
         background = QLabel(self)
@@ -105,11 +97,11 @@ class Gomoku(QWidget):
         background.setScaledContents(True)
         # show many black
         user_black = QLabel(self)
-        user_black.setPixmap(self.manyblack)
+        user_black.setPixmap(self.many_black)
         user_black.move(720, 10)
         # show many white
         user_white = QLabel(self)
-        user_white.setPixmap(self.manywhite)
+        user_white.setPixmap(self.many_white)
         user_white.move(720, HEIGHT_CHESSBOARD - 195)
         # show playername in black
         player_black = QLabel(self)
@@ -121,8 +113,8 @@ class Gomoku(QWidget):
         player_white.setText("White:    " + self.username_w)
         player_white.move(750, HEIGHT_CHESSBOARD - 230)
         player_white.setFont(QFont("Roman times", 16, QFont.Bold))
-        
-    def gamestart(self):
+
+    def game_start(self):
         #game start
         #location of a piece
         self.piece = QLabel(self)
@@ -131,27 +123,30 @@ class Gomoku(QWidget):
         # draw a piece, total 15 *15
         self.put = [QLabel(self) for i in range(15 * 15)]
         # self.step = 1
-        if self.putStone:
+        if self.put_stone:
             self.color = self.black
         else:
             self.color = self.white
-        
+
         if self.watch_game:
-            self.ws.connect()
+            self.web_socket.connect()
         # self.colornum = 1
-    
+
     def mouseReleaseEvent(self, event):
-        if self.putStone:
-            #self.putStone = False
+        if self.put_stone:
+            #self.put_stone = False
 
             self.piece.pos = event.pos()
             if self.piece.pos:
+
                 self.i = round((self.piece.pos.x() - MARGIN) / GRID_W)
                 self.j = round((self.piece.pos.y() - MARGIN) / GRID_H)
 
-            toSend = self.encode(self.i, self.j)
+                if self.i < 15 and self.j < 15 and\
+                    self.i >= 0 and self.j >= 0:
+                    to_send = self.encode(self.i, self.j)
 
-            self.ws.send(toSend)
+                    self.web_socket.send(to_send)
 
     def encode(self, x, y):
         message = x
@@ -160,19 +155,12 @@ class Gomoku(QWidget):
         message |= (self.step_no << 10)
         return str(message)
 
-    def paint(self, event):
-        if self.piece.pos:
-            self.put[self.step].setPixmap(self.color)
-            if self.i != None and self.j != None:
-                x = MARGIN + self.i * GRID_W - R_PIECE
-                y = MARGIN + self.j * GRID_H - R_PIECE
-                self.put[self.step].setGeometry(x, y, D_PIECE, D_PIECE) # draw piece to grid
-
     def paint(self, i, j, color):
         self.put[self.step_no + self.oth_step].setPixmap(color)
         x = MARGIN + i * GRID_W - R_PIECE
         y = MARGIN + j * GRID_H - R_PIECE
-        self.put[self.step_no + self.oth_step].setGeometry(x, y, D_PIECE, D_PIECE) # draw piece to grid
+        # draw piece to grid
+        self.put[self.step_no + self.oth_step].setGeometry(x, y, D_PIECE, D_PIECE)
 
         if self.watch_game:
             self.step_no += 1
@@ -193,10 +181,10 @@ class Gomoku(QWidget):
         if not self.watch_game:
             if self.my_stone == player:
                 self.step_no = step + 1
-                self.putStone = False
+                self.put_stone = False
             else:
                 self.oth_step = step + 1
-                self.putStone = True
+                self.put_stone = True
         if win_flag == 0:
             pass
         elif win_flag == 1:
@@ -210,9 +198,9 @@ class Gomoku(QWidget):
             self.end_game_signal.emit(3)
 
         self.update()
-    
+
     @pyqtSlot(int)
-    def showGameEnd(self, winner):
+    def show_game_end(self, winner):
         if self.watch_game:
             if winner == 3:
                 info = "Draw. lol"
@@ -222,12 +210,12 @@ class Gomoku(QWidget):
                 info = "White win!"
             elif winner == 6:
                 info = "Someone quitted."
-            button = QMessageBox.question(self,"Info",  
-                                      info,  
-                                      QMessageBox.Ok,  
+            button = QMessageBox.question(self, "Info",\
+                                      info,\
+                                      QMessageBox.Ok,\
                                       QMessageBox.Ok)
             if button == QMessageBox.Ok:
-                self.backHook()
+                self.back_hook()
                 self.close()
             else:
                 self.close()
@@ -243,21 +231,21 @@ class Gomoku(QWidget):
                 info = "You win! Nice!"
             else:
                 info = "You lose."
-        button = QMessageBox.question(self,"Info",  
-                                      info,  
-                                      QMessageBox.Ok,  
+        button = QMessageBox.question(self, "Info",\
+                                      info,\
+                                      QMessageBox.Ok,\
                                       QMessageBox.Ok)
         if button == QMessageBox.Ok:
-            self.backHook()
+            self.back_hook()
             self.close()
         else:
             self.close()
             raise SystemExit(0)
 
-    def resetSocketHook(self):
-        self.ws.hook(self)
+    def reset_socket_hook(self):
+        self.web_socket.hook(self)
 
-    def handleMessage(self, message):
+    def handle_message(self, message):
         print("Received: ", message)
         if message[0] == 'J':
             # join signal
@@ -272,7 +260,7 @@ class Gomoku(QWidget):
                     # GUEST_LEAVE_SIGNAL = -4
                     # MASTER_DELETE_SIGNAL = -5
                     # END_SIGNAL = -6
-                    
+
                     if signal == -6:
                         self.end_game_signal.emit(6)
                     else:

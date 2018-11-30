@@ -1,11 +1,12 @@
-import sys
-from PyQt5.QtGui import *
-from PyQt5.QtCore import *
-from PyQt5.QtWidgets import *
-from game import Gomoku
+#import sys
+# from PyQt5.QtGui import *
+from PyQt5.QtCore import pyqtSignal, pyqtSlot
+from PyQt5.QtWidgets import QWidget, QHBoxLayout, QPushButton,\
+    QMessageBox, QComboBox, QLineEdit
 import requests
-
 from ws4py.client.threadedclient import WebSocketClient
+
+from game import Gomoku
 
 START_SIGNAL = -1
 GUEST_READY_SIGNAL = -2
@@ -25,40 +26,40 @@ END_SIGNAL_MESSAGE = '-6'
 BLACK_STONE_SIGNAL_MESSAGE = '-7'
 WHITE_STONE_SIGNAL_MESSAGE = '-8'
 
-class socketCli(WebSocketClient):
-    def hook(self, toInfluence):
-        self.toInfluence = toInfluence
+class SocketCli(WebSocketClient):
+    def hook(self, to_influence):
+        self.to_influence = to_influence
 
     def opened(self):
         #self.send("open")
         pass
- 
+
     def closed(self, code, reason=None):
         print("Closed down", code, reason)
- 
+
     def received_message(self, message):
-        self.toInfluence.handleMessage(message.data.decode("utf-8"))
+        self.to_influence.handle_message(message.data.decode("utf-8"))
 
 class GameRoomWindow(QWidget):
 
     start_game_signal = pyqtSignal()
 
-    def __init__(self, roomName, masterName, guestName, serverIp, isMaster, backHook):
+    def __init__(self, room_name, master_name, guest_name, server_ip, is_master, back_hook):
         super().__init__()
-        
+
         self.start_game_signal.connect(self.start_game)
 
-        self.backHook = backHook
+        self.back_hook = back_hook
 
         self.layout = QHBoxLayout()
-        self.roomName = roomName
-        self.serverIp = serverIp
-        #self.userName = userName
-        self.isMaster = isMaster
-        self.masterStone = 1
+        self.room_name = room_name
+        self.server_ip = server_ip
+        #self.user_name = user_name
+        self.is_master = is_master
+        self.master_stone = 1
 
-        self.masterName = masterName
-        self.guestName = guestName
+        self.master_name = master_name
+        self.guest_name = guest_name
 
         self.title = "Game Hall"
         self.top = 100
@@ -68,41 +69,41 @@ class GameRoomWindow(QWidget):
 
         self.ready = False
 
-        self.initUI()
-        self.initSocket()
+        self.init_socket()
+        self.init_ui()
 
-    def initUI(self):
+    def init_ui(self):
         self.setWindowTitle(self.title)
         self.setGeometry(self.top, self.left, self.width, self.height)
 
         self.colors = QComboBox(self)
         self.colors.addItems(["Black", "White"])
         self.colors.setGeometry(250, 40, 100, 20)
-        self.colors.setEnabled(self.isMaster)
-        self.colors.currentIndexChanged.connect(self.handleColorChange)
+        self.colors.setEnabled(self.is_master)
+        self.colors.currentIndexChanged.connect(self.handle_color_change)
 
-        self.startButton = QPushButton('Start', self)
-        self.startButton.move(400, 34)
-        self.startButton.clicked.connect(self.handleStart)
-        self.startButton.setEnabled(False)
+        self.start_button = QPushButton('Start', self)
+        self.start_button.move(400, 34)
+        self.start_button.clicked.connect(self.handle_start)
+        self.start_button.setEnabled(False)
 
-        self.leaveButton = QPushButton('Leave', self)
-        self.leaveButton.move(250, 94)
-        self.leaveButton.clicked.connect(self.handleLeave)
+        self.leave_button = QPushButton('Leave', self)
+        self.leave_button.move(250, 94)
+        self.leave_button.clicked.connect(self.handle_leave)
 
-        self.readyButton = QPushButton('Unready', self)
-        self.readyButton.move(400, 94)
-        self.readyButton.clicked.connect(self.handleReady)
-        self.readyButton.setEnabled(not self.isMaster)
+        self.ready_button = QPushButton('Unready', self)
+        self.ready_button.move(400, 94)
+        self.ready_button.clicked.connect(self.handle_ready)
+        self.ready_button.setEnabled(not self.is_master)
 
         self.show()
 
-    def handleMessage(self, message):
+    def handle_message(self, message):
         print("Received: ", message)
         if message[0] == 'J':
             # join signal
-            if self.isMaster:
-                self.guestName = message[1:]
+            if self.is_master:
+                self.guest_name = message[1:]
         else:
             try:
                 signal = int(message)
@@ -114,42 +115,40 @@ class GameRoomWindow(QWidget):
                     # GUEST_LEAVE_SIGNAL = -4
                     # MASTER_DELETE_SIGNAL = -5
                     # END_SIGNAL = -6
-                    
-                    if self.isMaster:
+
+                    if self.is_master:
                         if signal == GUEST_READY_SIGNAL:
                             print("ready")
                             self.ready = True
-                            self.startButton.setEnabled(True)
-                            self.readyButton.setText("Ready")
+                            self.start_button.setEnabled(True)
+                            self.ready_button.setText("Ready")
                         elif signal == GUEST_UNREADY_SIGNAL:
                             print("unready")
                             self.ready = False
-                            self.startButton.setEnabled(False)
-                            self.readyButton.setText("Unready")
+                            self.start_button.setEnabled(False)
+                            self.ready_button.setText("Unready")
                         elif signal == GUEST_LEAVE_SIGNAL:
                             self.ready = False
-                            self.startButton.setEnabled(self.ready)
-                            self.readyButton.setText("Unready")
-                            self.guestName = None
+                            self.start_button.setEnabled(self.ready)
+                            self.ready_button.setText("Unready")
+                            self.guest_name = None
                         elif signal == START_SIGNAL:
-                            # TODO: start the game
                             print("try to start")
                             self.start_game_signal.emit()
                         else:
                             print("Unvalid master control signal.")
                     else:
                         if signal == START_SIGNAL:
-                            # TODO: start the game
                             print("try to start")
                             self.start_game_signal.emit()
                         elif signal == MASTER_DELETE_SIGNAL:
-                            self.backHook()
+                            self.back_hook()
                             self.close()
                             # TODO: pop a message box
                         elif signal == BLACK_STONE_SIGNAL:
-                            self.masterStone = 1
+                            self.master_stone = 1
                             self.colors.setCurrentIndex(self.colors.findText('Black'))
-                            self.masterStone = 2
+                            self.master_stone = 2
                         elif signal == WHITE_STONE_SIGNAL:
                             self.colors.setCurrentIndex(self.colors.findText('White'))
                         else:
@@ -164,174 +163,161 @@ class GameRoomWindow(QWidget):
     @pyqtSlot()
     def start_game(self):
         # return to hall after the match
-        # if return to room, must init socket, reset the toInfluence by calling hook()
-        backHook = self.backHook
+        # if return to room, must init socket, reset the to_influence by calling hook()
+        back_hook = self.back_hook
 
-        self.game_board = Gomoku(self.isMaster, 
-                                self.roomName,
-                                self.masterName, 
-                                self.guestName, 
-                                self.masterStone, 
-                                self.serverIp, 
-                                self.ws, 
-                                backHook)
+        self.game_board = Gomoku(self.is_master, self.room_name,\
+                                self.master_name, self.guest_name,\
+                                self.master_stone, self.server_ip,\
+                                self.web_socket, back_hook)
         self.game_board.show()
         self.close()
 
-    def initSocket(self):
-        self.uri = 'ws://' + self.serverIp + ':8080/playing'
-        # self.uri = 'ws://' + self.serverIp + ':8080/test'
-        # uri = 'ws://' + self.serverIp + ':8080/playing'
+    def init_socket(self):
+        # uri = 'ws://' + self.server_ip + ':8080/playing'
         # role can be: "m" for master, "g" for guest, "a" for audience
-        # if master use balck stone, "masterStone:1", if white, "masterStone:2"
+        # if master use balck stone, "master_stone:1", if white, "master_stone:2"
 
         # if self.colors.currentText() == 'Black':
-        #     masterStone = '1'
+        #     master_stone = '1'
         # else:
-        #     masterStone = '2'
+        #     master_stone = '2'
 
-        if self.isMaster:
+        self.uri = 'ws://' + self.server_ip + ':8080/playing'
+        # self.uri = 'ws://' + self.server_ip + ':8080/test'
+
+        if self.is_master:
             role = 'm'
-            userName = self.masterName
+            user_name = self.master_name
         else:
             role = 'g'
-            userName = self.guestName
-            
-        self.headers = [("role", role), 
-            ("roomName", self.roomName),
-            ("userName", userName),
-            ("masterStone", self.masterStone)]
-        self.ws = socketCli(self.uri, headers=self.headers)
-        self.ws.connect()
-        self.ws.hook(self)
+            user_name = self.guest_name
 
-        if not self.isMaster:
+        self.headers = [("role", role),\
+            ("roomName", self.room_name),\
+            ("userName", user_name),\
+            ("masterStone", self.master_stone)]
+        self.web_socket = SocketCli(self.uri, headers=self.headers)
+        self.web_socket.connect()
+        self.web_socket.hook(self)
+
+        if not self.is_master:
             print("before send join")
-            self.ws.send('J'+self.guestName)
+            self.web_socket.send('J'+self.guest_name)
             print("sent join")
 
     @pyqtSlot()
-    def handleColorChange(self):
-        # TODO: we need to send info to redis
-        print ("we need to send info to redis")
-        #res = requests.get('http://' + self.serverIp.text() + ':8080/auth/login', json=payload)
-
+    def handle_color_change(self):
         if self.colors.currentText() == 'Black':
-            self.masterStone = 1
-            self.ws.send(BLACK_STONE_SIGNAL_MESSAGE)
+            self.master_stone = 1
+            self.web_socket.send(BLACK_STONE_SIGNAL_MESSAGE)
         else:
-            self.masterStone = 2
-            self.ws.send(WHITE_STONE_SIGNAL_MESSAGE)
+            self.master_stone = 2
+            self.web_socket.send(WHITE_STONE_SIGNAL_MESSAGE)
 
 
     @pyqtSlot()
-    def handleStart(self):
-        # TODO: we need to send info to redis
-        print ("we need to send info to redis")
+    def handle_start(self):
+        # donot need to send info to redis,
+        # done by server
 
-        self.ws.send(START_SIGNAL_MESSAGE)
-        
+        self.web_socket.send(START_SIGNAL_MESSAGE)
+
 
     @pyqtSlot()
-    def handleLeave(self):
-        # TODO: we need to send info to redis
-        print ("we need to send info to redis")
+    def handle_leave(self):
+        # donot need to send info to redis,
+        # done by server
 
-        # payload = {}
-        # payload["master"] = self.userName.text()
-        # payload["roomName"] = self.pwd.text()
-        # result = requests.post('http://' + self.serverIp.text() + ':8080/auth/login', json=payload)
-        if self.isMaster:
-            res = requests.get('http://' + self.serverIp + ':8080/room/delete/'+ self.roomName + '/' + self.masterName)
+        if self.is_master:
+            res = requests.get('http://' + self.server_ip +\
+                ':8080/room/delete/'+ self.room_name + '/' +\
+                self.master_name)
             if res.text == 'Success':
-                self.ws.send(MASTER_DELETE_SIGNAL_MESSAGE)
-                self.backHook()
+                self.web_socket.send(MASTER_DELETE_SIGNAL_MESSAGE)
+                self.back_hook()
                 self.close()
             else:
                 print(res.text)
         else:
-            res = requests.get('http://' + self.serverIp + ':8080/room/leave/'+ self.roomName + '/' + self.guestName)
+            res = requests.get('http://' + self.server_ip +\
+            ':8080/room/leave/'+ self.room_name + '/' +\
+            self.guest_name)
             if res.text == 'Success':
-                self.ws.send(GUEST_LEAVE_SIGNAL_MESSAGE)
-                self.backHook()
+                self.web_socket.send(GUEST_LEAVE_SIGNAL_MESSAGE)
+                self.back_hook()
                 self.close()
             else:
                 print(res.text)
 
     @pyqtSlot()
-    def handleReady(self):
-        # TODO: we need to send info to redis
-        print ("we need to send info to redis")
+    def handle_ready(self):
+        # donot need to send info to redis,
+        # done by server
 
-        # payload = {}
-        # payload["master"] = self.userName.text()
-        # payload["roomName"] = self.pwd.text()
-        # result = requests.post('http://' + self.serverIp.text() + ':8080/auth/login', json=payload)
-        
         if self.ready:
             self.ready = False
-            self.ws.send(GUEST_UNREADY_SIGNAL_MESSAGE)
-            self.readyButton.setText("Unready")
+            self.web_socket.send(GUEST_UNREADY_SIGNAL_MESSAGE)
+            self.ready_button.setText("Unready")
         else:
             self.ready = True
-            self.ws.send(GUEST_READY_SIGNAL_MESSAGE)
-            self.readyButton.setText("Ready")
+            self.web_socket.send(GUEST_READY_SIGNAL_MESSAGE)
+            self.ready_button.setText("Ready")
 
 
 
 ########################### Create Room  ##############################
 
 class CreateRoomWindow(QWidget):
-    def __init__(self, masterName, serverIp, backHook):
+    def __init__(self, master_name, server_ip, back_hook):
         super().__init__()
 
-        self.backHook = backHook
-        self.serverIp = serverIp
-        self.masterName = masterName
+        self.back_hook = back_hook
+        self.server_ip = server_ip
+        self.master_name = master_name
 
         self.title = "Create a room"
         self.top = 100
         self.left = 100
         self.width = 600
         self.height = 300
-        
-        self.initUI()
 
-    def initUI(self):
+        self.init_ui()
+
+    def init_ui(self):
         self.setWindowTitle(self.title)
         self.setGeometry(self.top, self.left, self.width, self.height)
 
-        self.createButton = QPushButton('Create', self)
-        self.createButton.move(100, 180)
-        self.createButton.clicked.connect(self.handleCreate)
+        self.create_button = QPushButton('Create', self)
+        self.create_button.move(100, 180)
+        self.create_button.clicked.connect(self.handle_create)
 
-        self.createButton = QPushButton('Back', self)
-        self.createButton.move(200, 180)
-        self.createButton.clicked.connect(self.handleBack)
+        self.create_button = QPushButton('Back', self)
+        self.create_button.move(200, 180)
+        self.create_button.clicked.connect(self.handle_back)
 
-        self.roomName = QLineEdit("Enter the room name", self)
-        self.roomName.setGeometry(100, 100, 400, 30)
+        self.room_name = QLineEdit("Enter the room name", self)
+        self.room_name.setGeometry(100, 100, 400, 30)
 
         self.show()
 
     @pyqtSlot()
-    def handleBack(self):
-        self.backHook()
+    def handle_back(self):
+        self.back_hook()
         self.close()
-    
-    @pyqtSlot()
-    def handleCreate(self):
-        payload = {}
-        payload["master"] = self.masterName
-        payload["roomName"] = self.roomName.text()
 
-        result = requests.post('http://' + self.serverIp + ':8080/room', json=payload)
-        
-        if(result.text == "Success"):
-            self.gameRoom = GameRoomWindow(self.roomName.text(), self.masterName, None, self.serverIp, True, self.backHook)
-            self.gameRoom.show()
+    @pyqtSlot()
+    def handle_create(self):
+        payload = {}
+        payload["master"] = self.master_name
+        payload["roomName"] = self.room_name.text()
+
+        result = requests.post('http://' + self.server_ip + ':8080/room', json=payload)
+
+        if result.text == "Success":
+            self.game_room = GameRoomWindow(self.room_name.text(),\
+                self.master_name, None, self.server_ip, True, self.back_hook)
+            self.game_room.show()
             self.close()
         else:
             QMessageBox.warning(self, 'Error', result.text)
-
-    
