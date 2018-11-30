@@ -259,27 +259,37 @@ public class GameSocketHandler extends TextWebSocketHandler {
             if(!rooms.containsKey(roomName)){
                 System.out.println("No room.");
             }
-            rooms.get(roomName).addAudience(session);
 
-            // send past moves
-            rooms.get(roomName).sendAllMoves(session);
+            if(!rooms.containsKey(roomName) || rooms.get(roomName).getMaster() == null || rooms.get(roomName).getGuest() == null){
+                rooms.remove(roomName);
+                try {
+                    Room toDelete = roomRepository.findById(roomName).get();
+                    roomRepository.delete(toDelete);
+                } catch (NoSuchElementException e){
+                    return;
+                }
+                try {
+                    session.sendMessage(END_SIGNAL_MESSAGE);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            } else {
+                rooms.get(roomName).addAudience(session);
 
-            // testing info
-            rooms.get(roomName).test();
+                // send past moves
+                rooms.get(roomName).sendAllMoves(session);
+
+                // testing info
+                rooms.get(roomName).test();
+            }
         }
-
-        rooms.keySet().forEach(ele->{System.out.println(ele);});
-
-        // testing info
-        System.out.println(rooms.get(roomName).getMaster());
     }
 
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
         super.afterConnectionClosed(session, status);
-        System.out.println("socket closed.");
         // System.out.println("closing: "+session.getHandshakeHeaders().get("role"));
-        String userName = session.getHandshakeHeaders().get("userName").get(0);
+        // String userName = session.getHandshakeHeaders().get("userName").get(0);
         String role = session.getHandshakeHeaders().get("role").get(0);
         String roomName = session.getHandshakeHeaders().get("roomName").get(0);
         if(role.equals("m")){
@@ -287,10 +297,16 @@ public class GameSocketHandler extends TextWebSocketHandler {
             // now: ignore the game
             // TODO: judge winner and upload game info
             // send end signal
+            System.out.println("#### System info: A web socket session closed (master).");
             try{
                 Room toModify = roomRepository.findById(roomName).get();
-
-                rooms.get(roomName).getGuest().sendMessage(END_SIGNAL_MESSAGE);
+                try{
+                    if(rooms.get(roomName).getGuest() != null){
+                        rooms.get(roomName).getGuest().sendMessage(END_SIGNAL_MESSAGE);
+                    }
+                } catch (Exception e){
+                    System.out.println(e.getMessage());
+                }
                 rooms.get(roomName).getAudience().forEach(audienceSession -> {
                     try {
                         audienceSession.sendMessage(END_SIGNAL_MESSAGE);
@@ -305,7 +321,7 @@ public class GameSocketHandler extends TextWebSocketHandler {
                 roomRepository.delete(toModify);
 
             } catch (NoSuchElementException e){
-                return;
+                rooms.remove(roomName);
             }
 
         }else if(role.equals("g")){
@@ -314,45 +330,54 @@ public class GameSocketHandler extends TextWebSocketHandler {
             // TODO: judge winner and upload game info
             // send end signal
             //rooms.remove(roomName);
+            System.out.println("#### System info: A web socket session closed (guest).");
             try{
                 Room toModify = roomRepository.findById(roomName).get();
-                if (toModify != null) {
-                    if (toModify.getRoomStatus().equals("Playing")) {
-                        rooms.get(roomName).getGuest().sendMessage(END_SIGNAL_MESSAGE);
-                        rooms.get(roomName).getAudience().forEach(audienceSession -> {
-                            try {
-                                audienceSession.sendMessage(END_SIGNAL_MESSAGE);
-                            } catch (Exception e) {
-                                System.out.println(e.getMessage());
-                            }
-                        });
-                        rooms.remove(roomName);
+                if (toModify.getRoomStatus().equals("Playing")) {
+                    // if the room is playing
+                    try{
+                        rooms.get(roomName).getMaster().sendMessage(END_SIGNAL_MESSAGE);
+                    } catch (Exception e){
+                        System.out.println(e.getMessage());
+                    }
+                    rooms.get(roomName).getAudience().forEach(audienceSession -> {
+                        try {
+                            audienceSession.sendMessage(END_SIGNAL_MESSAGE);
+                        } catch (Exception e) {
+                            System.out.println(e.getMessage());
+                        }
+                    });
+                    rooms.remove(roomName);
 
+                    roomRepository.delete(toModify);
+                } else {
+                    // if the room is still in ready status
+                    if(rooms.get(roomName).getMaster() == null){
+                        // if the master already gone
                         roomRepository.delete(toModify);
+                        rooms.remove(roomName);
                     } else {
+                        // if the master still there
                         rooms.get(roomName).setGuest(null);
                     }
                 }
             } catch (NoSuchElementException e){
-                return;
+                rooms.remove(roomName);
             }
 
         }else if(role.equals("a")){
+            System.out.println("#### System info: A web socket session closed (audience).");
             rooms.get(roomName).getAudience().remove(session);
         }
-
-        // testing info
-        rooms.keySet().forEach(ele->{System.out.println(ele);});
-
     }
 
-    // to strt game after two players are ready
+    // to start game after two players are ready
     // Important: now, sending start signal is the task of RoomSocketHandler
     private void gameStart(String roomName){
         if(rooms.get(roomName).ready()){
 
             // testing info
-            System.out.println("Info: roomName: " + roomName + ", ready to start ......");
+            System.out.println("#### System info: roomName: " + roomName + ", ready to start ......");
             try{
 
                 rooms.get(roomName).getMaster().sendMessage(START_SIGNAL_MESSAGE);
