@@ -11,9 +11,11 @@ import sys
 from PyQt5.QtWidgets import QWidget, QApplication, QLabel, QVBoxLayout, QMessageBox, QPushButton
 from PyQt5.QtGui import QPixmap, QIcon, QFont
 from PyQt5.QtCore import Qt
-from showchessboard import Gomoku
+#from showchessboard import Gomoku
+from showchessboardOffline import GomokuOffline
 from choosechessboard import ChooseBtn
 #from variable import setvar
+from hall import GameHallWindow
 
 class manual(QWidget):
     def __init__(self, userName, serverIp):
@@ -40,7 +42,7 @@ class manual(QWidget):
         self.btn2.move(120, 250)
 
         # Setting
-        self.btn0 = QPushButton("Setting",self)
+        self.btn0 = QPushButton("Offline Setting",self)
         self.btn0.clicked.connect(self.Action0)
         self.btn0.resize(self.btn1.sizeHint())
         self.btn0.move(120, 50)
@@ -52,28 +54,31 @@ class manual(QWidget):
         self.btn3.move(120, 350)
 
     def Action0(self):
-        print("Action0")
+        #print("Action0")
         self.myset.show()
 
     def Action1(self):
         if self.myset.var.OK == 0:
             QMessageBox.warning(self, 'Setting Error', 'Confirm the setting first')
         else:
+            self.update()
             print("board:", "\nftype:", self.myset.var.fonttype, "\ncbtyp3:", self.myset.var.cbtype, "\nOK:", self.myset.var.OK)
             self.chooseboard = self.myset.var.cbtype
             self.myfont = self.myset.var.fonttype
-            self.mygame = Gomoku(self.username_b, self.serverIp, self.chooseboard, self.myfont)
+            self.mygame = GomokuOffline(self.username_b, self.serverIp, self.chooseboard, self.myfont)
             self.mygame.show()
 
     def Action2(self):
-        print("Action2")
+        #print("Action2")
+        self.hall = GameHallWindow(self.username_b, self.serverIp)
+        self.hall.show()
 
     def Action3(self):
         print("Action3")
 
 def main():
    app = QApplication(sys.argv)
-   exe = manual("12345", "54.173.206.13")
+   exe = manual("12345", "52.207.232.53")
    exe.show()
    sys.exit(app.exec_())
 

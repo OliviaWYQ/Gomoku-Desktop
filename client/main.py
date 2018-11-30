@@ -6,12 +6,13 @@ import sys
 #from PyQt5.QtGui import *
 from PyQt5.QtCore import pyqtSlot
 from PyQt5.QtWidgets import QMainWindow, QPushButton, QLineEdit, QMessageBox, QApplication
+from PyQt5.QtGui import QIcon
 import requests
-
+from manual import *
 from hall import GameHallWindow
 
-IP = "localhost"
-#IP = "52.207.232.53"
+#IP = "localhost"
+IP = "52.207.232.53"
 
 class Window(QMainWindow):
     """Log in window"""
@@ -19,7 +20,7 @@ class Window(QMainWindow):
     def __init__(self):
         super().__init__()
         self.title = "Gomoku"
-        self.top = 100
+        self.top = 330
         self.left = 100
         self.width = 600
         self.height = 500
@@ -29,7 +30,7 @@ class Window(QMainWindow):
         """init the window, adding buttons and inputs"""
         self.setWindowTitle(self.title)
         self.setGeometry(self.top, self.left, self.width, self.height)
-
+        self.setWindowIcon(QIcon('chessboard/gomoku_icon.png')) # set window icon
         login_btn = QPushButton('log in', self)
         login_btn.move(100, 300)
         login_btn.clicked.connect(self.handle_login)
@@ -63,8 +64,8 @@ class Window(QMainWindow):
 
         if res.text == "Success":
             #QMessageBox.warning(self, 'Success', 'Success')
-            self.hall = GameHallWindow(self.user_name_input.text(), self.server_ip.text())
-            self.hall.show()
+            self.game = manual(self.user_name_input.text(), self.server_ip.text())
+            self.game.show()
             self.close()
         else:
             QMessageBox.warning(self, 'Error', 'Unexisted user or wrong password')

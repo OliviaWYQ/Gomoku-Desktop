@@ -1,27 +1,29 @@
-from PyQt5.QtWidgets import QWidget, QLabel, QMessageBox
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Thu Oct 29 10:40:38 2018
+
+@author: yiqianwang
+
+Gomoku Game
+First Iteration
+chessboard UI
+"""
+
+import sys
+from PyQt5.QtWidgets import QWidget, QApplication, QLabel, QVBoxLayout, QMessageBox
 from PyQt5.QtGui import QPixmap, QIcon, QFont
-from PyQt5.QtCore import Qt, pyqtSignal, pyqtSlot
+from PyQt5.QtCore import Qt
+from chessboard import chessboard as CB
 import requests
 #from login import *
-from choosechessboard import ChooseBtn
+#from choosechessboard import ChooseBtn
+from music import musicplayer
 
-# main gaming UI
-class Gomoku(QWidget):
+class GomokuOffline(QWidget):
     def __init__(self, userName, serverIp, mycbtype, myfonttype):
         super().__init__()
-        self.start_game_signal.connect(self.showGameEnd)
-        self.step_no = 0
-        self.oth_step = 0
-        self.isMaster = isMaster
-
-        if self.isMaster:
-            self.userName = masterName
-        else:
-            self.userName = guestName
-
-        self.roomName = roomName
-        self.ws = websocket
-        self.backHook = backHook
+        #username_b = userName
         self.serverIp = serverIp
         self.username_b = userName
         self.username_w = "Guest"
@@ -56,7 +58,7 @@ class Gomoku(QWidget):
         self.grid_h = (self.height_chessboard - (self.margin * 2)) / self.cbnum
         self.restart()
 
-    def restart(self):    
+    def restart(self):
         #CB init
         self.obj = CB(self.cbnum+1)
         self.obj.reset()
@@ -139,12 +141,13 @@ class Gomoku(QWidget):
 
     def gamestart(self):
         #game start
+
         #location of a piece
         self.piece = QLabel(self)
         self.piece.setMouseTracking(True)
         self.piece.pos = None
         # draw a piece, total 15 *15
-        self.put = [QLabel(self) for i in range(self.cbnum+1 * self.cbnum+1)]
+        self.put = [QLabel(self) for i in range((self.cbnum+1) * (self.cbnum+1))]
         self.step = 1
         self.color = self.black # change to black first
         self.colornum = 1
@@ -156,7 +159,7 @@ class Gomoku(QWidget):
         super().mousePressEvent(event)
     '''
 
-    def mouseReleaseEvent(self, event):   
+    def mouseReleaseEvent(self, event):
         self.piece.pos = event.pos()
         if self.piece.pos:
             self.i = round((self.piece.pos.x() - self.margin) / self.grid_w)
@@ -208,21 +211,23 @@ class Gomoku(QWidget):
             winnername = self.username_w
         else:
             winnername = "TIE GAME! None of You"
-        self.label = QLabel("About Qt MessageBox")  
-        button = QMessageBox.question(self,"Gomoku Game Information",  
-                                      self.tr("Game End\n%s Win!\nQuit or Start A New Game?" % winnername),  
-                                      QMessageBox.Retry|QMessageBox.Close,  
-                                      QMessageBox.Retry)  
-        if button == QMessageBox.Retry:  
+        self.label = QLabel("About Qt MessageBox")
+        button = QMessageBox.question(self,"Gomoku Game Information",
+                                      self.tr("Game End\n%s Win!\nQuit or Start A New Game?" % winnername),
+                                      QMessageBox.Retry|QMessageBox.Close,
+                                      QMessageBox.Retry)
+        if button == QMessageBox.Retry:
             self.label.setText("Question button/Retry")
-            self.cam = Gomoku(self.username_b, self.serverIp, self.cbty, self.myfont)
+            self.cam = GomokuOffline(self.username_b, self.serverIp, self.cbty, self.myfont)
             self.cam.show()
             self.close()
 
-        elif button == QMessageBox.Close:  
-            self.label.setText("Question button/Close")  
-            raise SystemExit(0)
-        else:  
+        elif button == QMessageBox.Close:
+            self.label.setText("Question button/Close")
+            self.bgmusic.stop()
+            self.close()
+            #raise SystemExit(0)
+        else:
             return
 
     def sendMatch(self, winFlag, moves):
@@ -244,7 +249,7 @@ class Gomoku(QWidget):
 '''
 def main():
     app = QApplication(sys.argv)
-    mygame = Gomoku("12345", "54.173.206.13", 9, 'Roman times')
+    mygame = GomokuOffline("12345", "52.207.232.53", 9, 'Roman times')
     mygame.show()
     mygame.addmusic()
     sys.exit(app.exec_())

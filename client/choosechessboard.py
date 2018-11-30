@@ -125,11 +125,13 @@ class ChooseBtn(QWidget):
         if b.text() == "9*9 chessboard":
             if b.isChecked() == True:
                 self.chooseboard = 'cb8'
-                print (b.text()+" is selected")
+                self.var.cbtype = 9
+                print (b.text()+" is selected", self.var.cbtype)
         if b.text() == "15*15 chessboard":
             if b.isChecked() == True:
                 self.chooseboard = 'cb14'
-                print (b.text()+" is selected")
+                self.var.cbtype = 15
+                print (b.text()+" is selected", self.var.cbtype)
         if b.text() == self.type1:
             if b.isChecked() == True:
                 self.Myfont = 'ftype1'
@@ -146,16 +148,15 @@ class ChooseBtn(QWidget):
     def Action(self):
         if self.bt1.isEnabled():
             #self.game = Gomoku("12345", "54.173.206.13")
+            self.update()
             self.var.fonttype = self.var.getvalue(self.Myfont)
-            if self.chooseboard == 'cb14':
-                self.var.cbtype == 15
-            elif self.chooseboard == 'cb8':
-                self.var.cbtype = 9
-            else:
-                print('setting error!')
+            #if self.chooseboard == 'cb14' or 'cb8':
+            #    print('setting finish')
+            #else:
+            #    print('setting error!')
             #self.game.show()
             self.var.OK = 1
-            print("setting:", "\nftype:", self.var.fonttype, "\ncbtyp3:", self.var.cbtype, "\nOK:", self.var.OK)
+            #print("setting:", "\nftype:", self.var.fonttype, "\ncbtyp3:", self.chooseboard, self.var.cbtype, "\nOK:", self.var.OK)
             self.close()
             #raise SystemExit(0)
 
