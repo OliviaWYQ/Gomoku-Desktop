@@ -67,6 +67,7 @@ class manual(QWidget):
             self.myfont = self.myset.var.fonttype
             self.mygame = GomokuOffline(self.username_b, self.serverIp, self.chooseboard, self.myfont)
             self.mygame.show()
+            self.mygame.addmusic()
 
     def Action2(self):
         #print("Action2")
