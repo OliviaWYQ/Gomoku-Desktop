@@ -10,17 +10,23 @@ create room window (room.py)
 from PyQt5.QtCore import pyqtSlot, Qt
 from PyQt5.QtWidgets import QWidget, QPushButton,\
     QMessageBox, QTableWidget, QAbstractItemView,\
-    QTableWidgetItem, QHeaderView
+    QTableWidgetItem, QHeaderView, QApplication
 import requests
+import sys
 
 from room import GameRoomWindow, CreateRoomWindow, SocketCli
 from game import Gomoku
+from utils import pop_info_and_back
 
 class GameHallWindow(QWidget):
     """Game hall window, create/ join/ watch a match"""
 
-    def __init__(self, username, server_ip):
+    def __init__(self, username, server_ip, auth_headers, login_hook, manual_hook):
         super().__init__()
+        self.auth_headers = auth_headers
+        self.login_hook = login_hook
+        self.manual_hook = manual_hook
+
         self.server_ip = server_ip
         self.username = username
 
@@ -56,6 +62,10 @@ class GameHallWindow(QWidget):
         self.refresh_button = QPushButton('Refresh', self)
         self.refresh_button.move(580, 120)
         self.refresh_button.clicked.connect(self.refresh)
+
+        self.exit_button = QPushButton('Back', self)
+        self.exit_button.move(580, 340)
+        self.exit_button.clicked.connect(self.handle_back)
 
         self.exit_button = QPushButton('Exit', self)
         self.exit_button.move(580, 390)
@@ -97,17 +107,31 @@ class GameHallWindow(QWidget):
     @pyqtSlot()
     def refresh(self):
         """handle clicking refresh button, refresh the room info in the table"""
-        self.room_list = requests.get('http://' + self.server_ip + ':8080/room/all').json()
+        response = requests.get('http://' + self.server_ip + ':8080/room/all', headers=self.auth_headers)
+        try:
+            self.room_list = response.json()
+            print(self.room_list)
 
-        print(self.room_list)
+            self.max_page = int(len(self.room_list) / 10)
+            self.current_page = -1
+            self.browse(0)
 
-        self.max_page = int(len(self.room_list) / 10)
-        self.current_page = -1
-        self.browse(0)
-
-        # refresh chane the room list, should init the action btn
-        self.action_button.setEnabled(False)
-        self.action_button.setText("Action")
+            # refresh chane the room list, should init the action btn
+            self.action_button.setEnabled(False)
+            self.action_button.setText("Action")
+        except:
+            pop_info_and_back(self, response.text, self.login_hook)
+            # info = response.text
+            # button = QMessageBox.question(self, "Info",\
+            #                           info,\
+            #                           QMessageBox.Ok,\
+            #                           QMessageBox.Ok)
+            # if button == QMessageBox.Ok:
+            #     self.login_hook()
+            #     self.close()
+            # else:
+            #     self.close()
+            #     raise SystemExit(0)
 
     def browse(self, page):
         """choose the page of rooms to browse"""
@@ -127,14 +151,19 @@ class GameHallWindow(QWidget):
     @pyqtSlot()
     def handle_create_room(self):
         """create a room, call create window"""
-        self.create_room_page = CreateRoomWindow(self.username, self.server_ip, self.show)
+        self.create_room_page = CreateRoomWindow(master_name=self.username,\
+            server_ip=self.server_ip,\
+            hall_hook=self.hall_hook,\
+            login_hook=self.login_hook,\
+            auth_headers=self.auth_headers)
+
         self.create_room_page.show()
         self.close()
 
     @pyqtSlot()
     def handle_action(self):
         """watch or join or disable based on the room chosen"""
-        selected_row = self.rooms_observed.currentRow()
+        # selected_row = self.rooms_observed.currentRow()
         action = self.action_button.text()
         print(action)
         if action == "Join":
@@ -152,12 +181,12 @@ class GameHallWindow(QWidget):
 
         uri = 'ws://' + self.server_ip + ':8080/playing'
 
-        headers = [("role", 'a'),\
+        socket_headers = [("role", 'a'),\
             ("roomName", room_name),\
             ("userName", self.username),\
             ("masterStone", 1)]
 
-        self.web_socket = SocketCli(uri, headers=headers)
+        self.web_socket = SocketCli(uri, headers=socket_headers)
         # self.web_socket.hook(self)
 
         self.game_board = Gomoku(True, room_name, master_name,\
@@ -174,6 +203,11 @@ class GameHallWindow(QWidget):
         if reply == QMessageBox.Yes:
             # TODO: other actions
             self.close()
+
+    @pyqtSlot()
+    def handle_back(self):
+        self.manual_hook()
+        self.close()
 
     @pyqtSlot()
     def handle_click_room_observed(self):
@@ -204,17 +238,30 @@ class GameHallWindow(QWidget):
 
             uri = "http://" + self.server_ip + ':8080/room/join/' + room_name + '/' + self.username
 
-            result = requests.get(uri)
+            result = requests.get(uri, headers=self.auth_headers)
 
             print('from server: '+ result.text)
 
             if result.text == "Success":
                 master_name = self.room_list[selected_row + self.current_page * 10]["master"]
                 self.game_room = GameRoomWindow(room_name, master_name,\
-                    self.username, self.server_ip, False, self.show)
+                    self.username, self.server_ip, False, self.hall_hook, self.login_hook, self.auth_headers)
                 self.game_room.show()
                 self.close()
             else:
                 QMessageBox.warning(self, 'Error', result.text)
-        except:
+        except Exception as e:
+            print(e)
             QMessageBox.warning(self, 'Error', "Try again.")
+
+    def hall_hook(self):
+        self.show()
+
+def test():
+    app = QApplication(sys.argv)
+    exe = GameHallWindow("12345", "52.207.232.53", None, None, None)
+    exe.show()
+    sys.exit(app.exec_())
+
+if __name__ == '__main__':
+   test()

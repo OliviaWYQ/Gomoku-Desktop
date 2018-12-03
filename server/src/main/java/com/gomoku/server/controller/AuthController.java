@@ -1,5 +1,6 @@
 package com.gomoku.server.controller;
 
+import com.gomoku.server.auth.LoginInterceptor;
 import com.gomoku.server.mongo.model.User;
 import com.gomoku.server.mongo.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,9 @@ public class AuthController {
     @Autowired
     UserRepository userRepository;
 
+    @Autowired
+    LoginInterceptor loginInterceptor;
+
     @RequestMapping(path = "/auth/login",method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
     public @ResponseBody String login(@RequestBody User user){
         if(user.getUserName()==null || user.getPass()==null){
@@ -24,7 +28,14 @@ public class AuthController {
         User userToLog = userRepository.findOneByUserName(user.getUserName());
         if(userToLog == null)
             return "User not exists";
-        return userToLog.checkPass(user.getPass())?"Success": "Wrong passsword";
+        if (userToLog.checkPass(user.getPass())){
+            String token = String.valueOf(System.currentTimeMillis());
+            loginInterceptor.userLogIn(user.getUserName(), token);
+            return "Success," + token;
+        } else {
+            return "Wrong passsword";
+        }
+        //return userToLog.checkPass(user.getPass())?"Success": "Wrong passsword";
     }
 
     @RequestMapping(path = "/auth/signup",method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)

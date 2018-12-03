@@ -18,7 +18,7 @@ class Gomoku(QWidget):
     def __init__(self, is_master, room_name,\
                 master_name, guest_name,\
                 master_stone, server_ip,\
-                web_socket, back_hook,\
+                web_socket, hall_hook,\
                 watch_game=False):
         super().__init__()
 
@@ -47,7 +47,7 @@ class Gomoku(QWidget):
         # else:
         self.web_socket = web_socket
 
-        self.back_hook = back_hook
+        self.hall_hook = hall_hook
         self.server_ip = server_ip
 
         if master_stone == 1:
@@ -215,7 +215,7 @@ class Gomoku(QWidget):
                                       QMessageBox.Ok,\
                                       QMessageBox.Ok)
             if button == QMessageBox.Ok:
-                self.back_hook()
+                self.hall_hook()
                 self.close()
             else:
                 self.close()
@@ -236,7 +236,7 @@ class Gomoku(QWidget):
                                       QMessageBox.Ok,\
                                       QMessageBox.Ok)
         if button == QMessageBox.Ok:
-            self.back_hook()
+            self.hall_hook()
             self.close()
         else:
             self.close()

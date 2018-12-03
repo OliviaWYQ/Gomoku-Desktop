@@ -1,5 +1,6 @@
 package com.gomoku.server.controller;
 
+import com.gomoku.server.auth.LoginRequired;
 import com.gomoku.server.mongo.model.Match;
 import com.gomoku.server.mongo.repository.MatchRepository;
 import com.gomoku.server.redis.model.Room;
@@ -22,8 +23,9 @@ public class RoomController {
     RoomRepository roomRepository;
 
     // Create a new room.
+    @LoginRequired
     @RequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public @ResponseBody String creatRoom(@RequestBody Room room){
+    public @ResponseBody String createRoom(@RequestBody Room room){
         if(!room.isValid()){
             return "Failed, invalid message format.";
         }
@@ -39,6 +41,7 @@ public class RoomController {
     }
 
     // Join a room and be a guest.
+    @LoginRequired
     @RequestMapping(value = "/join/{roomName}/{userName}")
     public @ResponseBody String joinRoom(@PathVariable("roomName") String roomName,
                                          @PathVariable("userName") String userName){
@@ -75,6 +78,7 @@ public class RoomController {
     }
 
     // Leave a room.
+    @LoginRequired
     @RequestMapping(value = "/leave/{roomName}/{userName}")
     public @ResponseBody String leaveRoom(@PathVariable("roomName") String roomName,
                                          @PathVariable("userName") String userName){
@@ -107,6 +111,7 @@ public class RoomController {
     }
 
     // Delete a room.
+    @LoginRequired
     @RequestMapping(value = "/delete/{roomName}/{userName}")
     public @ResponseBody String deleteRoom(@PathVariable("roomName") String roomName,
                                           @PathVariable("userName") String userName){
@@ -180,8 +185,9 @@ public class RoomController {
 //    }
 
     // Search all rooms.
+    @LoginRequired
     @RequestMapping(value = "/all")
-    public @ResponseBody List<Room> searchAllRoom(){
+    public @ResponseBody Object searchAllRoom(){
         Iterable<Room> itr = roomRepository.findAll();
         List<Room> rooms = new ArrayList<>();
         itr.forEach(e -> rooms.add(e));
@@ -189,8 +195,9 @@ public class RoomController {
     }
 
     // Search a room by room name.
+    @LoginRequired
     @RequestMapping(value = "/{roomName}")
-    public @ResponseBody Room searchRoomByRoomName(@PathVariable("roomName") String roomName){
+    public @ResponseBody Object searchRoomByRoomName(@PathVariable("roomName") String roomName){
         return roomRepository.findById(roomName).get();
     }
 

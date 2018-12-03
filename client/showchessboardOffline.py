@@ -21,9 +21,11 @@ import requests
 from music import musicplayer
 
 class GomokuOffline(QWidget):
-    def __init__(self, userName, serverIp, mycbtype, myfonttype):
+    def __init__(self, userName, serverIp, mycbtype, myfonttype, manual_hook):
         super().__init__()
         #username_b = userName
+
+        self.manual_hook = manual_hook
         self.serverIp = serverIp
         self.username_b = userName
         self.username_w = "Guest"
@@ -218,13 +220,14 @@ class GomokuOffline(QWidget):
                                       QMessageBox.Retry)
         if button == QMessageBox.Retry:
             self.label.setText("Question button/Retry")
-            self.cam = GomokuOffline(self.username_b, self.serverIp, self.cbty, self.myfont)
+            self.cam = GomokuOffline(self.username_b, self.serverIp, self.cbty, self.myfont, self.manual_hook)
             self.cam.show()
             self.close()
 
         elif button == QMessageBox.Close:
             self.label.setText("Question button/Close")
             self.bgmusic.stop()
+            self.manual_hook()
             self.close()
             #raise SystemExit(0)
         else:

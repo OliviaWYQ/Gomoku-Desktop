@@ -9,14 +9,18 @@ smallchessboard
 """
 
 import sys
-from PyQt5.QtWidgets import QWidget, QPushButton, QApplication, QLabel, QGroupBox, QVBoxLayout, QMessageBox, QCheckBox, QHBoxLayout, QRadioButton, QGridLayout
+from PyQt5.QtWidgets import QWidget, QPushButton, QApplication, QLabel, QGroupBox, QVBoxLayout, QHBoxLayout, QRadioButton, QGridLayout
+    # QMessageBox, QCheckBox
 from PyQt5.QtGui import QPixmap, QIcon, QFont
-from PyQt5.QtCore import Qt
+#from PyQt5.QtCore import Qt
 from variable import setvar
 
 class ChooseBtn(QWidget):
-    def __init__(self, parent = None):
+    def __init__(self, manual_hook, parent = None):
         super(ChooseBtn, self).__init__(parent)
+
+        self.manual_hook = manual_hook
+
         self.setGeometry(330, 100, 600, 400)
         self.setWindowTitle("Setting")
         self.setWindowIcon(QIcon('chessboard/gomoku_icon.png'))
@@ -157,6 +161,7 @@ class ChooseBtn(QWidget):
             #self.game.show()
             self.var.OK = 1
             #print("setting:", "\nftype:", self.var.fonttype, "\ncbtyp3:", self.chooseboard, self.var.cbtype, "\nOK:", self.var.OK)
+            self.manual_hook()
             self.close()
             #raise SystemExit(0)
 
