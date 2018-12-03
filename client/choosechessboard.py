@@ -23,12 +23,14 @@ class ChooseBtn(QWidget):
 
         self.setGeometry(330, 100, 600, 400)
         self.setWindowTitle("Setting")
-        self.setWindowIcon(QIcon('chessboard/gomoku_icon.png'))
+        # self.setWindowIcon(QIcon('chessboard/gomoku_icon.png'))
         # init
         # static val
+
+        current_path = sys.path[0]+'/'
         self.var = setvar()
-        self.var.setvalue('cb8', 'chessboard/cb8.png')
-        self.var.setvalue('cb14', 'chessboard/cb14.png')
+        self.var.setvalue('cb8', current_path + 'chessboard/cb8.png')
+        self.var.setvalue('cb14', current_path + 'chessboard/cb14.png')
         #self.var.setvalue('chessboard14', 'chessboard/chessboard14.png') # set background
         #self.var.setvalue('chessboard8', 'chessboard/chessboard8.png')
         self.var.setvalue('ftype1', 'Roman times')

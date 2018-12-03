@@ -127,20 +127,27 @@ public class GameSocketHandler extends TextWebSocketHandler {
                             } catch (IOException e) {
                                 e.printStackTrace();
                             }
+                            try {
+                                rooms.get(roomName).getGuest().close();
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
                             break;
                         case MASTER_DELETE_SIGNAL:
                             // master delete
-                            rooms.remove(roomName);
                             try {
-                                rooms.get(roomName).getMaster().sendMessage(MASTER_DELETE_SIGNAL_MESSAGE);
+                                if (rooms.get(roomName).getGuest() != null){
+                                    rooms.get(roomName).getGuest().sendMessage(MASTER_DELETE_SIGNAL_MESSAGE);
+                                }
                             } catch (IOException e) {
                                 e.printStackTrace();
                             }
                             try {
-                                rooms.get(roomName).getGuest().sendMessage(MASTER_DELETE_SIGNAL_MESSAGE);
+                                rooms.get(roomName).getMaster().close();
                             } catch (IOException e) {
                                 e.printStackTrace();
                             }
+                            //rooms.remove(roomName);
                             break;
                         case BLACK_STONE_SIGNAL:
                             try {

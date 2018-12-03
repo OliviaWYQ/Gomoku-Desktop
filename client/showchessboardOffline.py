@@ -25,20 +25,21 @@ class GomokuOffline(QWidget):
         super().__init__()
         #username_b = userName
 
+        current_path = sys.path[0]+'/'
         self.manual_hook = manual_hook
         self.serverIp = serverIp
         self.username_b = userName
         self.username_w = "Guest"
         self.cbty = mycbtype
         self.myfont  = myfonttype
-        self.chooseboard = QPixmap('chessboard/chessboard14.png')
+        self.chooseboard = QPixmap(current_path + 'chessboard/chessboard14.png')
         self.width_chessboard = 715
         self.height_chessboard = 689
         self.bgmusic = musicplayer()
 
         # 9*9
         if self.cbty == 9:
-            self.chooseboard = QPixmap('chessboard/chessboard8.png')
+            self.chooseboard = QPixmap(current_path + 'chessboard/chessboard8.png')
             self.width_chessboard = 443
             self.height_chessboard = 443
             self.margin = 28
@@ -79,7 +80,7 @@ class GomokuOffline(QWidget):
         # init user interface
         self.setGeometry(330, 70, self.width_chessboard + 200, self.height_chessboard) # set window size
         self.setWindowTitle("Gomoku Game") # set window title
-        self.setWindowIcon(QIcon('chessboard/gomoku_icon.png')) # set window icon
+        #self.setWindowIcon(QIcon('chessboard/gomoku_icon.png')) # set window icon
         self.black = QPixmap('chessboard/black.png') # set black piece
         self.white = QPixmap('chessboard/white.png') # set white piece
         self.manyblack = QPixmap('chessboard/manyblack.png') # set many black

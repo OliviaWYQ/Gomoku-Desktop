@@ -168,12 +168,12 @@ class GameRoomWindow(QWidget):
     def start_game(self):
         # return to hall after the match
         # if return to room, must init socket, reset the to_influence by calling hook()
-        hall_hook = self.hall_hook
+        #hall_hook = self.hall_hook
 
         self.game_board = Gomoku(self.is_master, self.room_name,\
                                 self.master_name, self.guest_name,\
                                 self.master_stone, self.server_ip,\
-                                self.web_socket, hall_hook)
+                                self.web_socket, self.hall_hook)
         self.game_board.show()
         self.close()
 

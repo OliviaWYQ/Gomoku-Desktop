@@ -191,7 +191,7 @@ class GameHallWindow(QWidget):
 
         self.game_board = Gomoku(True, room_name, master_name,\
             guest_name, 1, self.server_ip, self.web_socket,\
-            self.show, True)
+            self.hall_hook, True)
         self.game_board.show()
         self.close()
 
