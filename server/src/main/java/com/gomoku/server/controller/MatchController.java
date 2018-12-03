@@ -1,5 +1,6 @@
 package com.gomoku.server.controller;
 
+import com.gomoku.server.auth.LoginRequired;
 import com.gomoku.server.mongo.model.Match;
 import com.gomoku.server.mongo.repository.MatchRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,9 +26,9 @@ public class MatchController {
             matchRepository.save(match);
     }
     */
-
+    @LoginRequired
     @RequestMapping(value = "/byuser/{userId}")
-    public @ResponseBody List<Match> searchMatches(@PathVariable("userId") String userId){
+    public @ResponseBody Object searchMatches(@PathVariable("userId") String userId){
         //match.setId();
         //matchRepository.save(match);
         List<Match> matches = matchRepository.findByUser1Id(userId);
@@ -38,6 +39,7 @@ public class MatchController {
         //return matchRepository.findByUser1Id(userId);
     }
 
+    @LoginRequired
     @RequestMapping(value = "/byid/{matchId}")
     public @ResponseBody Match searchMatch(@PathVariable("matchId") String matchId){
         //match.setId();

@@ -1,5 +1,6 @@
 package com.gomoku.server.controller;
 
+import com.gomoku.server.auth.LoginRequired;
 import com.gomoku.server.mongo.model.User;
 import com.gomoku.server.mongo.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,7 @@ public class UserInfoController {
     @Autowired
     UserRepository userRepository;
 
+    @LoginRequired
     @RequestMapping(value = "/byid/{userName}")
     public @ResponseBody User searchMatches(@PathVariable String userName){
         //match.setId();

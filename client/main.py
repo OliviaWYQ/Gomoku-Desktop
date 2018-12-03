@@ -61,9 +61,13 @@ class Window(QMainWindow):
 
         print(payload["userName"])
 
-        if res.text == "Success":
-            #QMessageBox.warning(self, 'Success', 'Success')
-            self.hall = GameHallWindow(self.user_name_input.text(), self.server_ip.text())
+        if len(res.text)>7 and res.text[:7] == "Success":
+            # user_tooken = res[6:]
+            # QMessageBox.warning(self, 'Success', 'Success')
+            user_name = self.user_name_input.text()
+            auth_headers = {'TOKEN': res.text[8:], 'USER_NAME': user_name}
+            print(auth_headers)
+            self.hall = GameHallWindow(user_name, self.server_ip.text(), auth_headers, self.login_hook)
             self.hall.show()
             self.close()
         else:
@@ -94,6 +98,9 @@ class Window(QMainWindow):
         else:
             QMessageBox.warning(self, 'Signup error', 'Username already exists')
             #tm.showerror("Signup error", "Try Again")
+
+    def login_hook(self):
+        self.show()
 
 if __name__ == '__main__':
     APP = QApplication(sys.argv)

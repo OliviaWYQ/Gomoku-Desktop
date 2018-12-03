@@ -7,6 +7,7 @@ import requests
 from ws4py.client.threadedclient import WebSocketClient
 
 from game import Gomoku
+from utils import pop_info_and_back
 
 START_SIGNAL = -1
 GUEST_READY_SIGNAL = -2
@@ -44,12 +45,15 @@ class GameRoomWindow(QWidget):
 
     start_game_signal = pyqtSignal()
 
-    def __init__(self, room_name, master_name, guest_name, server_ip, is_master, back_hook):
+    def __init__(self, room_name, master_name, guest_name, server_ip, is_master, hall_hook, login_hook, auth_headers):
         super().__init__()
+
+        self.auth_headers = auth_headers
 
         self.start_game_signal.connect(self.start_game)
 
-        self.back_hook = back_hook
+        self.hall_hook = hall_hook
+        self.login_hook = login_hook
 
         self.layout = QHBoxLayout()
         self.room_name = room_name
@@ -142,7 +146,7 @@ class GameRoomWindow(QWidget):
                             print("try to start")
                             self.start_game_signal.emit()
                         elif signal == MASTER_DELETE_SIGNAL:
-                            self.back_hook()
+                            self.hall_hook()
                             self.close()
                             # TODO: pop a message box
                         elif signal == BLACK_STONE_SIGNAL:
@@ -164,12 +168,12 @@ class GameRoomWindow(QWidget):
     def start_game(self):
         # return to hall after the match
         # if return to room, must init socket, reset the to_influence by calling hook()
-        back_hook = self.back_hook
+        hall_hook = self.hall_hook
 
         self.game_board = Gomoku(self.is_master, self.room_name,\
                                 self.master_name, self.guest_name,\
                                 self.master_stone, self.server_ip,\
-                                self.web_socket, back_hook)
+                                self.web_socket, hall_hook)
         self.game_board.show()
         self.close()
 
@@ -230,25 +234,29 @@ class GameRoomWindow(QWidget):
         # done by server
 
         if self.is_master:
-            res = requests.get('http://' + self.server_ip +\
+            response = requests.get('http://' + self.server_ip +\
                 ':8080/room/delete/'+ self.room_name + '/' +\
-                self.master_name)
-            if res.text == 'Success':
+                self.master_name, headers=self.auth_headers)
+            if response.text == 'Success':
                 self.web_socket.send(MASTER_DELETE_SIGNAL_MESSAGE)
-                self.back_hook()
+                self.hall_hook()
                 self.close()
+            elif response.text == "Unauthorized or timeout.":
+                pop_info_and_back(self, response.text, self.login_hook)
             else:
-                print(res.text)
+                print(response.text)
         else:
-            res = requests.get('http://' + self.server_ip +\
+            response = requests.get('http://' + self.server_ip +\
             ':8080/room/leave/'+ self.room_name + '/' +\
-            self.guest_name)
-            if res.text == 'Success':
+            self.guest_name, headers=self.auth_headers)
+            if response.text == 'Success':
                 self.web_socket.send(GUEST_LEAVE_SIGNAL_MESSAGE)
-                self.back_hook()
+                self.hall_hook()
                 self.close()
+            elif response.text == "Unauthorized or timeout.":
+                pop_info_and_back(self, response.text, self.login_hook)
             else:
-                print(res.text)
+                print(response.text)
 
     @pyqtSlot()
     def handle_ready(self):
@@ -269,10 +277,14 @@ class GameRoomWindow(QWidget):
 ########################### Create Room  ##############################
 
 class CreateRoomWindow(QWidget):
-    def __init__(self, master_name, server_ip, back_hook):
+    def __init__(self, master_name, server_ip, auth_headers, hall_hook, login_hook):
         super().__init__()
 
-        self.back_hook = back_hook
+        self.auth_headers = auth_headers
+
+        self.hall_hook = hall_hook
+        self.login_hook = login_hook
+
         self.server_ip = server_ip
         self.master_name = master_name
 
@@ -303,7 +315,7 @@ class CreateRoomWindow(QWidget):
 
     @pyqtSlot()
     def handle_back(self):
-        self.back_hook()
+        self.hall_hook()
         self.close()
 
     @pyqtSlot()
@@ -312,12 +324,15 @@ class CreateRoomWindow(QWidget):
         payload["master"] = self.master_name
         payload["roomName"] = self.room_name.text()
 
-        result = requests.post('http://' + self.server_ip + ':8080/room', json=payload)
+        response = requests.post('http://' + self.server_ip + ':8080/room', json=payload, headers=self.auth_headers)
 
-        if result.text == "Success":
+        if response.text == "Success":
             self.game_room = GameRoomWindow(self.room_name.text(),\
-                self.master_name, None, self.server_ip, True, self.back_hook)
+                self.master_name, None, self.server_ip, True, self.hall_hook, self.login_hook,\
+                self.auth_headers)
             self.game_room.show()
             self.close()
+        elif response.text == "Unauthorized or timeout.":
+            pop_info_and_back(self, response.text, self.login_hook)
         else:
-            QMessageBox.warning(self, 'Error', result.text)
+            QMessageBox.warning(self, 'Error', response.text)
