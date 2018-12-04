@@ -24,7 +24,7 @@ class manual(QWidget):
         self.auth_headers = auth_headers
         self.login_hook = login_hook
 
-        self.setGeometry(330, 100, 380, 450)
+        self.setGeometry(330, 100, 360, 450)
         self.setWindowTitle("Gomoku Game Manual")
         self.setWindowIcon(QIcon('chessboard/gomoku_icon.png'))
         self.server_ip = server_ip
@@ -72,10 +72,11 @@ class manual(QWidget):
             self.myfont = self.myset.var.fonttype
             self.mygame = GomokuOffline(self.username_b, self.server_ip, self.chooseboard, self.myfont, self.manual_hook)
             self.mygame.show()
+            self.mygame.addmusic()
             self.close()
 
     def handle_online_game(self):
-        #print("handle_online_game")
+        print("handle_online_game")
         self.hall = GameHallWindow(self.username_b, self.server_ip, self.auth_headers, self.login_hook, self.manual_hook)
         self.hall.show()
         self.close()

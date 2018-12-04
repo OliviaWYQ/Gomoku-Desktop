@@ -25,7 +25,8 @@ class GomokuOffline(QWidget):
         super().__init__()
         #username_b = userName
 
-        current_path = sys.path[0]+'/'
+        current_path = sys.path[0]
+        print(current_path)
         self.manual_hook = manual_hook
         self.serverIp = serverIp
         self.username_b = userName
@@ -46,7 +47,7 @@ class GomokuOffline(QWidget):
             self.cbnum = 8
         # 15*15
         elif self.cbty == 15:
-            self.chooseboard = QPixmap('chessboard/chessboard14.png')
+            self.chooseboard = QPixmap(current_path + 'chessboard/chessboard14.png')
             self.width_chessboard = 715
             self.height_chessboard = 689
             self.margin = 20
@@ -144,7 +145,7 @@ class GomokuOffline(QWidget):
 
     def gamestart(self):
         #game start
-
+        #self.addmusic()
         #location of a piece
         self.piece = QLabel(self)
         self.piece.setMouseTracking(True)
@@ -250,14 +251,13 @@ class GomokuOffline(QWidget):
         #     self.close()
         # else:
         #     QMessageBox.warning(self, 'Error', 'Bad user or password')
-'''
+
 def main():
     app = QApplication(sys.argv)
-    mygame = GomokuOffline("12345", "52.207.232.53", 9, 'Roman times')
+    mygame = GomokuOffline("12345", "52.207.232.53", 9, 'Roman times', None)
     mygame.show()
     mygame.addmusic()
     sys.exit(app.exec_())
 
 if __name__ == '__main__':
     main()
-'''

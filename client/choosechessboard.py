@@ -21,13 +21,13 @@ class ChooseBtn(QWidget):
 
         self.manual_hook = manual_hook
 
-        self.setGeometry(330, 100, 600, 400)
+        self.setGeometry(330, 100, 500, 400)
         self.setWindowTitle("Setting")
         # self.setWindowIcon(QIcon('chessboard/gomoku_icon.png'))
         # init
         # static val
 
-        current_path = sys.path[0]+'/'
+        current_path = sys.path[0]
         self.var = setvar()
         self.var.setvalue('cb8', current_path + 'chessboard/cb8.png')
         self.var.setvalue('cb14', current_path + 'chessboard/cb14.png')
@@ -65,7 +65,7 @@ class ChooseBtn(QWidget):
         self.bt1 = QPushButton("Confirm",self)
         self.bt1.clicked.connect(self.Action)
         self.bt1.resize(self.bt1.sizeHint())
-        self.bt1.move(505, 3)
+        #self.bt1.move(505, 3)
 
         # put text
         self.GroupBox0 = QGroupBox()
@@ -125,6 +125,7 @@ class ChooseBtn(QWidget):
         mainLayout.addWidget(self.GroupBox1)
         mainLayout.addWidget(self.GroupBox2)
         mainLayout.addWidget(self.GroupBox3)
+        mainLayout.addWidget(self.bt1)
         self.setLayout(mainLayout)
 
     def btnstate(self, b):
