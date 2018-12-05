@@ -77,6 +77,10 @@ public class GameStatus {
         return toSend;
     }
 
+    public void surrender(int role){
+        this.gameLogic.surrender(role);
+    }
+
     private void appendHistory(TextMessage move){
         this.historyMoves.add(move);
     }

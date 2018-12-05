@@ -5,25 +5,28 @@ Entrance of the project, login& signup window
 import sys
 #from PyQt5.QtGui import *
 from PyQt5.QtCore import pyqtSlot
-from PyQt5.QtWidgets import QMainWindow, QPushButton, QLineEdit, QMessageBox, QApplication
+from PyQt5.QtWidgets import QMainWindow, QPushButton, QLineEdit, QMessageBox, QApplication, QLabel
 from PyQt5.QtGui import QIcon
 import requests
 from manual import *
 from hall import GameHallWindow
 
-#IP = "localhost"
+# IP = "localhost"
 IP = "52.207.232.53"
 
 class Window(QMainWindow):
     """Log in window"""
 
-    def __init__(self):
+    def __init__(self, server_ip=IP):
         super().__init__()
         self.title = "Gomoku"
         self.top = 330
         self.left = 100
         self.width = 600
         self.height = 500
+
+        self.server_ip = server_ip
+
         self.init_ui()
 
     def init_ui(self):
@@ -31,22 +34,31 @@ class Window(QMainWindow):
         self.setWindowTitle(self.title)
         self.setGeometry(self.top, self.left, self.width, self.height)
         self.setWindowIcon(QIcon('chessboard/gomoku_icon.png')) # set window icon
-        login_btn = QPushButton('log in', self)
-        login_btn.move(100, 300)
-        login_btn.clicked.connect(self.handle_login)
+
+        self.user_name_label = QLabel("User name:", self)
+        self.user_name_label.setGeometry(100, 70, 400, 30)
+
         self.user_name_input = QLineEdit("12345", self)
         self.user_name_input.setGeometry(100, 100, 400, 30)
 
-        signup_btn = QPushButton('sign up', self)
-        signup_btn.move(400, 300)
-        signup_btn.clicked.connect(self.handle_signup)
+        self.pwd_label = QLabel("Password:", self)
+        self.pwd_label.setGeometry(100, 170, 400, 30)
+
         self.pwd_input = QLineEdit("123", self)
         self.pwd_input.setEchoMode(QLineEdit.Password)
         self.pwd_input.setGeometry(100, 200, 400, 30)
         self.pwd_input.setEchoMode(QLineEdit.Password)
 
-        self.server_ip = QLineEdit(IP, self)
-        self.server_ip.setGeometry(100, 400, 400, 30)
+        login_btn = QPushButton('log in', self)
+        login_btn.move(100, 300)
+        login_btn.clicked.connect(self.handle_login)
+
+        signup_btn = QPushButton('sign up', self)
+        signup_btn.move(400, 300)
+        signup_btn.clicked.connect(self.handle_signup)
+
+        # self.server_ip = QLineEdit(IP, self)
+        # self.server_ip.setGeometry(100, 400, 400, 30)
 
         self.show()
 
@@ -57,7 +69,7 @@ class Window(QMainWindow):
         payload["userName"] = self.user_name_input.text()
         payload["pass"] = self.pwd_input.text()
         #payload = {'user':'user', 'pass':'123456'}
-        res = requests.post('http://' + self.server_ip.text() + ':8080/auth/login', json=payload)
+        res = requests.post('http://' + self.server_ip + ':8080/auth/login', json=payload)
         print(res.text)
 
         print(payload["userName"])
@@ -68,9 +80,9 @@ class Window(QMainWindow):
             user_name = self.user_name_input.text()
             auth_headers = {'TOKEN': res.text[8:], 'USER_NAME': user_name}
             print(auth_headers)
-            self.manual_window = manual(self.user_name_input.text(), self.server_ip.text(), auth_headers, self.login_hook)
+            self.manual_window = manual(self.user_name_input.text(), self.server_ip, auth_headers, self.login_hook)
             self.manual_window.show()
-            # self.hall = GameHallWindow(user_name, self.server_ip.text(), auth_headers, self.login_hook)
+            # self.hall = GameHallWindow(user_name, self.server_ip, auth_headers, self.login_hook)
             # self.hall.show()
             self.close()
         else:
@@ -80,14 +92,22 @@ class Window(QMainWindow):
     def handle_signup(self):
         """handle clicking signup button"""
         # print("Clicked")
-        user_name = self.user_name_input.text()
+        user_name = self.user_name_input.text().strip()
         password = self.pwd_input.text()
+        if len(user_name) < 3:
+            _ = QMessageBox.question(self, 'Info', 'User name must longer than 3.\n (leading and ending spaces will be removed)',
+                                     QMessageBox.Ok, QMessageBox.Ok)
+            return
+        if len(password) < 2:
+            _ = QMessageBox.question(self, 'Info', 'Password must longer than 2.\n (leading and ending spaces will be removed)',
+                                     QMessageBox.Ok, QMessageBox.Ok)
+            return
         #authenticate from server side
         payload = {}
         payload["userName"] = user_name
         payload["pass"] = password
         #payload = {'user':'user', 'pass':'123456'}
-        res = requests.post('http://' + self.server_ip.text() + ':8080/auth/signup', json=payload)
+        res = requests.post('http://' + self.server_ip + ':8080/auth/signup', json=payload)
         print(res.text)
 
         print(payload["userName"])
@@ -107,5 +127,9 @@ class Window(QMainWindow):
 
 if __name__ == '__main__':
     APP = QApplication(sys.argv)
-    EX = Window()
+    if(len(sys.argv)>1 and sys.argv[1] == 't'):
+        print('#### Test: local server')
+        EX = Window(server_ip="localhost")
+    else:
+        EX = Window()
     sys.exit(APP.exec_())

@@ -63,9 +63,9 @@ class GameHallWindow(QWidget):
         self.refresh_button.move(580, 120)
         self.refresh_button.clicked.connect(self.refresh)
 
-        self.exit_button = QPushButton('Back', self)
-        self.exit_button.move(580, 340)
-        self.exit_button.clicked.connect(self.handle_back)
+        self.back_button = QPushButton('Back', self)
+        self.back_button.move(580, 340)
+        self.back_button.clicked.connect(self.handle_back)
 
         self.exit_button = QPushButton('Exit', self)
         self.exit_button.move(580, 390)
@@ -98,6 +98,11 @@ class GameHallWindow(QWidget):
         # disable resizing table
         self.rooms_observed.setCornerButtonEnabled(False)
         self.rooms_observed.horizontalHeader().setSectionResizeMode(QHeaderView.Fixed)
+
+        self.create_room_button.resize(self.refresh_button.sizeHint())
+        self.action_button.resize(self.refresh_button.sizeHint())
+        self.exit_button.resize(self.refresh_button.sizeHint())
+        self.back_button.resize(self.refresh_button.sizeHint())
 
         self.refresh()
         self.browse(0)
@@ -255,6 +260,8 @@ class GameHallWindow(QWidget):
             QMessageBox.warning(self, 'Error', "Try again.")
 
     def hall_hook(self):
+        self.refresh()
+        self.browse(0)
         self.show()
 
 def test():

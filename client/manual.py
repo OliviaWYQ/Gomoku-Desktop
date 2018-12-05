@@ -18,7 +18,7 @@ from choosechessboard import ChooseBtn
 from hall import GameHallWindow
 
 class manual(QWidget):
-    def __init__(self, userName, server_ip, auth_headers, login_hook):
+    def __init__(self, user_name, server_ip, auth_headers, login_hook):
         super(manual, self).__init__()
 
         self.auth_headers = auth_headers
@@ -28,34 +28,52 @@ class manual(QWidget):
         self.setWindowTitle("Gomoku Game Manual")
         self.setWindowIcon(QIcon('chessboard/gomoku_icon.png'))
         self.server_ip = server_ip
-        self.username_b = userName
+        self.user_name = user_name
         self.myset = ChooseBtn(self.manual_hook)
         self.showmanual()
 
-    def showmanual(self):
-        # Offline Game
-        self.offline_game_button = QPushButton("Offline Game",self)
-        self.offline_game_button.clicked.connect(self.handle_offline_game)
-        self.offline_game_button.resize(self.offline_game_button.sizeHint())
-        self.offline_game_button.move(120, 150)
+    def showmanual(self, base_x=120, base_y=80, offset_x=0, offset_y=70):
 
-        # Online Game
-        self.online_game_button = QPushButton("Online Game",self)
-        self.online_game_button.clicked.connect(self.handle_online_game)
-        self.online_game_button.resize(self.offline_game_button.sizeHint())
-        self.online_game_button.move(120, 250)
+        # id label
+        self.id_label = QLabel("Your id: " + self.user_name, self)
+        self.id_label.move(30, 30)
 
         # Setting
         self.offline_setting_button = QPushButton("Offline Setting",self)
         self.offline_setting_button.clicked.connect(self.handle_offline_setting)
-        self.offline_setting_button.resize(self.offline_game_button.sizeHint())
-        self.offline_setting_button.move(120, 50)
+        self.offline_setting_button.move(base_x, base_y)
+
+        # Offline Game
+        self.offline_game_button = QPushButton("Offline Game",self)
+        self.offline_game_button.clicked.connect(self.handle_offline_game)
+        self.offline_game_button.move(base_x, base_y+offset_y)
+
+        # Online Game
+        self.online_game_button = QPushButton("Online Game",self)
+        self.online_game_button.clicked.connect(self.handle_online_game)
+        self.online_game_button.move(base_x, base_y+2*offset_y)
 
         # Ranking
         self.ranking_button = QPushButton("Ranking",self)
         self.ranking_button.clicked.connect(self.handle_ranking)
+        self.ranking_button.move(base_x, base_y+3*offset_y)
+
+        # Ranking
+        self.logout_button = QPushButton("Log out",self)
+        self.logout_button.clicked.connect(self.handle_logout)
+        self.logout_button.move(base_x, base_y+4*offset_y)
+
+        # set button size
+        self.offline_setting_button.resize(self.offline_game_button.sizeHint())
+        # self.offline_game_button.resize(self.offline_game_button.sizeHint())
+        self.online_game_button.resize(self.offline_game_button.sizeHint())
         self.ranking_button.resize(self.offline_game_button.sizeHint())
-        self.ranking_button.move(120, 350)
+        self.logout_button.resize(self.offline_game_button.sizeHint())
+
+
+    def handle_logout(self):
+        self.login_hook()
+        self.close()
 
     def handle_offline_setting(self):
         #print("handle_offline_setting")
@@ -70,14 +88,14 @@ class manual(QWidget):
             print("board:", "\nftype:", self.myset.var.fonttype, "\ncbtyp3:", self.myset.var.cbtype, "\nOK:", self.myset.var.OK)
             self.chooseboard = self.myset.var.cbtype
             self.myfont = self.myset.var.fonttype
-            self.mygame = GomokuOffline(self.username_b, self.server_ip, self.chooseboard, self.myfont, self.manual_hook)
+            self.mygame = GomokuOffline(self.user_name, self.server_ip, self.chooseboard, self.myfont, self.manual_hook)
             self.mygame.show()
             self.mygame.addmusic()
             self.close()
 
     def handle_online_game(self):
         print("handle_online_game")
-        self.hall = GameHallWindow(self.username_b, self.server_ip, self.auth_headers, self.login_hook, self.manual_hook)
+        self.hall = GameHallWindow(self.user_name, self.server_ip, self.auth_headers, self.login_hook, self.manual_hook)
         self.hall.show()
         self.close()
 

@@ -1,4 +1,5 @@
-from PyQt5.QtWidgets import QWidget, QLabel, QMessageBox, QApplication
+from PyQt5.QtWidgets import QWidget, QLabel, QMessageBox,\
+    QApplication, QPushButton
 from PyQt5.QtGui import QPixmap, QIcon, QFont
 from PyQt5.QtCore import Qt, pyqtSignal, pyqtSlot
 import sys
@@ -94,6 +95,7 @@ class Gomoku(QWidget):
         self.many_black = QPixmap(current_path + 'chessboard/manyblack.png') # set many black
         self.many_white = QPixmap(current_path + 'chessboard/manywhite.png') # set many white
         self.setCursor(Qt.PointingHandCursor) # set mouse shape
+
         # show chessboard
         background = QLabel(self)
         background.setPixmap(self.chessboard14)
@@ -108,14 +110,45 @@ class Gomoku(QWidget):
         user_white.move(720, HEIGHT_CHESSBOARD - 195)
         # show playername in black
         player_black = QLabel(self)
-        player_black.setText("Black:    " + self.username_b)
+        player_black.setText("Black:  " + self.username_b)
         player_black.move(750, 220)
         player_black.setFont(QFont("Roman times", 16, QFont.Bold))
         # show playername in white
         player_white = QLabel(self)
-        player_white.setText("White:    " + self.username_w)
+        player_white.setText("White:  " + self.username_w)
         player_white.move(750, HEIGHT_CHESSBOARD - 230)
         player_white.setFont(QFont("Roman times", 16, QFont.Bold))
+
+        # init turn hinter
+        self.stone_label = QLabel(self)
+        self.stone_label.move(750, 290)
+        self.stone_label.setFont(QFont("Roman times", 16, QFont.Bold))
+
+        self.turn_hint = QLabel(self)
+        self.turn_hint.move(750, 320)
+        self.turn_hint.setFont(QFont("Roman times", 16, QFont.Bold))
+
+        self.surrender_button = QPushButton("Surrender and back",self)
+        self.surrender_button.clicked.connect(self.handle_surrender)
+        self.surrender_button.move(730, 375)
+
+        if self.put_stone:
+            self.turn_hint.setText("Your turn")
+            self.stone_label.setText("You use: Black")
+        else:
+            self.turn_hint.setText("Waiting ...")
+            self.stone_label.setText("You use: White")
+
+    def handle_surrender(self):
+        reply = QMessageBox.question(self, 'Exit', 'Surrender and go back?',
+                                     QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+        if reply == QMessageBox.Yes:
+            print("Surrender...")
+
+            self.web_socket.send("-9")
+            self.hall_hook()
+            self.close()
+        
 
     def game_start(self):
         #game start
@@ -185,9 +218,12 @@ class Gomoku(QWidget):
             if self.my_stone == player:
                 self.step_no = step + 1
                 self.put_stone = False
+                self.turn_hint.setText("Waiting ...")
             else:
                 self.oth_step = step + 1
                 self.put_stone = True
+                self.turn_hint.setText("Your turn")
+            
         if win_flag == 0:
             pass
         elif win_flag == 1:
@@ -213,6 +249,8 @@ class Gomoku(QWidget):
                 info = "White win!"
             elif winner == 6:
                 info = "Someone quitted."
+            elif winner == 9:
+                info = "Someone surrendered."
             button = QMessageBox.question(self, "Info",\
                                       info,\
                                       QMessageBox.Ok,\
@@ -230,6 +268,8 @@ class Gomoku(QWidget):
         else:
             if winner == 6:
                 info = "Your opponent quitted."
+            elif winner == 9:
+                info = "Opponent surrendered."
             elif winner == self.my_stone:
                 info = "You win! Nice!"
             else:
@@ -240,8 +280,10 @@ class Gomoku(QWidget):
                                       QMessageBox.Ok)
         if button == QMessageBox.Ok:
             self.hall_hook()
+            self.web_socket.close()
             self.close()
         else:
+            self.web_socket.close()
             self.close()
             raise SystemExit(0)
 
@@ -266,6 +308,9 @@ class Gomoku(QWidget):
 
                     if signal == -6:
                         self.end_game_signal.emit(6)
+                    elif signal == -9:
+                        print("Opponent surrendered.")
+                        self.end_game_signal.emit(9)
                     else:
                         print("Should not receive other control signals: ", signal)
                 else:

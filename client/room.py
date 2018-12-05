@@ -2,7 +2,7 @@
 # from PyQt5.QtGui import *
 from PyQt5.QtCore import pyqtSignal, pyqtSlot
 from PyQt5.QtWidgets import QWidget, QHBoxLayout, QPushButton,\
-    QMessageBox, QComboBox, QLineEdit
+    QMessageBox, QComboBox, QLineEdit, QLabel
 import requests
 from ws4py.client.threadedclient import WebSocketClient
 
@@ -80,25 +80,60 @@ class GameRoomWindow(QWidget):
         self.setWindowTitle(self.title)
         self.setGeometry(self.top, self.left, self.width, self.height)
 
+        self.stone_color_label = QLabel("Creator will use:", self)
+        self.stone_color_label.move(255, 14)
+
         self.colors = QComboBox(self)
         self.colors.addItems(["Black", "White"])
         self.colors.setGeometry(250, 40, 100, 20)
         self.colors.setEnabled(self.is_master)
-        self.colors.currentIndexChanged.connect(self.handle_color_change)
+        if self.is_master:
+            self.colors.currentIndexChanged.connect(self.handle_color_change)
+
+        self.start_button_label = QLabel("Start the game:", self)
+        self.start_button_label.move(405, 14)
 
         self.start_button = QPushButton('Start', self)
         self.start_button.move(400, 34)
         self.start_button.clicked.connect(self.handle_start)
         self.start_button.setEnabled(False)
 
-        self.leave_button = QPushButton('Leave', self)
+        self.leave_button_label = QLabel("Leave the game:", self)
+        self.leave_button_label.move(255, 74)
+
+        self.leave_button = QPushButton('  Leave  ', self)
         self.leave_button.move(250, 94)
         self.leave_button.clicked.connect(self.handle_leave)
+
+        self.guest_status_label = QLabel("Guest is:", self)
+        self.guest_status_label.move(405, 74)
 
         self.ready_button = QPushButton('Unready', self)
         self.ready_button.move(400, 94)
         self.ready_button.clicked.connect(self.handle_ready)
         self.ready_button.setEnabled(not self.is_master)
+
+        self.start_button.resize(self.leave_button.sizeHint())
+        self.ready_button.resize(self.leave_button.sizeHint())
+
+        self.room_status_label = QLabel(self)
+        self.room_status_label.move(255, 140)
+
+        # id label
+        self.id_label = QLabel(self)
+        self.id_label.move(40, 14)
+
+        self.role_label = QLabel(self)
+        self.role_label.move(40, 44)
+
+        if self.is_master:
+            self.id_label.setText("Your id: " + self.master_name)
+            self.role_label.setText("You're creator of this room.")
+            self.room_status_label.setText("Waiting for player ...")
+        else:
+            self.id_label.setText("Your id: " + self.guest_name)
+            self.role_label.setText("You're guest of this room.")
+            self.room_status_label.setText("Creator id: " + self.master_name)
 
         self.show()
 
@@ -108,6 +143,13 @@ class GameRoomWindow(QWidget):
             # join signal
             if self.is_master:
                 self.guest_name = message[1:]
+                self.room_status_label.setText("Guest id: " + self.guest_name)
+                if self.colors.currentText() == 'Black':
+                    self.master_stone = 1
+                    self.web_socket.send(BLACK_STONE_SIGNAL_MESSAGE)
+                else:
+                    self.master_stone = 2
+                    self.web_socket.send(WHITE_STONE_SIGNAL_MESSAGE)
         else:
             try:
                 signal = int(message)
@@ -136,6 +178,7 @@ class GameRoomWindow(QWidget):
                             self.start_button.setEnabled(self.ready)
                             self.ready_button.setText("Unready")
                             self.guest_name = None
+                            self.room_status_label.setText("Waiting for player ...")
                         elif signal == START_SIGNAL:
                             print("try to start")
                             self.start_game_signal.emit()
@@ -152,8 +195,8 @@ class GameRoomWindow(QWidget):
                         elif signal == BLACK_STONE_SIGNAL:
                             self.master_stone = 1
                             self.colors.setCurrentIndex(self.colors.findText('Black'))
-                            self.master_stone = 2
                         elif signal == WHITE_STONE_SIGNAL:
+                            self.master_stone = 2
                             self.colors.setCurrentIndex(self.colors.findText('White'))
                         else:
                             print("Unvalid guest control signal.")
@@ -214,9 +257,11 @@ class GameRoomWindow(QWidget):
     def handle_color_change(self):
         if self.colors.currentText() == 'Black':
             self.master_stone = 1
+            print("send: change to balck")
             self.web_socket.send(BLACK_STONE_SIGNAL_MESSAGE)
         else:
             self.master_stone = 2
+            print("send: change to white")
             self.web_socket.send(WHITE_STONE_SIGNAL_MESSAGE)
 
 
@@ -308,7 +353,10 @@ class CreateRoomWindow(QWidget):
         self.create_button.move(200, 180)
         self.create_button.clicked.connect(self.handle_back)
 
-        self.room_name = QLineEdit("Enter the room name", self)
+        self.room_name_label = QLabel("Room name:", self)
+        self.room_name_label.setGeometry(100, 70, 400, 30)
+
+        self.room_name = QLineEdit(self)
         self.room_name.setGeometry(100, 100, 400, 30)
 
         self.show()
@@ -322,7 +370,12 @@ class CreateRoomWindow(QWidget):
     def handle_create(self):
         payload = {}
         payload["master"] = self.master_name
-        payload["roomName"] = self.room_name.text()
+        payload["roomName"] = self.room_name.text().strip()
+        
+        if len(payload["roomName"]) == 0:
+            _ = QMessageBox.question(self, 'Info', 'Enter a room name.\n (leading and ending spaces will be removed)',
+                                     QMessageBox.Ok, QMessageBox.Ok)
+            return
 
         response = requests.post('http://' + self.server_ip + ':8080/room', json=payload, headers=self.auth_headers)
 
