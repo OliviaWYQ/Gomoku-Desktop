@@ -27,7 +27,8 @@ class ChooseBtn(QWidget):
         # init
         # static val
 
-        current_path = sys.path[0]
+        current_path = sys.path[0] + '/'
+        print(current_path)
         self.var = setvar()
         self.var.setvalue('cb8', current_path + 'chessboard/cb8.png')
         self.var.setvalue('cb14', current_path + 'chessboard/cb14.png')

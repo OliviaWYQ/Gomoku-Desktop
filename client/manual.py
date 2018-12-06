@@ -90,7 +90,8 @@ class manual(QWidget):
             self.myfont = self.myset.var.fonttype
             self.mygame = GomokuOffline(self.user_name, self.server_ip, self.chooseboard, self.myfont, self.manual_hook)
             self.mygame.show()
-            self.mygame.addmusic()
+            # do not use addmusic(), will block the program !!
+            # self.mygame.addmusic() # do not use addmusic(), will block the program !!
             self.close()
 
     def handle_online_game(self):

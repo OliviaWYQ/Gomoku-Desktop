@@ -19,6 +19,12 @@ class musicplayer(QThread):
         pygame.mixer.music.set_volume(0.2)
         pygame.mixer.music.play(-1)
 
+    def mute(self):
+        pygame.mixer.music.set_volume(0)
+
+    def unmute(self):
+        pygame.mixer.music.set_volume(0.2)
+        
     def start(self):
         pause = False
         #keymap = {}

@@ -4,7 +4,7 @@ import time
 class MongoClient:
     
     # to connect mongodb
-    uri = None;
+    uri = None
     client = None
     cols = None
     
@@ -51,7 +51,7 @@ class MongoClient:
     def get_matches(self, user_id):
         cursor = self.cols['history'].find({'user_1': user_id})
         matches = []
-        for m in curosr:
+        for m in cursor:
             matches.append(m)
         return matches
     

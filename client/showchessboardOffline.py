@@ -11,7 +11,7 @@ chessboard UI
 """
 
 import sys
-from PyQt5.QtWidgets import QWidget, QApplication, QLabel, QVBoxLayout, QMessageBox
+from PyQt5.QtWidgets import QWidget, QApplication, QLabel, QVBoxLayout, QMessageBox, QPushButton
 from PyQt5.QtGui import QPixmap, QIcon, QFont
 from PyQt5.QtCore import Qt
 from chessboard import chessboard as CB
@@ -25,7 +25,7 @@ class GomokuOffline(QWidget):
         super().__init__()
         #username_b = userName
 
-        current_path = sys.path[0]
+        current_path = sys.path[0] + '/'
         print(current_path)
         self.manual_hook = manual_hook
         self.serverIp = serverIp
@@ -38,6 +38,7 @@ class GomokuOffline(QWidget):
         self.height_chessboard = 689
         self.bgmusic = musicplayer()
 
+        self.muted = False
         # 9*9
         if self.cbty == 9:
             self.chooseboard = QPixmap(current_path + 'chessboard/chessboard8.png')
@@ -112,6 +113,15 @@ class GomokuOffline(QWidget):
         Player_w.move(475, self.height_chessboard - 213)
         Player_w.setFont(QFont(self.myfont, 16, QFont.Bold))
 
+        self.back_button = QPushButton("  Back  ", self)
+        self.back_button.clicked.connect(self.handle_back)
+        self.back_button.move(560, 415)
+
+        self.mute_button = QPushButton("Mute", self)
+        self.mute_button.clicked.connect(self.handle_mute)
+        self.mute_button.move(560, 385)
+        self.mute_button.resize(self.back_button.sizeHint())
+
     def showchessboard14(self):
         # show chessboard
         background = QLabel(self)
@@ -135,6 +145,29 @@ class GomokuOffline(QWidget):
         Player_w.setText("White:    " + self.username_w)
         Player_w.move(750, self.height_chessboard - 230)
         Player_w.setFont(QFont(self.myfont, 16, QFont.Bold))
+
+        self.back_button = QPushButton("  Back  ", self)
+        self.back_button.clicked.connect(self.handle_back)
+        self.back_button.move(740, 375)
+
+        self.mute_button = QPushButton("Mute", self)
+        self.mute_button.clicked.connect(self.handle_mute)
+        self.mute_button.move(740, 345)
+        self.mute_button.resize(self.back_button.sizeHint())
+
+    def handle_back(self):
+        self.manual_hook()
+        self.bgmusic.stop()
+        self.close()
+
+    def handle_mute(self):
+        if self.muted:
+            self.bgmusic.unmute()
+            self.mute_button.setText("Mute")
+        else:
+            self.mute_button.setText("Unmute")
+            self.bgmusic.mute()
+        self.muted = not self.muted
 
     def addmusic(self):
         try:
