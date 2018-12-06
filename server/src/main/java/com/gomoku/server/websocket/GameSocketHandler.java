@@ -178,6 +178,13 @@ public class GameSocketHandler extends TextWebSocketHandler {
                                 } catch (IOException e) {
                                     e.printStackTrace();
                                 }
+                                rooms.get(roomName).getAudience().forEach(audienceSession -> {
+                                    try {
+                                        audienceSession.sendMessage(SURRENDER_SIGNAL_MESSAGE);
+                                    } catch (Exception e){
+                                        System.out.println(e.getMessage());
+                                    }
+                                });
                                 this.surrender(1, roomName);
                                 //rooms.get(roomName).surrender(1);
                                 try {

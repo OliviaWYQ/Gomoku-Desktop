@@ -127,27 +127,43 @@ class Gomoku(QWidget):
         self.turn_hint = QLabel(self)
         self.turn_hint.move(750, 320)
         self.turn_hint.setFont(QFont("Roman times", 16, QFont.Bold))
-
-        self.surrender_button = QPushButton("Surrender and back",self)
+        if self.watch_game:
+            self.surrender_button = QPushButton("Back", self)
+        else:
+            self.surrender_button = QPushButton("Surrender and back", self)
+        
         self.surrender_button.clicked.connect(self.handle_surrender)
         self.surrender_button.move(730, 375)
 
-        if self.put_stone:
-            self.turn_hint.setText("Your turn")
-            self.stone_label.setText("You use: Black")
+        if self.watch_game:
+            self.stone_label.setText("Watching ...")
+            self.turn_hint.setText("Waiting black side")
         else:
-            self.turn_hint.setText("Waiting ...")
-            self.stone_label.setText("You use: White")
+            if self.put_stone:
+                self.turn_hint.setText("Your turn")
+                self.stone_label.setText("You use: Black")
+            else:
+                self.turn_hint.setText("Waiting ...")
+                self.stone_label.setText("You use: White")
 
     def handle_surrender(self):
-        reply = QMessageBox.question(self, 'Exit', 'Surrender and go back?',
-                                     QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
-        if reply == QMessageBox.Yes:
-            print("Surrender...")
+        if self.watch_game:
+            reply = QMessageBox.question(self, 'Exit', 'Go back to hall?',
+                                        QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+            if reply == QMessageBox.Yes:
+                print("Audience exit...")
 
-            self.web_socket.send("-9")
-            self.hall_hook()
-            self.close()
+                self.hall_hook()
+                self.close()
+        else:
+            reply = QMessageBox.question(self, 'Exit', 'Surrender and go back?',
+                                        QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+            if reply == QMessageBox.Yes:
+                print("Surrender...")
+
+                self.web_socket.send("-9")
+                self.hall_hook()
+                self.close()
         
 
     def game_start(self):
@@ -169,7 +185,7 @@ class Gomoku(QWidget):
         # self.colornum = 1
 
     def mouseReleaseEvent(self, event):
-        if self.put_stone:
+        if self.put_stone and (not self.watch_game):
             #self.put_stone = False
 
             self.piece.pos = event.pos()
@@ -199,6 +215,10 @@ class Gomoku(QWidget):
         self.put[self.step_no + self.oth_step].setGeometry(x, y, D_PIECE, D_PIECE)
 
         if self.watch_game:
+            if self.step_no % 2 ==0:
+                self.turn_hint.setText("Waiting white side")
+            else:
+                self.turn_hint.setText("Waiting black side")
             self.step_no += 1
 
     def put_a_stone(self, pos_by_int):
