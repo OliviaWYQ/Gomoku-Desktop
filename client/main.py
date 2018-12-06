@@ -126,10 +126,22 @@ class Window(QMainWindow):
         self.show()
 
 if __name__ == '__main__':
-    APP = QApplication(sys.argv)
-    if(len(sys.argv)>1 and sys.argv[1] == 't'):
-        print('#### Test: local server')
-        EX = Window(server_ip="localhost")
+    
+    if len(sys.argv) > 1:
+        if sys.argv[1] == 't':
+            print('#### Test mode: local server')
+            APP = QApplication(sys.argv)
+            EX = Window(server_ip="localhost")
+            sys.exit(APP.exec_())
+        elif sys.argv[1] == 'p' and len(sys.argv) > 2:
+            print('#### Test mode: ' + sys.argv[2])
+            APP = QApplication(sys.argv)
+            EX = Window(server_ip=sys.argv[2])
+            sys.exit(APP.exec_())
+        else:
+            print('Forgot server ip.')
     else:
+        APP = QApplication(sys.argv)
         EX = Window()
-    sys.exit(APP.exec_())
+        sys.exit(APP.exec_())
+    

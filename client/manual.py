@@ -97,7 +97,7 @@ class manual(QWidget):
     def handle_online_game(self):
         print("handle_online_game")
         self.hall = GameHallWindow(self.user_name, self.server_ip, self.auth_headers, self.login_hook, self.manual_hook)
-        self.hall.show()
+        # self.hall.show()
         self.close()
 
     def handle_ranking(self):

@@ -282,26 +282,51 @@ class GameRoomWindow(QWidget):
             response = requests.get('http://' + self.server_ip +\
                 ':8080/room/delete/'+ self.room_name + '/' +\
                 self.master_name, headers=self.auth_headers)
+            # if response.text == 'Success':
+            #     self.web_socket.send(MASTER_DELETE_SIGNAL_MESSAGE)
+            #     self.hall_hook()
+            #     self.close()
+            # elif response.text == "Unauthorized or timeout.":
+            #     pop_info_and_back(self, response.text, self.login_hook)
+            # else:
+            print('#### Info: master delete: ' + response.text)
             if response.text == 'Success':
+                print("Success")
                 self.web_socket.send(MASTER_DELETE_SIGNAL_MESSAGE)
+                self.web_socket.close()
                 self.hall_hook()
-                self.close()
-            elif response.text == "Unauthorized or timeout.":
-                pop_info_and_back(self, response.text, self.login_hook)
             else:
-                print(response.text)
+                print("Fail")
+                self.web_socket.close()
+                self.hall_hook(refresh=True)
+            self.close()
         else:
             response = requests.get('http://' + self.server_ip +\
-            ':8080/room/leave/'+ self.room_name + '/' +\
-            self.guest_name, headers=self.auth_headers)
+                ':8080/room/leave/'+ self.room_name + '/' +\
+                self.guest_name, headers=self.auth_headers)
+            # if response.text == 'Success':
+            #     self.web_socket.send(GUEST_LEAVE_SIGNAL_MESSAGE)
+            #     self.hall_hook()
+            #     self.close()
+            # elif response.text == "Unauthorized or timeout.":
+            #     pop_info_and_back(self, response.text, self.login_hook)
+            # else:
+            #     print(response.text)
+            print('#### Info: guest leave: ' + response.text)
+            self.web_socket.send(GUEST_LEAVE_SIGNAL_MESSAGE)
+            self.web_socket.close()
+            self.hall_hook()
+            self.close()
             if response.text == 'Success':
+                print("Success")
                 self.web_socket.send(GUEST_LEAVE_SIGNAL_MESSAGE)
+                self.web_socket.close()
                 self.hall_hook()
-                self.close()
-            elif response.text == "Unauthorized or timeout.":
-                pop_info_and_back(self, response.text, self.login_hook)
             else:
-                print(response.text)
+                print("Fail")
+                self.web_socket.close()
+                self.hall_hook(refresh=True)
+            self.close()
 
     @pyqtSlot()
     def handle_ready(self):

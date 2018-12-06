@@ -40,6 +40,8 @@ class GameHallWindow(QWidget):
 
         self.init_ui()
 
+        self.refresh()
+
     def init_ui(self):
         """
         init the ui of game hall:
@@ -104,9 +106,6 @@ class GameHallWindow(QWidget):
         self.exit_button.resize(self.refresh_button.sizeHint())
         self.back_button.resize(self.refresh_button.sizeHint())
 
-        self.refresh()
-        self.browse(0)
-
         self.show()
 
     @pyqtSlot()
@@ -126,6 +125,7 @@ class GameHallWindow(QWidget):
             self.action_button.setText("Action")
         except:
             pop_info_and_back(self, response.text, self.login_hook)
+
             # info = response.text
             # button = QMessageBox.question(self, "Info",\
             #                           info,\
@@ -259,10 +259,11 @@ class GameHallWindow(QWidget):
             print(e)
             QMessageBox.warning(self, 'Error', "Try again.")
 
-    def hall_hook(self):
-        self.refresh()
-        self.browse(0)
+    def hall_hook(self, refresh=True):
         self.show()
+        if refresh:
+            self.refresh()
+            # self.browse(0)
 
 def test():
     app = QApplication(sys.argv)

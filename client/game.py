@@ -153,7 +153,7 @@ class Gomoku(QWidget):
             if reply == QMessageBox.Yes:
                 print("Audience exit...")
 
-                self.hall_hook()
+                self.hall_hook(refresh=True)
                 self.close()
         else:
             reply = QMessageBox.question(self, 'Exit', 'Surrender and go back?',
@@ -162,7 +162,7 @@ class Gomoku(QWidget):
                 print("Surrender...")
 
                 self.web_socket.send("-9")
-                self.hall_hook()
+                self.hall_hook(refresh=True)
                 self.close()
         
 
@@ -276,7 +276,7 @@ class Gomoku(QWidget):
                                       QMessageBox.Ok,\
                                       QMessageBox.Ok)
             if button == QMessageBox.Ok:
-                self.hall_hook()
+                self.hall_hook(refresh=True)
                 self.close()
             else:
                 self.close()
@@ -299,7 +299,7 @@ class Gomoku(QWidget):
                                       QMessageBox.Ok,\
                                       QMessageBox.Ok)
         if button == QMessageBox.Ok:
-            self.hall_hook()
+            self.hall_hook(refresh=True)
             self.web_socket.close()
             self.close()
         else:
