@@ -262,14 +262,14 @@ class GomokuOffline(QWidget):
     def showGameEnd(self, winner):
         self.sendMatch(winner, self.obj.sendsteps())
         if winner == 1:
-            winnername = self.username_b
+            winnername = "Black"
         elif winner == 2:
-            winnername = self.username_w
+            winnername = "White"
         else:
             winnername = "TIE GAME! None of You"
         self.label = QLabel("About Qt MessageBox")
         button = QMessageBox.question(self,"Gomoku Game Information",
-                                      self.tr("Game End\n%s Win!\nQuit or Start A New Game?" % winnername),
+                                      self.tr("Game End\n%s Wins!\nQuit or Start A New Game?" % winnername),
                                       QMessageBox.Retry|QMessageBox.Close,
                                       QMessageBox.Retry)
         if button == QMessageBox.Retry:
