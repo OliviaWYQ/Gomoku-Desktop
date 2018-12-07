@@ -319,7 +319,6 @@ class GameRoomWindow(QWidget):
             self.close()
             if response.text == 'Success':
                 print("Success")
-                self.web_socket.send(GUEST_LEAVE_SIGNAL_MESSAGE)
                 self.web_socket.close()
                 self.hall_hook()
             else:

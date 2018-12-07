@@ -21,18 +21,18 @@ import requests
 from music import musicplayer
 
 class GomokuOffline(QWidget):
-    def __init__(self, userName, serverIp, mycbtype, myfonttype, manual_hook):
+    def __init__(self, user_name, server_ip, my_chessboard_type, my_font, manual_hook):
         super().__init__()
-        #username_b = userName
+        #username_b = user_name
 
         current_path = sys.path[0] + '/'
         print(current_path)
         self.manual_hook = manual_hook
-        self.serverIp = serverIp
-        self.username_b = userName
+        self.server_ip = server_ip
+        self.username_b = user_name
         self.username_w = "Guest"
-        self.cbty = mycbtype
-        self.myfont  = myfonttype
+        self.chessboard_type = my_chessboard_type
+        self.my_font  = my_font
         self.chooseboard = QPixmap(current_path + 'chessboard/chessboard14.png')
         self.width_chessboard = 715
         self.height_chessboard = 689
@@ -40,14 +40,14 @@ class GomokuOffline(QWidget):
 
         self.muted = False
         # 9*9
-        if self.cbty == 9:
+        if self.chessboard_type == 9:
             self.chooseboard = QPixmap(current_path + 'chessboard/chessboard8.png')
             self.width_chessboard = 443
             self.height_chessboard = 443
             self.margin = 28
             self.cbnum = 8
         # 15*15
-        elif self.cbty == 15:
+        elif self.chessboard_type == 15:
             self.chooseboard = QPixmap(current_path + 'chessboard/chessboard14.png')
             self.width_chessboard = 715
             self.height_chessboard = 689
@@ -57,8 +57,8 @@ class GomokuOffline(QWidget):
             print('error cbnum!')
 
         # other
-        self.D_piece = 36
-        self.R_piece = self.D_piece / 2
+        self.d_piece = 36
+        self.r_piece = self.d_piece / 2
         self.grid_w = (self.width_chessboard - (self.margin * 2)) / self.cbnum
         self.grid_h = (self.height_chessboard - (self.margin * 2)) / self.cbnum
         self.restart()
@@ -68,50 +68,59 @@ class GomokuOffline(QWidget):
         self.obj = CB(self.cbnum+1)
         self.obj.reset()
         self.winnervalue = 0
-        self.Setting()
-        if self.cbty == 9:
+        self.setting()
+        if self.chessboard_type == 9:
             self.showchessboard8()
-        elif self.cbty == 15:
+        elif self.chessboard_type == 15:
             self.showchessboard14()
         else:
             print('error cbnum!')
         self.gamestart()
         self.setMouseTracking(True)
 
-    def Setting(self):
+    def setting(self):
         # init user interface
         self.setGeometry(330, 70, self.width_chessboard + 200, self.height_chessboard) # set window size
         self.setWindowTitle("Gomoku Game") # set window title
         #self.setWindowIcon(QIcon('chessboard/gomoku_icon.png')) # set window icon
         self.black = QPixmap('chessboard/black.png') # set black piece
         self.white = QPixmap('chessboard/white.png') # set white piece
-        self.manyblack = QPixmap('chessboard/manyblack.png') # set many black
-        self.manywhite = QPixmap('chessboard/manywhite.png') # set many white
+        self.many_black = QPixmap('chessboard/manyblack.png') # set many black
+        self.many_white = QPixmap('chessboard/manywhite.png') # set many white
         self.setCursor(Qt.PointingHandCursor) # set mouse shape
 
     def showchessboard8(self):
         # show chessboard
-        background = QLabel(self)
-        background.setPixmap(self.chooseboard)
-        background.setScaledContents(True)
+        self.background = QLabel(self)
+        self.background.setPixmap(self.chooseboard)
+        self.background.setScaledContents(True)
         # show many black
-        user_black = QLabel(self)
-        user_black.setPixmap(self.manyblack)
-        user_black.move(450, 10)
+        self.user_black = QLabel(self)
+        self.user_black.setPixmap(self.many_black)
+        self.user_black.move(450, 10)
         # show many white
-        user_white = QLabel(self)
-        user_white.setPixmap(self.manywhite)
-        user_white.move(450, self.height_chessboard - 195)
-        # show playername in black
-        Player_b = QLabel(self)
-        Player_b.setText("Black:    " + self.username_b)
-        Player_b.move(475, 203)
-        Player_b.setFont(QFont(self.myfont, 16, QFont.Bold))
-        # show playername in white
-        Player_w = QLabel(self)
-        Player_w.setText("White:    " + self.username_w)
-        Player_w.move(475, self.height_chessboard - 213)
-        Player_w.setFont(QFont(self.myfont, 16, QFont.Bold))
+        self.user_white = QLabel(self)
+        self.user_white.setPixmap(self.many_white)
+        self.user_white.move(450, self.height_chessboard - 195)
+
+        # # show playername in black
+        # self.player_b = QLabel(self)
+        # self.player_b.setText("Black:    " + self.username_b)
+        # self.player_b.move(475, 203)
+        # self.player_b.setFont(QFont(self.my_font, 16, QFont.Bold))
+        # # show playername in white
+        # self.player_w = QLabel(self)
+        # self.player_w.setText("White:    " + self.username_w)
+        # self.player_w.move(475, self.height_chessboard - 213)
+        # self.player_w.setFont(QFont(self.my_font, 16, QFont.Bold))
+
+        self.id_label = QLabel("Id: " + self.username_b, self)
+        self.id_label.move(475, 203)
+        self.id_label.setFont(QFont(self.my_font, 16, QFont.Bold))
+
+        self.turn_label = QLabel("Black side...", self)
+        self.turn_label.move(475, self.height_chessboard - 213)
+        self.turn_label.setFont(QFont(self.my_font, 16, QFont.Bold))
 
         self.back_button = QPushButton("  Back  ", self)
         self.back_button.clicked.connect(self.handle_back)
@@ -124,27 +133,35 @@ class GomokuOffline(QWidget):
 
     def showchessboard14(self):
         # show chessboard
-        background = QLabel(self)
-        background.setPixmap(self.chooseboard)
-        background.setScaledContents(True)
+        self.background = QLabel(self)
+        self.background.setPixmap(self.chooseboard)
+        self.background.setScaledContents(True)
         # show many black
-        user_black = QLabel(self)
-        user_black.setPixmap(self.manyblack)
-        user_black.move(720, 10)
+        self.user_black = QLabel(self)
+        self.user_black.setPixmap(self.many_black)
+        self.user_black.move(720, 10)
         # show many white
-        user_white = QLabel(self)
-        user_white.setPixmap(self.manywhite)
-        user_white.move(720, self.height_chessboard - 195)
+        self.user_white = QLabel(self)
+        self.user_white.setPixmap(self.many_white)
+        self.user_white.move(720, self.height_chessboard - 195)
         # show playername in black
-        Player_b = QLabel(self)
-        Player_b.setText("Black:    " + self.username_b)
-        Player_b.move(750, 220)
-        Player_b.setFont(QFont(self.myfont, 16, QFont.Bold))
+        self.player_b = QLabel(self)
+        self.player_b.setText("Black")
+        self.player_b.move(750, 220)
+        self.player_b.setFont(QFont(self.my_font, 16, QFont.Bold))
         # show playername in white
-        Player_w = QLabel(self)
-        Player_w.setText("White:    " + self.username_w)
-        Player_w.move(750, self.height_chessboard - 230)
-        Player_w.setFont(QFont(self.myfont, 16, QFont.Bold))
+        self.player_w = QLabel(self)
+        self.player_w.setText("White")
+        self.player_w.move(750, self.height_chessboard - 230)
+        self.player_w.setFont(QFont(self.my_font, 16, QFont.Bold))
+        
+        self.id_label = QLabel("Id: " + self.username_b, self)
+        self.id_label.move(750, 270)
+        self.id_label.setFont(QFont(self.my_font, 16, QFont.Bold))
+
+        self.turn_label = QLabel("Black side...", self)
+        self.turn_label.move(750, 300)
+        self.turn_label.setFont(QFont(self.my_font, 16, QFont.Bold))
 
         self.back_button = QPushButton("  Back  ", self)
         self.back_button.clicked.connect(self.handle_back)
@@ -225,9 +242,9 @@ class GomokuOffline(QWidget):
         if self.piece.pos:
             self.put[self.step].setPixmap(self.color)
             if self.i != None and self.j != None:
-                x = self.margin + self.i * self.grid_w - self.R_piece
-                y = self.margin + self.j * self.grid_h - self.R_piece
-                self.put[self.step].setGeometry(x, y, self.D_piece, self.D_piece) # draw piece to grid
+                x = self.margin + self.i * self.grid_w - self.r_piece
+                y = self.margin + self.j * self.grid_h - self.r_piece
+                self.put[self.step].setGeometry(x, y, self.d_piece, self.d_piece) # draw piece to grid
 
     def nextstep(self):
         # next step
@@ -236,9 +253,11 @@ class GomokuOffline(QWidget):
         if self.color == self.black:
             self.color = self.white
             self.colornum = 2
+            self.turn_label.setText("White side...")
         else:
             self.color = self.black
             self.colornum = 1
+            self.turn_label.setText("Black side...")
 
     def showGameEnd(self, winner):
         self.sendMatch(winner, self.obj.sendsteps())
@@ -255,7 +274,7 @@ class GomokuOffline(QWidget):
                                       QMessageBox.Retry)
         if button == QMessageBox.Retry:
             self.label.setText("Question button/Retry")
-            self.cam = GomokuOffline(self.username_b, self.serverIp, self.cbty, self.myfont, self.manual_hook)
+            self.cam = GomokuOffline(self.username_b, self.server_ip, self.chessboard_type, self.my_font, self.manual_hook)
             self.cam.show()
             self.close()
 
@@ -275,11 +294,11 @@ class GomokuOffline(QWidget):
         payload["user1win"] = winFlag
         payload["moves"] = moves
         #payload = {'user':'user', 'pass':'123456'}
-        r = requests.post('http://' + self.serverIp + ':8080/match', json=payload)
+        _ = requests.post('http://' + self.server_ip + ':8080/match', json=payload)
         # print(payload)
         # if (r.text == "Success"):
         #     QMessageBox.warning(self, 'Success', 'Success')
-        #     self.game = Gomoku(self.userName.text())
+        #     self.game = Gomoku(self.user_name.text())
         #     self.game.show()
         #     self.close()
         # else:
