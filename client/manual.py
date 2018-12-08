@@ -16,6 +16,7 @@ from showchessboardOffline import GomokuOffline
 from choosechessboard import ChooseBtn
 #from variable import setvar
 from hall import GameHallWindow
+from gamehelp import helper
 
 class manual(QWidget):
     def __init__(self, user_name, server_ip, auth_headers, login_hook):
@@ -24,12 +25,14 @@ class manual(QWidget):
         self.auth_headers = auth_headers
         self.login_hook = login_hook
 
-        self.setGeometry(330, 100, 360, 450)
+        self.setGeometry(330, 100, 380, 450)
         self.setWindowTitle("Gomoku Game Manual")
         self.setWindowIcon(QIcon('chessboard/gomoku_icon.png'))
         self.server_ip = server_ip
         self.user_name = user_name
         self.myset = ChooseBtn(self.manual_hook)
+
+        self.note = helper(self.manual_hook)
         self.showmanual()
 
     def showmanual(self, base_x=120, base_y=80, offset_x=0, offset_y=70):
@@ -37,6 +40,11 @@ class manual(QWidget):
         # id label
         self.id_label = QLabel("Your id: " + self.user_name, self)
         self.id_label.move(30, 30)
+
+        # Setting
+        self.offline_setting_button = QPushButton("Help",self)
+        self.offline_setting_button.clicked.connect(self.game_help)
+        self.offline_setting_button.move(270, 20)
 
         # Setting
         self.offline_setting_button = QPushButton("Offline Setting",self)
@@ -70,6 +78,9 @@ class manual(QWidget):
         self.ranking_button.resize(self.offline_game_button.sizeHint())
         self.logout_button.resize(self.offline_game_button.sizeHint())
 
+    def game_help(self):
+        self.note.show()
+        self.close()
 
     def handle_logout(self):
         self.login_hook()

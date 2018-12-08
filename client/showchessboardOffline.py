@@ -126,6 +126,11 @@ class GomokuOffline(QWidget):
         self.back_button.clicked.connect(self.handle_back)
         self.back_button.move(560, 415)
 
+        self.mute_button = QPushButton("Next", self)
+        self.mute_button.clicked.connect(self.handle_next)
+        self.mute_button.move(560, 355)
+        self.mute_button.resize(self.back_button.sizeHint())
+
         self.mute_button = QPushButton("Mute", self)
         self.mute_button.clicked.connect(self.handle_mute)
         self.mute_button.move(560, 385)
@@ -165,11 +170,16 @@ class GomokuOffline(QWidget):
 
         self.back_button = QPushButton("  Back  ", self)
         self.back_button.clicked.connect(self.handle_back)
-        self.back_button.move(740, 375)
+        self.back_button.move(730, 375)
+
+        self.mute_button = QPushButton("Next", self)
+        self.mute_button.clicked.connect(self.handle_next)
+        self.mute_button.move(820, 345)
+        self.mute_button.resize(self.back_button.sizeHint())
 
         self.mute_button = QPushButton("Mute", self)
         self.mute_button.clicked.connect(self.handle_mute)
-        self.mute_button.move(740, 345)
+        self.mute_button.move(730, 345)
         self.mute_button.resize(self.back_button.sizeHint())
 
     def handle_back(self):
@@ -182,9 +192,13 @@ class GomokuOffline(QWidget):
             self.bgmusic.unmute()
             self.mute_button.setText("Mute")
         else:
-            self.mute_button.setText("Unmute")
             self.bgmusic.mute()
+            self.mute_button.setText("Unmute")
         self.muted = not self.muted
+
+    def handle_next(self):
+        if self.muted == False:
+            self.bgmusic.nextsong()
 
     def addmusic(self):
         try:

@@ -10,20 +10,43 @@ import sys, os
 import pygame
 from pygame.locals import *
 from PyQt5.QtCore import QThread
+import os.path
 
 class musicplayer(QThread):
     def __init__(self):
         pygame.init()
         pygame.mixer.init()
-        pygame.mixer.music.load('music/music1.ogg')
+        #pygame.mixer.music.load('music/music1.ogg')
         pygame.mixer.music.set_volume(0.2)
-        pygame.mixer.music.play(-1)
+        #pygame.mixer.music.play(-1)
+        self.musicpath = 'music/'
+        self.get_music()
+
+    def get_music(self):
+        folder = os.listdir(self.musicpath)
+        self.music_files = []
+        for filename in folder:
+            if filename.lower().endswith('.ogg'):
+                self.music_files.append(os.path.join(self.musicpath, filename))
+        print(self.music_files)
+        # init
+        self.current = 0
+        self.total = len(self.music_files)
+        pygame.mixer.music.load(self.music_files[self.current])
+        pygame.mixer.music.play()
+        print('Now playing:', self.music_files[self.current])
 
     def mute(self):
-        pygame.mixer.music.set_volume(0)
+        pygame.mixer.music.pause()
 
     def unmute(self):
-        pygame.mixer.music.set_volume(0.2)
+        pygame.mixer.music.unpause()
+
+    def nextsong(self):
+        self.current = (self.current + 1) % self.total
+        pygame.mixer.music.load(self.music_files[self.current])
+        pygame.mixer.music.play()
+        print('Now playing:', self.music_files[self.current])
         
     def start(self):
         pause = False
@@ -41,13 +64,20 @@ class musicplayer(QThread):
             else:
                 pygame.mixer.music.unpause()  # unpause
 
+    def test(self):
+        while True:
+            for event in pygame.event.get():
+                if event.type == KEYDOWN:
+                    if event.key == K_SPACE:
+                        self.nextsong()
+
     def stop(self):
         pygame.mixer.music.stop()
 '''
 def main():
     try:
         bgmusic = musicplayer()
-        bgmusic.start()
+        bgmusic.test()
     except KeyboardInterrupt:
         bgmusic.stop()
 

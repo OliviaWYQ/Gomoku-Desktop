@@ -23,7 +23,7 @@ class Window(QMainWindow):
         self.top = 330
         self.left = 100
         self.width = 600
-        self.height = 500
+        self.height = 460
 
         self.server_ip = server_ip
 
