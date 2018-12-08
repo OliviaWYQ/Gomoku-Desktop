@@ -54,8 +54,12 @@ class Window(QMainWindow):
         login_btn.clicked.connect(self.handle_login)
 
         signup_btn = QPushButton('sign up', self)
-        signup_btn.move(400, 300)
+        signup_btn.move(250, 300)
         signup_btn.clicked.connect(self.handle_signup)
+
+        exit_button = QPushButton("Exit",self)
+        exit_button.clicked.connect(self.close)
+        exit_button.move(400, 300)
 
         # self.server_ip = QLineEdit(IP, self)
         # self.server_ip.setGeometry(100, 400, 400, 30)

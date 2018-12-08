@@ -12,7 +12,8 @@ from PyQt5.QtWidgets import QWidget, QApplication, QLabel, QVBoxLayout, QMessage
 from PyQt5.QtGui import QPixmap, QIcon, QFont
 from PyQt5.QtCore import Qt
 #from showchessboard import Gomoku
-from showchessboardOffline import GomokuOffline
+#from showchessboardOffline import GomokuOffline
+from chooseAI import chooseAI as cAI
 from choosechessboard import ChooseBtn
 #from variable import setvar
 from hall import GameHallWindow
@@ -41,7 +42,7 @@ class manual(QWidget):
         self.id_label = QLabel("Your id: " + self.user_name, self)
         self.id_label.move(30, 30)
 
-        # Setting
+        # Help
         self.offline_setting_button = QPushButton("Help",self)
         self.offline_setting_button.clicked.connect(self.game_help)
         self.offline_setting_button.move(270, 20)
@@ -66,7 +67,7 @@ class manual(QWidget):
         self.ranking_button.clicked.connect(self.handle_ranking)
         self.ranking_button.move(base_x, base_y+3*offset_y)
 
-        # Ranking
+        # Log out
         self.logout_button = QPushButton("Log out",self)
         self.logout_button.clicked.connect(self.handle_logout)
         self.logout_button.move(base_x, base_y+4*offset_y)
@@ -99,8 +100,10 @@ class manual(QWidget):
             print("board:", "\nftype:", self.myset.var.fonttype, "\ncbtyp3:", self.myset.var.cbtype, "\nOK:", self.myset.var.OK)
             self.chooseboard = self.myset.var.cbtype
             self.myfont = self.myset.var.fonttype
-            self.mygame = GomokuOffline(self.user_name, self.server_ip, self.chooseboard, self.myfont, self.manual_hook)
-            self.mygame.show()
+            #self.mygame = GomokuOffline(self.user_name, self.server_ip, self.chooseboard, self.myfont, self.manual_hook)
+            #self.mygame.show()
+            self.choose = cAI(self.user_name, self.server_ip, self.chooseboard, self.myfont, self.manual_hook)
+            self.choose.show()
             # do not use addmusic(), will block the program !!
             # self.mygame.addmusic() # do not use addmusic(), will block the program !!
             self.close()

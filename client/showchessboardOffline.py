@@ -15,23 +15,56 @@ from PyQt5.QtWidgets import QWidget, QApplication, QLabel, QVBoxLayout, QMessage
 from PyQt5.QtGui import QPixmap, QIcon, QFont
 from PyQt5.QtCore import Qt
 from chessboard import chessboard as CB
+from showAI import useAI
 import requests
 #from login import *
 #from choosechessboard import ChooseBtn
 from music import musicplayer
 
 class GomokuOffline(QWidget):
-    def __init__(self, user_name, server_ip, my_chessboard_type, my_font, manual_hook):
+    def __init__(self, user_name, server_ip, my_chessboard_type, my_font, manual_hook, usecolor, opponent):
         super().__init__()
-        #username_b = user_name
+        self.chessboard_type = my_chessboard_type
+        self.username = user_name
+        self.usecolor = usecolor
+        self.opponent = opponent
+        # init ai name
+        self.ai = useAI(self.chessboard_type)
+        if self.opponent == 1: # guest
+            self.ifAI = 0
+            if usecolor == 1:
+                self.username_b = self.username
+                self.username_w = "Guest"
+            elif usecolor == 2:
+                self.username_b = "Guest"
+                self.username_w = self.username
+        elif self.opponent == 2: # AI
+            self.ifAI = 1
+            if usecolor == 1:
+                self.username_b = self.username
+                self.username_w = "AlphaGomoku"
+            elif usecolor == 2:
+                self.username_b = "AlphaGomoku"
+                self.username_w = self.username
+        else:
+            self.username_b = self.username_w = None
+            print('opponent error')
+
+        #init ai turn
+        if self.ifAI:
+            if self.usecolor == 1: # use black
+                self.usrturn = 1
+            elif self.usecolor == 2: # use white
+                self.usrturn = 0
+            else:
+                self.usrturn = 0
+                print('usecolor error')
 
         current_path = sys.path[0] + '/'
         print(current_path)
         self.manual_hook = manual_hook
         self.server_ip = server_ip
-        self.username_b = user_name
-        self.username_w = "Guest"
-        self.chessboard_type = my_chessboard_type
+
         self.my_font  = my_font
         self.chooseboard = QPixmap(current_path + 'chessboard/chessboard14.png')
         self.width_chessboard = 715
@@ -114,7 +147,7 @@ class GomokuOffline(QWidget):
         # self.player_w.move(475, self.height_chessboard - 213)
         # self.player_w.setFont(QFont(self.my_font, 16, QFont.Bold))
 
-        self.id_label = QLabel("Id: " + self.username_b, self)
+        self.id_label = QLabel("Id: " + self.username, self)
         self.id_label.move(475, 203)
         self.id_label.setFont(QFont(self.my_font, 16, QFont.Bold))
 
@@ -151,16 +184,16 @@ class GomokuOffline(QWidget):
         self.user_white.move(720, self.height_chessboard - 195)
         # show playername in black
         self.player_b = QLabel(self)
-        self.player_b.setText("Black")
+        self.player_b.setText("Black: " + self.username_b)
         self.player_b.move(750, 220)
         self.player_b.setFont(QFont(self.my_font, 16, QFont.Bold))
         # show playername in white
         self.player_w = QLabel(self)
-        self.player_w.setText("White")
+        self.player_w.setText("White: " + self.username_w)
         self.player_w.move(750, self.height_chessboard - 230)
         self.player_w.setFont(QFont(self.my_font, 16, QFont.Bold))
         
-        self.id_label = QLabel("Id: " + self.username_b, self)
+        self.id_label = QLabel("Id: " + self.username, self)
         self.id_label.move(750, 270)
         self.id_label.setFont(QFont(self.my_font, 16, QFont.Bold))
 
@@ -217,9 +250,8 @@ class GomokuOffline(QWidget):
         # draw a piece, total 15 *15
         self.put = [QLabel(self) for i in range((self.cbnum+1) * (self.cbnum+1))]
         self.step = 1
-        self.color = self.black # change to black first
+        self.color = self.black # black first
         self.colornum = 1
-
     '''
     def mousePressEvent(self, event):
         if event.button() == Qt.LeftButton:
@@ -228,29 +260,68 @@ class GomokuOffline(QWidget):
     '''
 
     def mouseReleaseEvent(self, event):
-        self.piece.pos = event.pos()
-        if self.piece.pos:
-            self.i = round((self.piece.pos.x() - self.margin) / self.grid_w)
-            self.j = round((self.piece.pos.y() - self.margin) / self.grid_h)
-        #print('test: step: %d, 网格坐标: ( x: %d ,y: %d, color: %d )' % (self.step, self.i, self.j, self.colornum))
-
-        #CB input value
-        if (self.obj.changevalue(self.i, self.j, self.colornum) == 0):
-            print("Invalid! (step: %d, x: %d ,y: %d, color: %d)"  % (self.step, self.i, self.j, self.colornum))
-            self.i = None
-            self.j = None
-        else:
-            print('step: %d, 网格坐标: ( x: %d ,y: %d, color: %d )' % (self.step, self.i, self.j, self.colornum))
-            #CB check value
-            self.winnervalue = self.obj.checkwinner()
-            print('winner:', self.winnervalue)
-            if self.winnervalue != 0:
+        if self.ifAI:
+            if self.usrturn:
+                self.piece.pos = event.pos()
+                if self.piece.pos:
+                    self.i = round((self.piece.pos.x() - self.margin) / self.grid_w)
+                    self.j = round((self.piece.pos.y() - self.margin) / self.grid_h)
+                # check margin
+                if (self.obj.changevalue(self.i, self.j, self.colornum) == 0):
+                    print("Invalid! (step: %d, x: %d ,y: %d, color: %d)"  % (self.step, self.i, self.j, self.colornum))
+                    self.i = None
+                    self.j = None
+                else:
+                    print('step: %d, 网格坐标: ( x: %d ,y: %d, color: %d )' % (self.step, self.i, self.j, self.colornum))
+                    #CB check winner value
+                    self.winnervalue = self.obj.checkwinner()
+                    print('winner:', self.winnervalue)
+                    if self.winnervalue != 0:
+                        self.paint(event)
+                        self.showGameEnd(self.winnervalue)
+                    else:
+                        self.paint(event)
+                        self.usrturn = not self.usrturn
+                        self.nextstep()
+                self.update()
+            if not self.usrturn:
+                if self.step == 1:
+                    self.aix = self.chessboard_type // 2
+                    self.aiy = self.chessboard_type // 2
+                    print('ai first', self.aix, self.aix)
+                    self.piece.pos = event.pos()
+                else:
+                    self.aix, self.aiy = self.ai.getval(self.i, self.j)
+                    print('step: %d, AI 网格坐标: ( x: %d ,y: %d, color: %d )' % (self.step, self.aix, self.aiy, self.colornum))
+                self.i = self.aix
+                self.j = self.aiy
                 self.paint(event)
-                self.showGameEnd(self.winnervalue)
-            else:
-                self.paint(event)
+                self.usrturn = not self.usrturn
                 self.nextstep()
-        self.update()
+                self.update()
+        else:
+            self.piece.pos = event.pos()
+            if self.piece.pos:
+                self.i = round((self.piece.pos.x() - self.margin) / self.grid_w)
+                self.j = round((self.piece.pos.y() - self.margin) / self.grid_h)
+            #print('test: step: %d, 网格坐标: ( x: %d ,y: %d, color: %d )' % (self.step, self.i, self.j, self.colornum))
+            #CB input winner value
+            if (self.obj.changevalue(self.i, self.j, self.colornum) == 0):
+                print("Invalid! (step: %d, x: %d ,y: %d, color: %d)"  % (self.step, self.i, self.j, self.colornum))
+                self.i = None
+                self.j = None
+            else:
+                print('step: %d, 网格坐标: ( x: %d ,y: %d, color: %d )' % (self.step, self.i, self.j, self.colornum))
+                #CB check value
+                self.winnervalue = self.obj.checkwinner()
+                print('winner:', self.winnervalue)
+                if self.winnervalue != 0:
+                    self.paint(event)
+                    self.showGameEnd(self.winnervalue)
+                else:
+                    self.paint(event)
+                    self.nextstep()
+            self.update()
 
     def paint(self, event):
         if self.piece.pos:
@@ -288,7 +359,7 @@ class GomokuOffline(QWidget):
                                       QMessageBox.Retry)
         if button == QMessageBox.Retry:
             self.label.setText("Question button/Retry")
-            self.cam = GomokuOffline(self.username_b, self.server_ip, self.chessboard_type, self.my_font, self.manual_hook)
+            self.cam = GomokuOffline(self.username, self.server_ip, self.chessboard_type, self.my_font, self.manual_hook, self.usecolor, self.opponent)
             self.cam.show()
             self.close()
 
@@ -320,9 +391,8 @@ class GomokuOffline(QWidget):
 
 def main():
     app = QApplication(sys.argv)
-    mygame = GomokuOffline("12345", "52.207.232.53", 9, 'Roman times', None)
+    mygame = GomokuOffline("12345", "52.207.232.53", 9, 'Roman times', None, 2, 2)
     mygame.show()
-    mygame.addmusic()
     sys.exit(app.exec_())
 
 if __name__ == '__main__':
