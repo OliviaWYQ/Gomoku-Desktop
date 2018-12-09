@@ -83,6 +83,26 @@ To verify your installation:
 ```
 $ mvn -version
 ```
+### Install [Spring Boot](https://spring.io/projects/spring-boot)
+
+We use Spring framework to deploy [MongoDB](https://docs.mongodb.com/) and [Redis](https://redis.io/).
+
+Download installation package:
+```
+wget http://repo.spring.io/release/org/springframework/boot/spring-boot-cli/2.0.6.RELEASE/spring-boot-cli-2.0.6.RELEASE-bin.tar.gz
+```
+Decompress the .tar.gz package:
+```
+tar -zxvf spring-boot-cli-2.0.6.RELEASE-bin.tar.gz
+```
+Add PATH to .bashrc or /etc/profile:
+```
+export PATH=${PATH}:~/spring-2.0.6.RELEASE/bin
+```
+Verify the version of Spring framework:
+```
+spring --version
+```
 
 ## Running the Program
 
