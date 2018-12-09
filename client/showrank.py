@@ -32,7 +32,7 @@ class rank(QWidget):
 
     def myrank(self):
         # top rank
-        self.title = QLabel("Top Ranking", self)
+        self.title = QLabel("Ranking", self)
         self.title.setFont(QFont('Arial', 20, QFont.Bold))
         self.title.move(80, 10)
         # no1
