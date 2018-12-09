@@ -1,6 +1,7 @@
 package com.gomoku.server.websocket;
 
 import com.gomoku.server.mongo.repository.MatchRepository;
+import com.gomoku.server.rank.RankSystem;
 import com.gomoku.server.redis.model.Room;
 import com.gomoku.server.redis.repository.RoomRepository;
 import com.gomoku.server.websocket.model.GameStatus;
@@ -50,6 +51,9 @@ public class GameSocketHandler extends TextWebSocketHandler {
 
     @Autowired
     RoomRepository roomRepository;
+
+    @Autowired
+    RankSystem rankSystem;
 
     @Override
     public void handleTextMessage(WebSocketSession session, TextMessage message){
@@ -243,6 +247,11 @@ public class GameSocketHandler extends TextWebSocketHandler {
                                 Room toDelete = roomRepository.findById(roomName).get();
                                 roomRepository.delete(toDelete);
                                 matchRepository.save(rooms.get(roomName).summaryMatch());
+                                rankSystem.updateInfo(rooms.get(roomName).getMasterName(),
+                                        rooms.get(roomName).getGuestName(),
+                                        rooms.get(roomName).getMasterStone(),
+                                        rooms.get(roomName).getWinFlag()
+                                        );
                             } catch (Exception e){
                                 return;
                             }

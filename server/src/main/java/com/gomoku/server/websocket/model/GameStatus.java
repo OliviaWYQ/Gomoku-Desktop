@@ -250,4 +250,8 @@ public class GameStatus {
             this.guestStone = 1;
         }
     }
+
+    public int getMasterStone(){
+        return this.masterStone;
+    }
 }

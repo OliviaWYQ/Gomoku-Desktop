@@ -117,8 +117,7 @@ class manual(QWidget):
 
     def handle_ranking(self):
         print("handle_ranking")
-        self.ranksystem = rank(self.user_name, self.manual_hook)
-        self.ranksystem.show()
+        self.ranksystem = rank(self.user_name, self.server_ip, self.auth_headers, self.manual_hook, self.login_hook)
         self.close()
 
     def manual_hook(self):

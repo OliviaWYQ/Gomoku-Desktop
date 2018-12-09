@@ -8,7 +8,7 @@ music
 """
 import sys, os
 import pygame
-from pygame.locals import *
+from pygame.locals import KEYDOWN, K_SPACE
 from PyQt5.QtCore import QThread
 import os.path
 

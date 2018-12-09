@@ -45,7 +45,8 @@ class GameRoomWindow(QWidget):
 
     start_game_signal = pyqtSignal()
 
-    def __init__(self, room_name, master_name, guest_name, server_ip, is_master, hall_hook, login_hook, auth_headers):
+    def __init__(self, room_name, master_name, guest_name,\
+        server_ip, is_master, hall_hook, login_hook, auth_headers):
         super().__init__()
 
         self.auth_headers = auth_headers
@@ -397,15 +398,18 @@ class CreateRoomWindow(QWidget):
         payload["roomName"] = self.room_name.text().strip()
         
         if len(payload["roomName"]) == 0:
-            _ = QMessageBox.question(self, 'Info', 'Enter a room name.\n (leading and ending spaces will be removed)',
-                                     QMessageBox.Ok, QMessageBox.Ok)
+            _ = QMessageBox.question(self, 'Info',\
+                'Enter a room name.\n (leading and ending spaces will be removed)',\
+                QMessageBox.Ok, QMessageBox.Ok)
             return
 
-        response = requests.post('http://' + self.server_ip + ':8080/room', json=payload, headers=self.auth_headers)
+        response = requests.post('http://' + self.server_ip + ':8080/room',\
+            json=payload, headers=self.auth_headers)
 
         if response.text == "Success":
             self.game_room = GameRoomWindow(self.room_name.text(),\
-                self.master_name, None, self.server_ip, True, self.hall_hook, self.login_hook,\
+                self.master_name, None, self.server_ip,\
+                True, self.hall_hook, self.login_hook,\
                 self.auth_headers)
             self.game_room.show()
             self.close()
