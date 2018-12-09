@@ -83,6 +83,7 @@ To verify your installation:
 ```
 $ mvn -version
 ```
+
 ### Install [Spring Boot](https://spring.io/projects/spring-boot)
 
 We use Spring framework to deploy [MongoDB](https://docs.mongodb.com/) and [Redis](https://redis.io/).
