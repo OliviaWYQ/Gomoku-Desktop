@@ -50,10 +50,10 @@ class rank(QWidget):
             
             self.no1.setText("No.1: %s (%d)"\
                 % (top_three[0]['userName'], top_three[0]['rankScore']))
-            self.no2.setText("No.1: %s (%d)"\
+            self.no2.setText("No.2: %s (%d)"\
                 % (top_three[1]['userName'], top_three[1]['rankScore']))
-            self.no3.setText("No.1: %s (%d)"\
-                % (top_three[1]['userName'], top_three[1]['rankScore']))
+            self.no3.setText("No.3: %s (%d)"\
+                % (top_three[1]['userName'], top_three[2]['rankScore']))
 
             rank = requests.get('http://%s:8080/rank/byscore/%d'\
                 % (self.server_ip, my_info['rankScore']),\
