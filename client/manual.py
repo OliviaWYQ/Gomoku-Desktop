@@ -18,6 +18,7 @@ from choosechessboard import ChooseBtn
 #from variable import setvar
 from hall import GameHallWindow
 from gamehelp import helper
+from showrank import rank
 
 class manual(QWidget):
     def __init__(self, user_name, server_ip, auth_headers, login_hook):
@@ -116,6 +117,9 @@ class manual(QWidget):
 
     def handle_ranking(self):
         print("handle_ranking")
+        self.ranksystem = rank(self.user_name, self.manual_hook)
+        self.ranksystem.show()
+        self.close()
 
     def manual_hook(self):
         self.show()
