@@ -80,9 +80,8 @@ class GameRoomWindow(QWidget):
 
     def init_ui(self):
         self.setWindowTitle(self.title)
-        self.setWindowIcon(QIcon('chessboard/gomoku_icon.png')) # set window icon
         self.setGeometry(self.top, self.left, self.width, self.height)
-
+        self.setWindowIcon(QIcon('chessboard/gomoku_icon.png')) # set window icon
         self.stone_color_label = QLabel("Creator will use:", self)
         self.stone_color_label.move(255, 14)
 
