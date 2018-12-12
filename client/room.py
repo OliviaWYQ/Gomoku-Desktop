@@ -370,7 +370,7 @@ class CreateRoomWindow(QWidget):
     def init_ui(self):
         self.setWindowTitle(self.title)
         self.setGeometry(self.top, self.left, self.width, self.height)
-
+        self.setWindowIcon(QIcon('chessboard/gomoku_icon.png')) # set window icon
         self.create_button = QPushButton('Create', self)
         self.create_button.move(100, 180)
         self.create_button.clicked.connect(self.handle_create)
