@@ -3,6 +3,7 @@
 from PyQt5.QtCore import pyqtSignal, pyqtSlot
 from PyQt5.QtWidgets import QWidget, QHBoxLayout, QPushButton,\
     QMessageBox, QComboBox, QLineEdit, QLabel
+from PyQt5.QtGui import QIcon
 import requests
 from ws4py.client.threadedclient import WebSocketClient
 
@@ -79,6 +80,7 @@ class GameRoomWindow(QWidget):
 
     def init_ui(self):
         self.setWindowTitle(self.title)
+        self.setWindowIcon(QIcon('chessboard/gomoku_icon.png')) # set window icon
         self.setGeometry(self.top, self.left, self.width, self.height)
 
         self.stone_color_label = QLabel("Creator will use:", self)
