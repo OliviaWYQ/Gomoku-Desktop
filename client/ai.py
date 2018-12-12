@@ -28,7 +28,7 @@ class ai(chessboard):
         return
 
     def maximum_loc(self):
-        max = 0        
+        max = 0
         for i in range(self.size):
             for j in range(self.size):
                 if (self.getvalue(i,j) == 0):
@@ -42,7 +42,7 @@ class ai(chessboard):
         else:
             return None
 
-    #user is always black
+
     #input is the human step and val
     def decision(self,row,col):
         if(self.difficulty == 1):
