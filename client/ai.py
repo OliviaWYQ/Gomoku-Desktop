@@ -36,7 +36,7 @@ class ai(chessboard):
                 return
         self.e_value[row][col] = self.e_value[row][col] + 30
         if self.e_value[row][col] > self.e_value_max:
-            print ("update:",row,col,self.e_value[row][col])
+            #print ("update:",row,col,self.e_value[row][col])
             self.e_value_max = self.e_value[row][col]
             self.ai_row = row
             self.ai_col = col
