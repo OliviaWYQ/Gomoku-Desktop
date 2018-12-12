@@ -1,10 +1,10 @@
 #! /usr/bin/python
 import sys
-
+from chessboard import chessboard
 # inherit chessboard
 # add e_value
 class ai(chessboard):
-    def __init__ (self, s , difficulty_1, val) :
+    def __init__ (self, s, difficulty_1, val) :
         chessboard.__init__(self,s)
         self.e_value = [ [ 0 for i in range(self.size)] for j in range(self.size)]
         self.difficulty = difficulty_1
@@ -13,7 +13,11 @@ class ai(chessboard):
             self.ai_val = 2
         else:
             self.ai_val = 1
-
+        self.e_value_max = 0
+        self.ai_row = 0
+        self.ai_col = 0
+    def reset_e_value(self):
+        self.e_value = [ [ 0 for i in range(self.size)] for j in range(self.size)]
     def evluate_five(self,row,col,n_dir):
         x = row
         y = col
@@ -22,38 +26,42 @@ class ai(chessboard):
             x = x + n_dir[0]
             y = y + n_dir[1]
             if self.getvalue(x,y) != self.h_val:
-                self.e_value[row][col] = self.e_value[row][col] + n
+                self.e_value[row][col] = self.e_value[row][col] + n **2
+                print ("update:",row,col,n,self.e_value[row][col])
+                if self.e_value[row][col] > self.e_value_max:
+
+                    self.e_value_max = self.e_value[row][col]
+                    self.ai_row = row
+                    self.ai_col = col
                 return
-        self.e_value[row][col] = self.e_value[row][col] + 4
+        self.e_value[row][col] = self.e_value[row][col] + 30
+        if self.e_value[row][col] > self.e_value_max:
+            print ("update:",row,col,self.e_value[row][col])
+            self.e_value_max = self.e_value[row][col]
+            self.ai_row = row
+            self.ai_col = col
         return
 
-    def maximum_loc(self):
-        max = 0
-        for i in range(self.size):
-            for j in range(self.size):
-                if (self.getvalue(i,j) == 0):
-                    if (self.e_value[i][j] > max):
-                        max = self.e_value[i][j]
-                        ai_row = i
-                        ai_row = j
-        valid = self.changevalue(ai_row,ai_col,self.ai_val)
-        if valid == 1:
-            return (ai_row,ai_col)
-        else:
-            return None
+
 
 
     #input is the human step and val
     def decision(self,row,col):
+        self.reset_e_value()
+        self.e_value_max = 0
+        self.ai_row = 0
+        self.ai_col = 0
         if(self.difficulty == 1):
             #find the closet position
-            min = 100
+            minimum = 10000
+            ai_row = 0
+            ai_col = 0
             for i in range(self.size):
                 for j in range(self.size):
                     if (self.getvalue(i,j) == 0):
-                        temp = min(abs(row - i), abs(col - j))
-                        if (temp < min):
-                            min = temp
+                        temp = (row - i)**2 + (col - j)**2
+                        if (temp < minimum):
+                            minimum = temp
                             ai_row = i
                             ai_col = j
             valid = self.changevalue(ai_row,ai_col,self.ai_val)
@@ -72,6 +80,8 @@ class ai(chessboard):
                     #if the point is empty
                     if (self.getvalue(i,j) == 0):
                         for d in dir:
-                            self.evluate_five(i,j,d,self.h_val)
-            return self.maximum_loc()
+                            self.evluate_five(i,j,d)
+            valid = self.changevalue(self.ai_row,self.ai_col,self.ai_val)
+
+            return (self.ai_row,self.ai_col)
             # get the maximum

@@ -15,8 +15,8 @@ from PyQt5.QtWidgets import QWidget, QApplication, QLabel, QVBoxLayout, QMessage
 from PyQt5.QtGui import QPixmap, QIcon, QFont
 from PyQt5.QtCore import Qt
 from chessboard import chessboard as CB
-from showAI import ai
-#from ai import ai
+#from showAI import ai
+from ai import ai
 import requests
 #from login import *
 #from choosechessboard import ChooseBtn
@@ -194,7 +194,7 @@ class GomokuOffline(QWidget):
         self.player_w.setText("White: " + self.username_w)
         self.player_w.move(750, self.height_chessboard - 230)
         self.player_w.setFont(QFont(self.my_font, 16, QFont.Bold))
-        
+
         self.id_label = QLabel("Id: " + self.username, self)
         self.id_label.move(750, 270)
         self.id_label.setFont(QFont(self.my_font, 16, QFont.Bold))
@@ -269,14 +269,14 @@ class GomokuOffline(QWidget):
                     self.i = round((self.piece.pos.x() - self.margin) / self.grid_w)
                     self.j = round((self.piece.pos.y() - self.margin) / self.grid_h)
                 # check margin
-                if (self.obj.changevalue(self.i, self.j, self.colornum) == 0):
+                if (self.ai.changevalue(self.i, self.j, self.colornum) == 0):
                     print("Invalid! (step: %d, x: %d ,y: %d, color: %d)"  % (self.step, self.i, self.j, self.colornum))
                     self.i = None
                     self.j = None
                 else:
                     print('step: %d, 网格坐标: ( x: %d ,y: %d, color: %d )' % (self.step, self.i, self.j, self.colornum))
                     #CB check winner value
-                    self.winnervalue = self.obj.checkwinner()
+                    self.winnervalue = self.ai.checkwinner()
                     print('winner:', self.winnervalue)
                     if self.winnervalue != 0:
                         self.paint(event)
@@ -291,8 +291,10 @@ class GomokuOffline(QWidget):
                     self.aix = self.chessboard_type // 2
                     self.aiy = self.chessboard_type // 2
                     print('ai first', self.aix, self.aix)
+                    self.ai.changevalue(self.aix, self.aiy, self.colornum)
                     self.piece.pos = event.pos()
                 else:
+                    print('input: ( x: %d ,y: %d, color: %d )' % ( self.i, self.j, self.colornum))
                     self.aix, self.aiy = self.ai.decision(self.i, self.j)
                     print('step: %d, AI 网格坐标: ( x: %d ,y: %d, color: %d )' % (self.step, self.aix, self.aiy, self.colornum))
                 self.i = self.aix
@@ -361,7 +363,7 @@ class GomokuOffline(QWidget):
                                       QMessageBox.Retry)
         if button == QMessageBox.Retry:
             self.label.setText("Question button/Retry")
-            self.cam = GomokuOffline(self.username, self.server_ip, self.chessboard_type, self.my_font, self.manual_hook, self.usecolor, self.opponent)
+            self.cam = GomokuOffline(self.username, self.server_ip, self.chessboard_type, self.my_font, self.manual_hook, self.usecolor, self.opponent,self.difficulty)
             self.cam.show()
             self.close()
 
