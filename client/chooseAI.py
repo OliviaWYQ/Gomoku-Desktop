@@ -19,12 +19,13 @@ class chooseAI(QWidget):
         self.server_ip = server_ip
         self.chooseboard = chooseboard
         self.myfont = myfont
-        self.setGeometry(330, 100, 400, 100)
+        self.setGeometry(330, 100, 420, 150)
         self.setWindowTitle("Choose opponent")
         self.setWindowIcon(QIcon('chessboard/gomoku_icon.png'))
         self.user_name = user_name
         self.usecolor = 1
         self.opponent = 1
+        self.difficulty = 1
         self.choose_opponent()
 
     def renew(self):
@@ -34,31 +35,48 @@ class chooseAI(QWidget):
 
     def choose_opponent(self):
         self.choosecolor = QLabel("Choose color:", self)
-        self.choosecolor.move(30, 20)
+        self.choosecolor.move(30, 25)
 
         self.colors = QComboBox(self)
         self.colors.addItems(["Black", "White"])
-        self.colors.setGeometry(30, 50, 100, 20)
+        self.colors.setGeometry(180, 25, 100, 20)
         self.colors.currentIndexChanged.connect(self.handle_color_change)
 
         self.choosecolor = QLabel("Choose opponent:", self)
-        self.choosecolor.move(150, 20)
+        self.choosecolor.move(30, 65)
 
         self.colors = QComboBox(self)
         self.colors.addItems(["Guest", "AI"])
-        self.colors.setGeometry(150, 50, 100, 20)
+        self.colors.setGeometry(180, 65, 100, 20)
         self.colors.currentIndexChanged.connect(self.handle_opponent_change)
+
+        self.choosediff = QLabel("Choose AI Difficulty:", self)
+        self.choosediff.move(30, 105)
+
+        self.diff = QComboBox(self)
+        self.diff.addItems(["Easy", "Medium", "Hard"])
+        self.diff.setGeometry(180, 105, 100, 20)
+        self.diff.currentIndexChanged.connect(self.handle_difficulty)
+        self.diff.setEnabled(False)
 
         self.back_button = QPushButton("Back", self)
         self.back_button.clicked.connect(self.handle_back)
-        self.back_button.move(280, 20)
+        self.back_button.move(300, 60)
 
         self.confirm_button = QPushButton("Confirm", self)
         self.confirm_button.clicked.connect(self.opponent_confirm)
-        self.confirm_button.move(280, 50)
+        self.confirm_button.move(300, 100)
 
         self.confirm_button.resize(self.confirm_button.sizeHint())
         self.back_button.resize(self.confirm_button.sizeHint())
+
+    def handle_difficulty(self):
+        if self.diff.currentText() == "Easy":
+            self.difficulty = 1
+        elif self.diff.currentText() == "Medium":
+            self.difficulty = 2
+        else:
+            self.difficulty = 3
 
     def handle_color_change(self):
         if self.colors.currentText() == "Black":
@@ -70,13 +88,15 @@ class chooseAI(QWidget):
         if self.colors.currentText() == "Guest":
             self.opponent = 1
         else:
+            self.diff.setEnabled(True)
             self.opponent = 2
 
     def opponent_confirm(self):
         print("color", self.usecolor)
         print("opponent", self.opponent)
+        print("difficulty", self.difficulty)
         self.mygame = GomokuOffline(self.user_name, self.server_ip, self.chooseboard, \
-                                    self.myfont, self.manual_hook, self.usecolor, self.opponent)
+                                    self.myfont, self.manual_hook, self.usecolor, self.opponent, self.difficulty)
         self.mygame.show()
         self.close()
 

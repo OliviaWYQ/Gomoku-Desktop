@@ -15,12 +15,12 @@ from PyQt5.QtCore import Qt
 from chessboard import chessboard as CB
 import random
 
-class useAI(object):
-    def __init__(self, board_size):
+class ai(object):
+    def __init__(self, board_size, difficulty, usecolor):
         self.board_size = board_size
         self.obj = CB(self.board_size)
 
-    def getval(self, i, j):
+    def decision(self, i, j):
         self.usr_x = i
         self.usr_y = j
         self.AI_x = random.randint(0, self.board_size-1)

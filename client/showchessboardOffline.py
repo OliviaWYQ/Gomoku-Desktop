@@ -15,21 +15,23 @@ from PyQt5.QtWidgets import QWidget, QApplication, QLabel, QVBoxLayout, QMessage
 from PyQt5.QtGui import QPixmap, QIcon, QFont
 from PyQt5.QtCore import Qt
 from chessboard import chessboard as CB
-from showAI import useAI
+from showAI import ai
+#from ai import ai
 import requests
 #from login import *
 #from choosechessboard import ChooseBtn
 from music import musicplayer
 
 class GomokuOffline(QWidget):
-    def __init__(self, user_name, server_ip, my_chessboard_type, my_font, manual_hook, usecolor, opponent):
+    def __init__(self, user_name, server_ip, my_chessboard_type, my_font, manual_hook, usecolor, opponent, difficulty):
         super().__init__()
         self.chessboard_type = my_chessboard_type
         self.username = user_name
         self.usecolor = usecolor
         self.opponent = opponent
         # init ai name
-        self.ai = useAI(self.chessboard_type)
+        self.difficulty = difficulty
+        self.ai = ai(self.chessboard_type, self.difficulty, self.usecolor)
         if self.opponent == 1: # guest
             self.ifAI = 0
             if usecolor == 1:
@@ -291,7 +293,7 @@ class GomokuOffline(QWidget):
                     print('ai first', self.aix, self.aix)
                     self.piece.pos = event.pos()
                 else:
-                    self.aix, self.aiy = self.ai.getval(self.i, self.j)
+                    self.aix, self.aiy = self.ai.decision(self.i, self.j)
                     print('step: %d, AI 网格坐标: ( x: %d ,y: %d, color: %d )' % (self.step, self.aix, self.aiy, self.colornum))
                 self.i = self.aix
                 self.j = self.aiy
