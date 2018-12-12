@@ -299,9 +299,15 @@ class GomokuOffline(QWidget):
                     print('step: %d, AI 网格坐标: ( x: %d ,y: %d, color: %d )' % (self.step, self.aix, self.aiy, self.colornum))
                 self.i = self.aix
                 self.j = self.aiy
-                self.paint(event)
-                self.usrturn = not self.usrturn
-                self.nextstep()
+                self.winnervalue = self.ai.checkwinner()
+                print('winner:', self.winnervalue)
+                if self.winnervalue != 0:
+                    self.paint(event)
+                    self.showGameEnd(self.winnervalue)
+                else:
+                    self.paint(event)
+                    self.usrturn = not self.usrturn
+                    self.nextstep()
                 self.update()
         else:
             self.piece.pos = event.pos()

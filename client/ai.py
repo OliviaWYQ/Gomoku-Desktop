@@ -18,18 +18,18 @@ class ai(chessboard):
         self.ai_col = 0
     def reset_e_value(self):
         self.e_value = [ [ 0 for i in range(self.size)] for j in range(self.size)]
-    def evluate_five(self,row,col,n_dir):
+
+    def evluate_five(self,row,col,n_dir,val):
         x = row
         y = col
         #if next four pieces can be in a line
         for n in range(4):
             x = x + n_dir[0]
             y = y + n_dir[1]
-            if self.getvalue(x,y) != self.h_val:
+            if self.getvalue(x,y) != val:
                 self.e_value[row][col] = self.e_value[row][col] + n **2
                 print ("update:",row,col,n,self.e_value[row][col])
                 if self.e_value[row][col] > self.e_value_max:
-
                     self.e_value_max = self.e_value[row][col]
                     self.ai_row = row
                     self.ai_col = col
@@ -70,17 +70,16 @@ class ai(chessboard):
             else:
                 return None
         else:
-            if (self.difficulty == 2):
-                dir = ((0,1),(1,-1),(1,0),(1,1))
-            else :
-                dir = ((0,1),(0,-1),(1,-1),(-1,1),(1,0),(-1,0),(1,1),(-1,-1))
+            dir = ((0,1),(0,-1),(1,-1),(-1,1),(1,0),(-1,0),(1,1),(-1,-1))
             #check each point
             for i in range(self.size):
                 for j in range(self.size):
                     #if the point is empty
                     if (self.getvalue(i,j) == 0):
                         for d in dir:
-                            self.evluate_five(i,j,d)
+                            self.evluate_five(i,j,d,self.h_val)
+                            if (self.difficulty == 3):
+                                self.evluate_five(i,j,d,self.ai_val)
             valid = self.changevalue(self.ai_row,self.ai_col,self.ai_val)
 
             return (self.ai_row,self.ai_col)
