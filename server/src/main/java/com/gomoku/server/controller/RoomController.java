@@ -51,7 +51,7 @@ public class RoomController {
             Room toJoin = roomRepository.findById(roomName).get();
 
             if (toJoin.getMaster().equals(userName)){
-                return "You're master of the room.";
+                return "Cannot join. You're master of the room.";
             }
             if (toJoin.getGuest() != null && toJoin.getGuest().equals(userName)){
                 return "Success";

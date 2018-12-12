@@ -77,6 +77,10 @@ public class GameStatus {
         return toSend;
     }
 
+    public void surrender(int role){
+        this.gameLogic.surrender(role);
+    }
+
     private void appendHistory(TextMessage move){
         this.historyMoves.add(move);
     }
@@ -245,5 +249,9 @@ public class GameStatus {
             this.masterStone = 2;
             this.guestStone = 1;
         }
+    }
+
+    public int getMasterStone(){
+        return this.masterStone;
     }
 }

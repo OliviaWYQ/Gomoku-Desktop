@@ -9,25 +9,30 @@ smallchessboard
 """
 
 import sys
-from PyQt5.QtWidgets import QWidget, QPushButton, QApplication, QLabel, QGroupBox, QVBoxLayout, QHBoxLayout, QRadioButton, QGridLayout
+from PyQt5.QtWidgets import QWidget, QPushButton,\
+    QApplication, QLabel, QGroupBox, QVBoxLayout,\
+    QHBoxLayout, QRadioButton, QGridLayout
     # QMessageBox, QCheckBox
 from PyQt5.QtGui import QPixmap, QIcon, QFont
 #from PyQt5.QtCore import Qt
 from variable import setvar
 
 class ChooseBtn(QWidget):
-    def __init__(self, manual_hook, parent = None):
+    def __init__(self, manual_hook, parent=None):
         super(ChooseBtn, self).__init__(parent)
+
+        current_path = sys.path[0] + '/'
+        print(current_path)
 
         self.manual_hook = manual_hook
 
         self.setGeometry(330, 100, 500, 400)
         self.setWindowTitle("Setting")
-        # self.setWindowIcon(QIcon('chessboard/gomoku_icon.png'))
+        self.setWindowIcon(QIcon(current_path + 'chessboard/gomoku_icon.png'))
         # init
         # static val
 
-        current_path = sys.path[0]
+        
         self.var = setvar()
         self.var.setvalue('cb8', current_path + 'chessboard/cb8.png')
         self.var.setvalue('cb14', current_path + 'chessboard/cb14.png')
@@ -62,8 +67,8 @@ class ChooseBtn(QWidget):
         cb8.setPixmap(self.cb8)
         cb14 = QLabel(self)
         cb14.setPixmap(self.cb14)
-        self.bt1 = QPushButton("Confirm",self)
-        self.bt1.clicked.connect(self.Action)
+        self.bt1 = QPushButton("Confirm", self)
+        self.bt1.clicked.connect(self.action)
         self.bt1.resize(self.bt1.sizeHint())
         #self.bt1.move(505, 3)
 
@@ -83,12 +88,12 @@ class ChooseBtn(QWidget):
         # button1 for 9*9
         self.b1 = QRadioButton("9*9 chessboard")
         self.b1.setFont(QFont("Roman times", 16, QFont.Bold))
-        self.b1.toggled.connect(lambda:self.btnstate(self.b1))
+        self.b1.toggled.connect(lambda: self.btnstate(self.b1))
         # button2 for 15*15
         self.b2 = QRadioButton("15*15 chessboard")
         self.b2.setFont(QFont("Roman times", 16, QFont.Bold))
         self.b2.setChecked(True)
-        self.b2.toggled.connect(lambda:self.btnstate(self.b2))
+        self.b2.toggled.connect(lambda: self.btnstate(self.b2))
 
         # put button
         self.GroupBox2 = QGroupBox()
@@ -100,15 +105,15 @@ class ChooseBtn(QWidget):
         # button3 for Roman Times
         self.b3 = QRadioButton(self.type1)
         self.b3.setChecked(True)
-        self.b3.toggled.connect(lambda:self.btnstate(self.b3))
+        self.b3.toggled.connect(lambda: self.btnstate(self.b3))
         self.b3.setFont(QFont(self.type1, 16, QFont.Bold))
         # button4 for Arial
         self.b4 = QRadioButton(self.type2)
-        self.b4.toggled.connect(lambda:self.btnstate(self.b4))
+        self.b4.toggled.connect(lambda: self.btnstate(self.b4))
         self.b4.setFont(QFont(self.type2, 16, QFont.Bold))
         # button5 for Helvetica
         self.b5 = QRadioButton(self.type3)
-        self.b5.toggled.connect(lambda:self.btnstate(self.b5))
+        self.b5.toggled.connect(lambda: self.btnstate(self.b5))
         self.b5.setFont(QFont(self.type3, 16, QFont.Bold))
 
         # put button
@@ -133,26 +138,26 @@ class ChooseBtn(QWidget):
             if b.isChecked() == True:
                 self.chooseboard = 'cb8'
                 self.var.cbtype = 9
-                print (b.text()+" is selected", self.var.cbtype)
+                print(b.text()+" is selected", self.var.cbtype)
         if b.text() == "15*15 chessboard":
             if b.isChecked() == True:
                 self.chooseboard = 'cb14'
                 self.var.cbtype = 15
-                print (b.text()+" is selected", self.var.cbtype)
+                print(b.text()+" is selected", self.var.cbtype)
         if b.text() == self.type1:
             if b.isChecked() == True:
                 self.Myfont = 'ftype1'
-                print ("Font style is "+b.text())
+                print("Font style is "+b.text())
         if b.text() == self.type2:
             if b.isChecked() == True:
                 self.Myfont = 'ftype2'
-                print ("Font style is "+b.text())
+                print("Font style is "+b.text())
         if b.text() == self.type3:
             if b.isChecked() == True:
                 self.Myfont = 'ftype3'
-                print ("Font style is "+b.text())
+                print("Font style is "+b.text())
 
-    def Action(self):
+    def action(self):
         if self.bt1.isEnabled():
             #self.game = Gomoku("12345", "54.173.206.13")
             self.update()
@@ -168,13 +173,12 @@ class ChooseBtn(QWidget):
             self.close()
             #raise SystemExit(0)
 
-'''
+
 def main():
    app = QApplication(sys.argv)
-   ex = ChooseBtn()
+   ex = ChooseBtn(None)
    ex.show()
    sys.exit(app.exec_())
 
 if __name__ == '__main__':
    main()
-'''

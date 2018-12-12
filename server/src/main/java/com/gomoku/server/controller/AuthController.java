@@ -50,7 +50,7 @@ public class AuthController {
 
         // init rank score, win rate
         // and encode the password
-        user.beforeSave();
+        user.beforeCreate();
         userRepository.save(user);
         return "Success";
     }

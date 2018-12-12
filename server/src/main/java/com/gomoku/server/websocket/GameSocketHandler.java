@@ -1,6 +1,7 @@
 package com.gomoku.server.websocket;
 
 import com.gomoku.server.mongo.repository.MatchRepository;
+import com.gomoku.server.rank.RankSystem;
 import com.gomoku.server.redis.model.Room;
 import com.gomoku.server.redis.repository.RoomRepository;
 import com.gomoku.server.websocket.model.GameStatus;
@@ -29,6 +30,9 @@ public class GameSocketHandler extends TextWebSocketHandler {
     final int END_SIGNAL = -6;
     final int BLACK_STONE_SIGNAL = -7;
     final int WHITE_STONE_SIGNAL = -8;
+    final int SURRENDER_SIGNAL = -9;
+
+    final int NO_ROOM_SIGNAL = -10;
 
     final TextMessage START_SIGNAL_MESSAGE = new TextMessage(START_SIGNAL + "");
     final TextMessage GUEST_READY_SIGNAL_MESSAGE = new TextMessage(GUEST_READY_SIGNAL + "");
@@ -36,15 +40,20 @@ public class GameSocketHandler extends TextWebSocketHandler {
     final TextMessage GUEST_LEAVE_SIGNAL_MESSAGE = new TextMessage(GUEST_LEAVE_SIGNAL + "");
     final TextMessage MASTER_DELETE_SIGNAL_MESSAGE = new TextMessage(MASTER_DELETE_SIGNAL + "");
     final TextMessage END_SIGNAL_MESSAGE = new TextMessage(END_SIGNAL + "");
-
     final TextMessage BLACK_STONE_SIGNAL_MESSAGE = new TextMessage(BLACK_STONE_SIGNAL + "");
     final TextMessage WHITE_STONE_SIGNAL_MESSAGE = new TextMessage(WHITE_STONE_SIGNAL + "");
+    final TextMessage SURRENDER_SIGNAL_MESSAGE = new TextMessage(SURRENDER_SIGNAL + "");
+
+    final TextMessage NO_ROOM_SIGNAL_MESSAGE = new TextMessage(NO_ROOM_SIGNAL + "");
 
     @Autowired
     MatchRepository matchRepository;
 
     @Autowired
     RoomRepository roomRepository;
+
+    @Autowired
+    RankSystem rankSystem;
 
     @Override
     public void handleTextMessage(WebSocketSession session, TextMessage message){
@@ -152,7 +161,10 @@ public class GameSocketHandler extends TextWebSocketHandler {
                         case BLACK_STONE_SIGNAL:
                             try {
                                 rooms.get(roomName).setStones(true);
-                                rooms.get(roomName).getGuest().sendMessage(BLACK_STONE_SIGNAL_MESSAGE);
+                                if (rooms.get(roomName).getGuest() != null){
+                                    rooms.get(roomName).getGuest().sendMessage(BLACK_STONE_SIGNAL_MESSAGE);
+                                }
+
                             } catch (IOException e) {
                                 e.printStackTrace();
                             }
@@ -160,11 +172,50 @@ public class GameSocketHandler extends TextWebSocketHandler {
                         case WHITE_STONE_SIGNAL:
                             try {
                                 rooms.get(roomName).setStones(false);
-                                rooms.get(roomName).getGuest().sendMessage(WHITE_STONE_SIGNAL_MESSAGE);
+                                if (rooms.get(roomName).getGuest() != null){
+                                    rooms.get(roomName).getGuest().sendMessage(WHITE_STONE_SIGNAL_MESSAGE);
+                                }
                             } catch (IOException e) {
                                 e.printStackTrace();
                             }
                             break;
+                        case SURRENDER_SIGNAL:
+                            if (role.equals("m")){
+                                try {
+                                    rooms.get(roomName).getGuest().sendMessage(SURRENDER_SIGNAL_MESSAGE);
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                                rooms.get(roomName).getAudience().forEach(audienceSession -> {
+                                    try {
+                                        audienceSession.sendMessage(SURRENDER_SIGNAL_MESSAGE);
+                                    } catch (Exception e){
+                                        System.out.println(e.getMessage());
+                                    }
+                                });
+                                this.surrender(1, roomName);
+                                //rooms.get(roomName).surrender(1);
+                                try {
+                                    session.close();
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+
+                            }else if (role.equals("g")){
+                                try {
+                                    rooms.get(roomName).getMaster().sendMessage(SURRENDER_SIGNAL_MESSAGE);
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                                // rooms.get(roomName).surrender(2);
+                                this.surrender(2, roomName);
+                                try {
+                                    session.close();
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+
                         default:
                             // TODO: send a certain step to the use
                             break;
@@ -196,6 +247,11 @@ public class GameSocketHandler extends TextWebSocketHandler {
                                 Room toDelete = roomRepository.findById(roomName).get();
                                 roomRepository.delete(toDelete);
                                 matchRepository.save(rooms.get(roomName).summaryMatch());
+                                rankSystem.updateInfo(rooms.get(roomName).getMasterName(),
+                                        rooms.get(roomName).getGuestName(),
+                                        rooms.get(roomName).getMasterStone(),
+                                        rooms.get(roomName).getWinFlag()
+                                        );
                             } catch (Exception e){
                                 return;
                             }
@@ -209,10 +265,25 @@ public class GameSocketHandler extends TextWebSocketHandler {
                 System.out.println("Invalid message.");
             }
         }else{
-            System.out.println("Command cannot be processed.");
+            System.out.println("No room.");
+            try {
+                session.sendMessage(NO_ROOM_SIGNAL_MESSAGE);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
+    private void surrender(int role, String roomName){
+        rooms.get(roomName).surrender(role);
+        try{
+            Room toDelete = roomRepository.findById(roomName).get();
+            roomRepository.delete(toDelete);
+            matchRepository.save(rooms.get(roomName).summaryMatch());
+        } catch (Exception e){
+            return;
+        }
+    }
     @Override
     public void afterConnectionEstablished(WebSocketSession session){
         try{
@@ -226,14 +297,13 @@ public class GameSocketHandler extends TextWebSocketHandler {
         String role = session.getHandshakeHeaders().get("role").get(0);
         String roomName = session.getHandshakeHeaders().get("roomName").get(0);
         String userName = session.getHandshakeHeaders().get("userName").get(0);
-        int masterStone = Integer.parseInt(session.getHandshakeHeaders().get("masterStone").get(0));
 
         if(role.equals("m")){
 
             // create a room and set master info, name and session
             // may throw invalid stone
             try {
-                rooms.put(roomName, new GameStatus(masterStone, userName, session));
+                rooms.put(roomName, new GameStatus(1, userName, session));
             } catch (Exception e){
                 System.out.println(e.getMessage());
                 return;
@@ -313,7 +383,11 @@ public class GameSocketHandler extends TextWebSocketHandler {
                 Room toModify = roomRepository.findById(roomName).get();
                 try{
                     if(rooms.get(roomName).getGuest() != null){
-                        rooms.get(roomName).getGuest().sendMessage(END_SIGNAL_MESSAGE);
+                        if (toModify.getRoomStatus().equals("Playing")){
+                            rooms.get(roomName).getGuest().sendMessage(END_SIGNAL_MESSAGE);
+                        } else {
+                            rooms.get(roomName).getGuest().sendMessage(MASTER_DELETE_SIGNAL_MESSAGE);
+                        }
                     }
                 } catch (Exception e){
                     System.out.println(e.getMessage());
@@ -369,7 +443,17 @@ public class GameSocketHandler extends TextWebSocketHandler {
                         rooms.remove(roomName);
                     } else {
                         // if the master still there
-                        rooms.get(roomName).setGuest(null);
+                        rooms.get(roomName).setGuestReady(false);
+                        if (rooms.get(roomName).getGuestName()!=null || rooms.get(roomName).getGuest()!=null){
+                            rooms.get(roomName).setGuest(null);
+                            rooms.get(roomName).setGuestName(null);
+                            try {
+                                rooms.get(roomName).getMaster().sendMessage(GUEST_LEAVE_SIGNAL_MESSAGE);
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }
+
                     }
                 }
             } catch (NoSuchElementException e){

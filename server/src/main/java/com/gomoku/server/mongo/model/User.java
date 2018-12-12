@@ -15,11 +15,15 @@ public class User{
     private int rankScore;
     private int winMatchNum;
     private int totalMatchNum;
+    private int winRate;
 
-    public void beforeSave(){
+    public void beforeCreate(){
         this.rankScore = 1000;
         this.winMatchNum = 0;
         this.totalMatchNum = 0;
+
+        // winRate = (winMatchNum * 10000) / totalMatchNum
+        this.winRate = 0;
 
         this.encodePass();
     }
@@ -44,6 +48,18 @@ public class User{
         return BCrypt.checkpw(rawPass, this.pass);
     }
 
+    public void oneMoreMatch(){
+        this.totalMatchNum = this.totalMatchNum + 1;
+    }
+
+    public void oneMoreWinMatch(){
+        this.winMatchNum = this.winMatchNum + 1;
+    }
+
+    public void updateWinRate(){
+        this.winRate = (this.winMatchNum * 10000) / this.totalMatchNum;
+    }
+
     public int getRankScore() {
         return rankScore;
     }
@@ -66,6 +82,22 @@ public class User{
 
     public void setTotalMatchNum(int totalMatchNum) {
         this.totalMatchNum = totalMatchNum;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    public void setPass(String pass) {
+        this.pass = pass;
+    }
+
+    public int getWinRate() {
+        return winRate;
+    }
+
+    public void setWinRate(int winRate) {
+        this.winRate = winRate;
     }
 }
 

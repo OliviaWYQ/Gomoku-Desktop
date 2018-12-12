@@ -49,7 +49,7 @@ public class GameLogic {
 
     private final int WIN_FLAG_OFFSET = STEP_NO_OFFSET + STEP_NO_LENGTH;
     private final int WIN_FLAG_LENGTH = 3;
-    private final int WIN_FLAG_MASK = 0b11;
+    private final int WIN_FLAG_MASK = 0b111;
 
     public GameLogic() {
         board = new int[SIZE][SIZE];
@@ -104,6 +104,10 @@ public class GameLogic {
         // test
         System.out.println("win flag: " + winFlag);
         return pos + (winFlag << WIN_FLAG_OFFSET);
+    }
+
+    public void surrender(int role){
+        this.winFlag = 3 + role;
     }
 
     // Judge win or not

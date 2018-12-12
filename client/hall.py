@@ -40,6 +40,8 @@ class GameHallWindow(QWidget):
 
         self.init_ui()
 
+        self.refresh()
+
     def init_ui(self):
         """
         init the ui of game hall:
@@ -63,9 +65,9 @@ class GameHallWindow(QWidget):
         self.refresh_button.move(580, 120)
         self.refresh_button.clicked.connect(self.refresh)
 
-        self.exit_button = QPushButton('Back', self)
-        self.exit_button.move(580, 340)
-        self.exit_button.clicked.connect(self.handle_back)
+        self.back_button = QPushButton('Back', self)
+        self.back_button.move(580, 340)
+        self.back_button.clicked.connect(self.handle_back)
 
         self.exit_button = QPushButton('Exit', self)
         self.exit_button.move(580, 390)
@@ -99,15 +101,19 @@ class GameHallWindow(QWidget):
         self.rooms_observed.setCornerButtonEnabled(False)
         self.rooms_observed.horizontalHeader().setSectionResizeMode(QHeaderView.Fixed)
 
-        self.refresh()
-        self.browse(0)
+        self.create_room_button.resize(self.refresh_button.sizeHint())
+        self.action_button.resize(self.refresh_button.sizeHint())
+        self.exit_button.resize(self.refresh_button.sizeHint())
+        self.back_button.resize(self.refresh_button.sizeHint())
 
         self.show()
 
     @pyqtSlot()
     def refresh(self):
         """handle clicking refresh button, refresh the room info in the table"""
-        response = requests.get('http://' + self.server_ip + ':8080/room/all', headers=self.auth_headers)
+        response = requests.get('http://%s:8080/room/all'\
+            % self.server_ip,\
+            headers=self.auth_headers)
         try:
             self.room_list = response.json()
             print(self.room_list)
@@ -121,6 +127,7 @@ class GameHallWindow(QWidget):
             self.action_button.setText("Action")
         except:
             pop_info_and_back(self, response.text, self.login_hook)
+
             # info = response.text
             # button = QMessageBox.question(self, "Info",\
             #                           info,\
@@ -236,7 +243,8 @@ class GameHallWindow(QWidget):
         try:
             room_name = self.rooms_observed.item(selected_row, 0).text()
 
-            uri = "http://" + self.server_ip + ':8080/room/join/' + room_name + '/' + self.username
+            uri = "http://%s:8080/room/join/%s/%s"\
+                % (self.server_ip, room_name, self.username)
 
             result = requests.get(uri, headers=self.auth_headers)
 
@@ -245,7 +253,8 @@ class GameHallWindow(QWidget):
             if result.text == "Success":
                 master_name = self.room_list[selected_row + self.current_page * 10]["master"]
                 self.game_room = GameRoomWindow(room_name, master_name,\
-                    self.username, self.server_ip, False, self.hall_hook, self.login_hook, self.auth_headers)
+                    self.username, self.server_ip, False, self.hall_hook,\
+                    self.login_hook, self.auth_headers)
                 self.game_room.show()
                 self.close()
             else:
@@ -254,8 +263,11 @@ class GameHallWindow(QWidget):
             print(e)
             QMessageBox.warning(self, 'Error', "Try again.")
 
-    def hall_hook(self):
+    def hall_hook(self, refresh=True):
         self.show()
+        if refresh:
+            self.refresh()
+            # self.browse(0)
 
 def test():
     app = QApplication(sys.argv)
