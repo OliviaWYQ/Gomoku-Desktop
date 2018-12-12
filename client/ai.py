@@ -28,7 +28,7 @@ class ai(chessboard):
             y = y + n_dir[1]
             if self.getvalue(x,y) != val:
                 self.e_value[row][col] = self.e_value[row][col] + n **2
-                print ("update:",row,col,n,self.e_value[row][col])
+                #print ("update:",row,col,n,self.e_value[row][col])
                 if self.e_value[row][col] > self.e_value_max:
                     self.e_value_max = self.e_value[row][col]
                     self.ai_row = row
