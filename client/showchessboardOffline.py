@@ -250,7 +250,7 @@ class GomokuOffline(QWidget):
         self.piece.setMouseTracking(True)
         self.piece.pos = None
         # draw a piece, total 15 *15
-        self.put = [QLabel(self) for i in range((self.cbnum+1) * (self.cbnum+1))]
+        self.put = [QLabel(self) for i in range((self.cbnum+1) * (self.cbnum+1))+1]
         self.step = 1
         self.color = self.black # black first
         self.colornum = 1
