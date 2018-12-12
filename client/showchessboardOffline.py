@@ -117,7 +117,7 @@ class GomokuOffline(QWidget):
         # init user interface
         self.setGeometry(330, 70, self.width_chessboard + 200, self.height_chessboard) # set window size
         self.setWindowTitle("Gomoku Game") # set window title
-        #self.setWindowIcon(QIcon('chessboard/gomoku_icon.png')) # set window icon
+        self.setWindowIcon(QIcon('chessboard/gomoku_icon.png')) # set window icon
         self.black = QPixmap('chessboard/black.png') # set black piece
         self.white = QPixmap('chessboard/white.png') # set white piece
         self.many_black = QPixmap('chessboard/manyblack.png') # set many black
