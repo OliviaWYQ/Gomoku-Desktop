@@ -11,6 +11,7 @@ from PyQt5.QtCore import pyqtSlot, Qt
 from PyQt5.QtWidgets import QWidget, QPushButton,\
     QMessageBox, QTableWidget, QAbstractItemView,\
     QTableWidgetItem, QHeaderView, QApplication
+from PyQt5.QtGui import QIcon
 import requests
 import sys
 
@@ -49,6 +50,7 @@ class GameHallWindow(QWidget):
         And set the style of them
         """
         self.setWindowTitle(self.title)
+        self.setWindowIcon(QIcon('chessboard/gomoku_icon.png')) # set window icon
         self.setGeometry(self.top, self.left, self.width, self.height)
 
         self.create_room_button = QPushButton('Create', self)

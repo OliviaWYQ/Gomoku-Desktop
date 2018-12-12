@@ -1,5 +1,5 @@
 #! /usr/bin/python
-import sys
+#import sys
 from chessboard import chessboard
 # inherit chessboard
 # add e_value

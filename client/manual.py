@@ -8,9 +8,9 @@ main manual
 """
 
 import sys
-from PyQt5.QtWidgets import QWidget, QApplication, QLabel, QVBoxLayout, QMessageBox, QPushButton
-from PyQt5.QtGui import QPixmap, QIcon, QFont
-from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import QWidget, QApplication, QLabel, QMessageBox, QPushButton
+from PyQt5.QtGui import QIcon
+#from PyQt5.QtCore import Qt
 #from showchessboard import Gomoku
 #from showchessboardOffline import GomokuOffline
 from chooseAI import chooseAI as cAI
