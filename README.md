@@ -124,6 +124,42 @@ Enter the username, password and IPv4 of server, or sign up a new account.
 
 We use PyQt5 to build the UI, and use Pygame to play the background music. You can press SPACE to pause or unpause the music.
 
+### Use Pyinstaller to pack Python files in macOS:
+
+Install Pyinstaller:
+```
+pip install pyinstaller
+```
+Packing client folder:
+```
+pyinstaller --onefile --windowed client/main.py
+```
+Add music repositories to main.spec:
+```
+exe = EXE(pyz,
+          a.scripts,
+          a.binaries,
+          a.zipfiles,
+          a.datas,
+          [('music/music4.ogg', r'<current_path>/client/music/music4.ogg', 'music'),('music/music3.ogg', r'<current_path>/client/music/music3.ogg', 'music'),('music/music2.ogg', r'<current_path>/client/music/music2.ogg', 'music'),('music/music1.ogg', r'<current_path>/client/music/music1.ogg', 'music')],
+          name='main',
+          debug=False,
+          bootloader_ignore_signals=False,
+          strip=False,
+          upx=True,
+          runtime_tmpdir=None,
+          console=False , icon='gomoku.ico')
+app = BUNDLE(exe,
+             name='Alpha Gomoku.app',
+             icon='gomoku.ico',
+             bundle_identifier=None)
+```
+Write main.spec to exec:
+```
+pyinstaller main.spec
+```
+It will generate build/ and dist/ folders. The exec file and app file are in dist/, Run those files by double clicks.
+
 ### Server:
 
 Get to the server folder and use Maven to compile and package Java program:
