@@ -4,6 +4,8 @@ In this project, we implement a Gomoku game software, which has two modes: game 
 
 [Video Guide in YouTube](https://youtu.be/tKCVi8650Y0)
 
+[Download Alpha Gomoku Game for macOS](https://www.dropbox.com/s/e0ras0pq2yms584/main.zip?dl=0)
+
 ## Getting Start
 
 ### Prerequisites
@@ -109,6 +111,20 @@ spring --version
 
 ## Running the Program
 
+### Server:
+
+Get to the server folder and use Maven to compile and package Java program:
+```
+$ cd server/
+$ mvn clean
+$ mvn compile
+$ mvn package
+```
+Run server:
+```
+java -jar <jarfilename>.jar
+```
+
 ### Client:
 
 Get to the client folder:
@@ -124,19 +140,57 @@ Enter the username, password and IPv4 of server, or sign up a new account.
 
 We use PyQt5 to build the UI, and use Pygame to play the background music. You can press SPACE to pause or unpause the music.
 
-### Server:
+### Use Pyinstaller to pack Python files in macOS:
 
-Get to the server folder and use Maven to compile and package Java program:
+Install Pyinstaller:
 ```
-$ cd server/
-$ mvn clean
-$ mvn compile
-$ mvn package
+pip install pyinstaller
 ```
-Run server:
+Add image repositories in img.qrc:
 ```
-java -jar <jarfilename>.jar
+<RCC>
+  <qresource prefix="/" >
+    <file>chessboard/image1.png</file>
+    <file>chessboard/image2.png</file>
+  </qresource>
+</RCC>
 ```
+Encode images in Python file:
+```
+pyrcc5 -o img.py img.qrc
+```
+For PyQt5 files, import img and add ':' before current_path.
+
+Packing client folder:
+```
+pyinstaller --onefile --windowed client/main.py
+```
+Add music repositories to main.spec:
+```
+exe = EXE(pyz,
+          a.scripts,
+          a.binaries,
+          a.zipfiles,
+          a.datas,
+          [('music/music1.ogg', r'<current_path>/client/music/music1.ogg', 'music'),('music/music2.ogg', r'<current_path>/client/music/music2.ogg', 'music')],
+          name='main',
+          debug=False,
+          bootloader_ignore_signals=False,
+          strip=False,
+          upx=True,
+          runtime_tmpdir=None,
+          console=False , icon='gomoku.ico')
+app = BUNDLE(exe,
+             name='Alpha Gomoku.app',
+             icon='gomoku.ico',
+             bundle_identifier=None)
+```
+Use main.spec to build package:
+```
+pyinstaller main.spec
+```
+It will generate build/ folder for .pkg files, and dist/ folder for .app files. You can run exec files by double clicks.
+
 ## Code Test
 
 ### Pre-commit:
@@ -153,7 +207,8 @@ We use [Coveralls](https://coveralls.io/) as the coverage tool.
 
 ### Style Checker Tool:
 
-* [pylint](https://www.pylint.org/)
+* [pylint](https://www.pylint.org/) for Python
+* [PMD](https://pmd.github.io/) for Java
 
 ### Test Report:
 
