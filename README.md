@@ -205,7 +205,8 @@ We use [Coveralls](https://coveralls.io/) as the coverage tool.
 
 ### Style Checker Tool:
 
-* [pylint](https://www.pylint.org/)
+* [pylint](https://www.pylint.org/) for Python
+* [PMD](https://pmd.github.io/) for Java
 
 ### Test Report:
 
