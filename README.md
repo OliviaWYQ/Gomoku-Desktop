@@ -183,11 +183,11 @@ app = BUNDLE(exe,
              icon='gomoku.ico',
              bundle_identifier=None)
 ```
-Write main.spec to exec:
+Use main.spec to build package:
 ```
 pyinstaller main.spec
 ```
-It will generate build/ and dist/ folders. The exec file and app file are in dist/, Run those files by double clicks.
+It will generate build/ folder for .pkg files, and dist/ folder for .app files. You can run exec files by double clicks.
 
 ## Code Test
 
