@@ -130,6 +130,21 @@ Install Pyinstaller:
 ```
 pip install pyinstaller
 ```
+Add image repositories in img.qrc:
+```
+<RCC>
+  <qresource prefix="/" >
+    <file>chessboard/image1.png</file>
+    <file>chessboard/image2.png</file>
+  </qresource>
+</RCC>
+```
+Encode images in Python file:
+```
+pyrcc5 -o img.py img.qrc
+```
+For PyQt5 files, import img and add ':' to image_path.
+
 Packing client folder:
 ```
 pyinstaller --onefile --windowed client/main.py
@@ -141,7 +156,7 @@ exe = EXE(pyz,
           a.binaries,
           a.zipfiles,
           a.datas,
-          [('music/music4.ogg', r'<current_path>/client/music/music4.ogg', 'music'),('music/music3.ogg', r'<current_path>/client/music/music3.ogg', 'music'),('music/music2.ogg', r'<current_path>/client/music/music2.ogg', 'music'),('music/music1.ogg', r'<current_path>/client/music/music1.ogg', 'music')],
+          [('music/music1.ogg', r'<current_path>/client/music/music1.ogg', 'music'),('music/music2.ogg', r'<current_path>/client/music/music2.ogg', 'music')],
           name='main',
           debug=False,
           bootloader_ignore_signals=False,
