@@ -109,6 +109,20 @@ spring --version
 
 ## Running the Program
 
+### Server:
+
+Get to the server folder and use Maven to compile and package Java program:
+```
+$ cd server/
+$ mvn clean
+$ mvn compile
+$ mvn package
+```
+Run server:
+```
+java -jar <jarfilename>.jar
+```
+
 ### Client:
 
 Get to the client folder:
@@ -175,19 +189,6 @@ pyinstaller main.spec
 ```
 It will generate build/ and dist/ folders. The exec file and app file are in dist/, Run those files by double clicks.
 
-### Server:
-
-Get to the server folder and use Maven to compile and package Java program:
-```
-$ cd server/
-$ mvn clean
-$ mvn compile
-$ mvn package
-```
-Run server:
-```
-java -jar <jarfilename>.jar
-```
 ## Code Test
 
 ### Pre-commit:
