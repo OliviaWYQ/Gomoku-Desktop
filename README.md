@@ -1,6 +1,6 @@
 # Alpha Gomoku Game
 
-In this project, we plan to implement a Gomoku game software, which has two modes: game between two people and rivalry between Human and Artifactual Intelligence. The client and user interface will be implemented using Python and the server side will be implemented using Java. To develop further, We applied algorithms with three difficulties in the application to enhance the wisdom of AI chess player.
+In this project, we implement a Gomoku game software, which has two modes: game between two people and rivalry between Human and Artifactual Intelligence. The client and user interface are implemented using Python and the server side is implemented using Java. To develop further, We apply algorithms with three difficulties in the application to enhance the wisdom of AI chess player.
 
 [Video Link](https://youtu.be/BUF09sqIxoU)
 
