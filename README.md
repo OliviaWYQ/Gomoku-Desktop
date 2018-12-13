@@ -4,8 +4,7 @@ In this project, we implement a Gomoku game software, which has two modes: game 
 
 [Video Guide in YouTube](https://youtu.be/tKCVi8650Y0)
 
-Download Alpha Gomoku Game for macOS: 
-[Gomoku.app](https://www.dropbox.com/s/y240fdgfntsu5zi/Alpha%20Gomoku.app.zip?dl=0)
+[Download Alpha Gomoku Game for macOS](https://www.dropbox.com/s/e0ras0pq2yms584/main.zip?dl=0)
 
 ## Getting Start
 
