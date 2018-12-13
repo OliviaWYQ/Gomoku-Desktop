@@ -2,9 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 Created on Thu Oct 29 10:40:38 2018
-
 @author: yiqianwang
-
 Gomoku Game
 First Iteration
 chessboard UI
@@ -21,6 +19,7 @@ import requests
 #from login import *
 #from choosechessboard import ChooseBtn
 from music import musicplayer
+import img
 
 class GomokuOffline(QWidget):
     def __init__(self, user_name, server_ip, my_chessboard_type, my_font, manual_hook, usecolor, opponent, difficulty):
@@ -62,7 +61,7 @@ class GomokuOffline(QWidget):
                 self.usrturn = 0
                 print('usecolor error')
 
-        current_path = sys.path[0] + '/'
+        current_path = ':/' # sys.path[0] + '/'
         print(current_path)
         self.manual_hook = manual_hook
         self.server_ip = server_ip
@@ -117,11 +116,12 @@ class GomokuOffline(QWidget):
         # init user interface
         self.setGeometry(330, 70, self.width_chessboard + 200, self.height_chessboard) # set window size
         self.setWindowTitle("Gomoku Game") # set window title
-        self.setWindowIcon(QIcon('chessboard/gomoku_icon.png')) # set window icon
-        self.black = QPixmap('chessboard/black.png') # set black piece
-        self.white = QPixmap('chessboard/white.png') # set white piece
-        self.many_black = QPixmap('chessboard/manyblack.png') # set many black
-        self.many_white = QPixmap('chessboard/manywhite.png') # set many white
+        current_path = ':/' # sys.path[0] + '/'
+        self.setWindowIcon(QIcon(current_path + 'chessboard/gomoku_icon.png')) # set window icon
+        self.black = QPixmap(current_path + 'chessboard/black.png') # set black piece
+        self.white = QPixmap(current_path + 'chessboard/white.png') # set white piece
+        self.many_black = QPixmap(current_path + 'chessboard/manyblack.png') # set many black
+        self.many_white = QPixmap(current_path + 'chessboard/manywhite.png') # set many white
         self.setCursor(Qt.PointingHandCursor) # set mouse shape
 
     def showchessboard8(self):
@@ -401,7 +401,7 @@ class GomokuOffline(QWidget):
 
 def main():
     app = QApplication(sys.argv)
-    mygame = GomokuOffline("12345", "52.207.232.53", 9, 'Roman times', None, 2, 2)
+    mygame = GomokuOffline("12345", "52.207.232.53", 9, 'Roman times', None, 2, 2, 3)
     mygame.show()
     sys.exit(app.exec_())
 

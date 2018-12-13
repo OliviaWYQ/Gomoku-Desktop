@@ -1,0 +1,13 @@
+<RCC>
+  <qresource prefix="/" >
+    <file>chessboard/chessboard14.png</file>
+    <file>chessboard/chessboard8.png</file>
+    <file>chessboard/cb14.png</file>
+    <file>chessboard/cb8.png</file>
+    <file>chessboard/black.png</file>
+    <file>chessboard/white.png</file>
+    <file>chessboard/manyblack.png</file>
+    <file>chessboard/manywhite.png</file>
+    <file>chessboard/gomoku_icon.png</file>
+  </qresource>
+</RCC>

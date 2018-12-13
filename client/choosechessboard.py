@@ -16,12 +16,13 @@ from PyQt5.QtWidgets import QWidget, QPushButton,\
 from PyQt5.QtGui import QPixmap, QIcon, QFont
 #from PyQt5.QtCore import Qt
 from variable import setvar
+import img
 
 class ChooseBtn(QWidget):
     def __init__(self, manual_hook, parent=None):
         super(ChooseBtn, self).__init__(parent)
 
-        current_path = sys.path[0] + '/'
+        current_path = ':/' # sys.path[0] + '/'
         print(current_path)
 
         self.manual_hook = manual_hook

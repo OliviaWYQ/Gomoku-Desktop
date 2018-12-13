@@ -81,7 +81,8 @@ class GameRoomWindow(QWidget):
     def init_ui(self):
         self.setWindowTitle(self.title)
         self.setGeometry(self.top, self.left, self.width, self.height)
-        self.setWindowIcon(QIcon('chessboard/gomoku_icon.png')) # set window icon
+        current_path = ':/' # sys.path[0] + '/'
+        self.setWindowIcon(QIcon(current_path + 'chessboard/gomoku_icon.png')) # set window icon
         self.stone_color_label = QLabel("Creator will use:", self)
         self.stone_color_label.move(255, 14)
 
@@ -370,7 +371,8 @@ class CreateRoomWindow(QWidget):
     def init_ui(self):
         self.setWindowTitle(self.title)
         self.setGeometry(self.top, self.left, self.width, self.height)
-        self.setWindowIcon(QIcon('chessboard/gomoku_icon.png')) # set window icon
+        current_path = ':/' # sys.path[0] + '/'
+        self.setWindowIcon(QIcon(current_path + 'chessboard/gomoku_icon.png')) # set window icon
         self.create_button = QPushButton('Create', self)
         self.create_button.move(100, 180)
         self.create_button.clicked.connect(self.handle_create)

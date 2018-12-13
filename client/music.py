@@ -19,15 +19,27 @@ class musicplayer(QThread):
         #pygame.mixer.music.load('music/music1.ogg')
         pygame.mixer.music.set_volume(0.2)
         #pygame.mixer.music.play(-1)
-        self.musicpath = 'music/'
+        #current_path = sys.path[0] + '/'
+        #self.musicpath = current_path + 'music/'
         self.get_music()
 
+    def resource_path(self, relative_path):
+        """
+        定义一个读取相对路径的函数
+        """
+        if hasattr(sys, "_MEIPASS"):
+            base_path = sys._MEIPASS
+        else:
+            base_path = os.path.abspath(".")
+        return os.path.join(base_path, relative_path)
+
     def get_music(self):
+        self.musicpath = self.resource_path('music/')
         folder = os.listdir(self.musicpath)
         self.music_files = []
         for filename in folder:
             if filename.lower().endswith('.ogg'):
-                self.music_files.append(os.path.join(self.musicpath, filename))
+                self.music_files.append(self.musicpath + filename)
         print(self.music_files)
         # init
         self.current = 0
@@ -73,14 +85,13 @@ class musicplayer(QThread):
 
     def stop(self):
         pygame.mixer.music.stop()
-'''
+
 def main():
     try:
         bgmusic = musicplayer()
-        bgmusic.test()
+        bgmusic.start()
     except KeyboardInterrupt:
         bgmusic.stop()
 
 if __name__ == '__main__':
     main()
-'''

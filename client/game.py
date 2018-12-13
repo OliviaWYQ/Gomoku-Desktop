@@ -3,6 +3,7 @@ from PyQt5.QtWidgets import QWidget, QLabel, QMessageBox,\
 from PyQt5.QtGui import QPixmap, QIcon, QFont
 from PyQt5.QtCore import Qt, pyqtSignal, pyqtSlot
 import sys
+import img
 
 D_PIECE = 36
 R_PIECE = D_PIECE / 2
@@ -84,11 +85,11 @@ class Gomoku(QWidget):
 
     def show_chess_board(self):
         # init user interface
-        current_path = sys.path[0]+'/'
+        current_path = ':/' # sys.path[0]+'/'
         print(current_path)
         self.setGeometry(330, 70, WIDTH_CHESSBOARD + 200, HEIGHT_CHESSBOARD) # set window size
         self.setWindowTitle("Gomoku Game") # set window title
-        self.setWindowIcon(QIcon('chessboard/gomoku_icon.png')) # set window icon
+        self.setWindowIcon(QIcon(current_path + 'chessboard/gomoku_icon.png')) # set window icon
         self.chessboard14 = QPixmap(current_path + 'chessboard/chessboard14.png') # set background
         self.black = QPixmap(current_path + 'chessboard/black.png') # set black piece
         self.white = QPixmap(current_path + 'chessboard/white.png') # set white piece
