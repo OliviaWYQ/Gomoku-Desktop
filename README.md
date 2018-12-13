@@ -157,7 +157,7 @@ Encode images in Python file:
 ```
 pyrcc5 -o img.py img.qrc
 ```
-For PyQt5 files, import img and add ':' to image_path.
+For PyQt5 files, import img and add ':' before current_path.
 
 Packing client folder:
 ```
