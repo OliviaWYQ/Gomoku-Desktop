@@ -24,9 +24,7 @@ class musicplayer(QThread):
         self.get_music()
 
     def resource_path(self, relative_path):
-        """
-        定义一个读取相对路径的函数
-        """
+        # related path
         if hasattr(sys, "_MEIPASS"):
             base_path = sys._MEIPASS
         else:
